@@ -368,7 +368,7 @@ function generatePerfectionistFeedback(data: AdaptiveFeedbackData): string {
 }
 
 function generateOverconfidentFeedback(data: AdaptiveFeedbackData): string {
-  return `💪 I love your confidence! You used ${data.hints} hints and made ${data.errors} errors, which just means more chances to learn and grow. I’ve set goals that will challenge you while building on your positive mindset. Your enthusiasm is your superpower! 🚀`;
+  return `💪 I love your confidence! You used ${data.hints} hints and made ${data.errors} errors, which just means more chances to learn and grow. I've set goals that will challenge you while building on your positive mindset. Your enthusiasm is your superpower! 🚀`;
 }
 
 function generateImpostorSyndromeFeedback(data: AdaptiveFeedbackData): string {
