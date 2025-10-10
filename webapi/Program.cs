@@ -40,8 +40,8 @@ builder.Services.AddCors(options =>
                 // Allow your original domain
                 if (origin.ToLower().StartsWith("https://algespace.sic.saarland")) return true;
                 
-                // Allow ALL Netlify deployments (*.netlify.app)
-                if (origin.ToLower().Contains(".netlify.app")) return true;
+                // Add your frontend domain when you deploy it (Vercel/Netlify)
+                // Example: if (origin.ToLower().StartsWith("https://your-frontend.vercel.app")) return true;
                 
                 return false;
             });

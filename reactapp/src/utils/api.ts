@@ -3,10 +3,7 @@
 import { Goal, GoalInput } from "../types/goal";
 import { PretestAnswers, PretestStatus, PretestResult } from "../types/pretest";
 
-// Use environment variable with fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7273/api";
-
-console.log("🌐 API Base URL:", API_BASE_URL);
+const API_BASE_URL = "http://localhost:7273/api";
 
 // Debug function to test study session userId
 export async function testStudySessionUserId(): Promise<void> {
