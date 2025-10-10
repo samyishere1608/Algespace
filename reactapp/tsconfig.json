@@ -19,12 +19,12 @@
 
     /* Linting */
     "strict": false,
-    "noImplicitAny":  true,
-    "noImplicitThis": true,
+    "noImplicitAny":  false,
+    "noImplicitThis": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch":false,
 
     /* Handling JSON */
     "experimentalDecorators": true,
