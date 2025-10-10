@@ -1,0 +1,32 @@
+[build]
+  # Base directory for the build (where your React app is)
+  base = "reactapp"
+  
+  # Build command
+  command = "npm run build"
+  
+  # Directory that contains the built static files
+  publish = "dist"
+
+# Redirect all routes to index.html for client-side routing (React Router)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and caching
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Environment variables (set these in Netlify dashboard)
+# VITE_API_URL = "https://algespace-production.up.railway.app"

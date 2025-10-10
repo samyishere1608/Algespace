@@ -14,9 +14,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevelopmentPolicy", builder =>
     {
-        builder.WithMethods("GET", "PUT", "POST","DELETE","PATCH","OPTIONS")
+        builder.WithMethods("GET", "PUT", "POST","DELETE","PATCH")
             .WithHeaders(HeaderNames.Accept, HeaderNames.ContentType, HeaderNames.Authorization, "X-API-Key")
-            .WithExposedHeaders("*")  // Expose all response headers
             .AllowCredentials()
             .SetIsOriginAllowed(origin =>
             {
@@ -28,13 +27,22 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("ProductionPolicy", builder =>
     {
-        builder.WithMethods("GET", "PUT", "POST")
+        builder.WithMethods("GET", "PUT", "POST", "DELETE", "PATCH")
             .WithHeaders(HeaderNames.Accept, HeaderNames.ContentType, HeaderNames.Authorization, "X-API-Key")
             .AllowCredentials()
             .SetIsOriginAllowed(origin =>
             {
                 if (string.IsNullOrWhiteSpace(origin)) return false;
+                
+                // Allow Railway backend domain
+                if (origin.ToLower().StartsWith("https://algespace-production.up.railway.app")) return true;
+                
+                // Allow your original domain
                 if (origin.ToLower().StartsWith("https://algespace.sic.saarland")) return true;
+                
+                // Add your frontend domain when you deploy it (Vercel/Netlify)
+                // Example: if (origin.ToLower().StartsWith("https://your-frontend.vercel.app")) return true;
+                
                 return false;
             });
     });
