@@ -317,7 +317,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseCors("ProductionPolicy");
-    app.UseMiddleware<ApiKeyMiddleware>(); // Modified to allow all requests for public access
+    // app.UseMiddleware<ApiKeyMiddleware>(); // DISABLED for public access - re-enable if API key protection needed
     app.UseHttpsRedirection();
 }
 
