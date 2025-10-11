@@ -37,11 +37,11 @@ builder.Services.AddCors(options =>
                 // Allow Railway backend domain
                 if (origin.ToLower().StartsWith("https://algespace-production.up.railway.app")) return true;
                 
+                // Allow Netlify frontend domain
+                if (origin.ToLower().StartsWith("https://algespace1.netlify.app")) return true;
+                
                 // Allow your original domain
                 if (origin.ToLower().StartsWith("https://algespace.sic.saarland")) return true;
-                
-                // Add your frontend domain when you deploy it (Vercel/Netlify)
-                // Example: if (origin.ToLower().StartsWith("https://your-frontend.vercel.app")) return true;
                 
                 return false;
             });
