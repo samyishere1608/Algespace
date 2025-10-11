@@ -1,11 +1,10 @@
 import Axios, { AxiosInstance } from "axios";
 
 const axiosInstance: AxiosInstance = Axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:7273",
+    baseURL: import.meta.env.VITE_API_URL || "https://algespace-production.up.railway.app",
     headers: {
         Accept: "application/json",
-        "Content-Type": "application/json",
-        "X-API-Key": `${import.meta.env.VITE_API_KEY}`
+        "Content-Type": "application/json"
     }
 });
 
