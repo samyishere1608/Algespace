@@ -110,7 +110,8 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseCors("ProductionPolicy");
-    app.UseMiddleware<ApiKeyMiddleware>();
+    // Temporarily disabled API key middleware for public access
+    // app.UseMiddleware<ApiKeyMiddleware>();
     app.UseHttpsRedirection();
 }
 
