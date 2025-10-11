@@ -4,6 +4,8 @@
  * while maintaining compatibility with the existing public access system.
  */
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL || 'https://algespace-production.up.railway.app'}/api`;
+
 export interface StudySession {
     userId: number;
     participantId: string;
@@ -25,7 +27,7 @@ const generateSessionId = (): string => {
 export const createStudySession = async (participantId: string): Promise<StudySession> => {
     try {
         // Call backend to get unique userId for this participant
-        const response = await fetch('/api/goals/study/login', {
+        const response = await fetch(`${API_BASE_URL}/goals/study/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ participantId: participantId.trim().toUpperCase() })

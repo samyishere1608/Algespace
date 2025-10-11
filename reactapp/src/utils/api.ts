@@ -234,7 +234,7 @@ export async function submitPretestAnswers(userId: number, answers: PretestAnswe
 // Test function for backend study login
 export const testBackendStudyLogin = async (participantId: string): Promise<{userId: number, participantId: string}> => {
     try {
-        const response = await fetch('/api/goals/study/login', {
+        const response = await fetch(`${API_BASE_URL}/goals/study/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ participantId })

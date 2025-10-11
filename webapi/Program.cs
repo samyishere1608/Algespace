@@ -155,8 +155,12 @@ void InitializeDatabaseTables(IServiceProvider services)
     try
     {
         using var scope = services.CreateScope();
+        var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         
         Console.WriteLine("🔄 Starting database initialization...");
+        
+        // Create Goals and PretestAnswers tables in studies.db
+        CreateStudiesDBTables(config);
         
         // Initialize Flexibility Exercise Service tables
         var flexService = scope.ServiceProvider.GetRequiredService<IFlexibilityExerciseService>();
@@ -180,6 +184,97 @@ void InitializeDatabaseTables(IServiceProvider services)
     {
         Console.WriteLine($"❌ Error initializing database tables: {ex.Message}");
         Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    }
+}
+
+void CreateStudiesDBTables(IConfiguration config)
+{
+    try
+    {
+        var connectionString = config.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrEmpty(connectionString)) return;
+
+        using var conn = new System.Data.SQLite.SQLiteConnection(connectionString);
+        conn.Open();
+
+        // Create Goals table
+        var createGoalsTable = @"
+            CREATE TABLE IF NOT EXISTS Goals (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                UserId INTEGER NOT NULL,
+                Title TEXT NOT NULL,
+                Difficulty TEXT NOT NULL,
+                CreatedAt TEXT NOT NULL,
+                UpdatedAt TEXT,
+                Completed INTEGER NOT NULL DEFAULT 0,
+                MotivationRating INTEGER,
+                Category TEXT NOT NULL,
+                ConfidenceBefore INTEGER,
+                ExpectedMistakes INTEGER,
+                ActualScore REAL,
+                GoalAchieved INTEGER,
+                HintsUsed INTEGER,
+                ErrorsMade INTEGER,
+                PostSatisfaction INTEGER,
+                PostConfidence INTEGER,
+                PostEffort INTEGER,
+                PostEnjoyment INTEGER,
+                PostAnxiety INTEGER
+            );";
+
+        using var cmd1 = new System.Data.SQLite.SQLiteCommand(createGoalsTable, conn);
+        cmd1.ExecuteNonQuery();
+        Console.WriteLine("✅ Goals table created/verified");
+
+        // Create PretestAnswers table
+        var createPretestTable = @"
+            CREATE TABLE IF NOT EXISTS PretestAnswers (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                UserId INTEGER NOT NULL,
+                Answers TEXT NOT NULL,
+                SuggestedGoals TEXT NOT NULL,
+                CompletedAt TEXT NOT NULL
+            );";
+
+        using var cmd2 = new System.Data.SQLite.SQLiteCommand(createPretestTable, conn);
+        cmd2.ExecuteNonQuery();
+        Console.WriteLine("✅ PretestAnswers table created/verified");
+
+        // Create CustomExercises table
+        var createCustomExercisesTable = @"
+            CREATE TABLE IF NOT EXISTS CustomExercises (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                UserId INTEGER NOT NULL,
+                GoalId INTEGER NOT NULL,
+                ExerciseType TEXT NOT NULL,
+                CompletedAt TEXT NOT NULL,
+                Score REAL,
+                TimeSpent INTEGER,
+                HintsUsed INTEGER,
+                ErrorsMade INTEGER
+            );";
+
+        using var cmd3 = new System.Data.SQLite.SQLiteCommand(createCustomExercisesTable, conn);
+        cmd3.ExecuteNonQuery();
+        Console.WriteLine("✅ CustomExercises table created/verified");
+
+        // Create Logs table
+        var createLogsTable = @"
+            CREATE TABLE IF NOT EXISTS Logs (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                UserId INTEGER NOT NULL,
+                ActionType TEXT NOT NULL,
+                Timestamp TEXT NOT NULL,
+                Description TEXT
+            );";
+
+        using var cmd4 = new System.Data.SQLite.SQLiteCommand(createLogsTable, conn);
+        cmd4.ExecuteNonQuery();
+        Console.WriteLine("✅ Logs table created/verified");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error creating studies.db tables: {ex.Message}");
     }
 }
 
