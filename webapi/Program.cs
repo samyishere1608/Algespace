@@ -98,6 +98,55 @@ builder.Services.AddScoped<IPretestService>(provider =>
 
 var app = builder.Build();
 
+// Copy database to volume on first run (for Railway deployment)
+EnsureDatabaseInVolume(app.Configuration);
+
+void EnsureDatabaseInVolume(IConfiguration config)
+{
+    try
+    {
+        var connectionString = config.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrEmpty(connectionString)) return;
+
+        // Extract database path from connection string
+        var volumeDbPath = connectionString.Split(';')[0].Replace("Data Source=", "").Trim();
+        var volumeDir = Path.GetDirectoryName(volumeDbPath);
+        
+        // Create volume directory if it doesn't exist
+        if (!string.IsNullOrEmpty(volumeDir) && !Directory.Exists(volumeDir))
+        {
+            Directory.CreateDirectory(volumeDir);
+            Console.WriteLine($"✅ Created volume directory: {volumeDir}");
+        }
+
+        // Check if database already exists in volume
+        if (!File.Exists(volumeDbPath))
+        {
+            // Try to copy from repo location
+            var repoDbPath = "Data/databases/studies.db";
+            if (File.Exists(repoDbPath))
+            {
+                File.Copy(repoDbPath, volumeDbPath, overwrite: false);
+                Console.WriteLine($"✅ Copied database from repo to volume: {volumeDbPath}");
+            }
+            else
+            {
+                Console.WriteLine($"⚠️ Database not found in repo at: {repoDbPath}");
+                Console.WriteLine($"⚠️ Volume database will be created on first use: {volumeDbPath}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"✅ Database already exists in volume: {volumeDbPath}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error setting up database: {ex.Message}");
+    }
+}
+
+
 app.UseRateLimiter();
 
 if (app.Environment.IsDevelopment())
