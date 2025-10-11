@@ -295,12 +295,31 @@ void InitializeTable(string tableName, Action initAction)
         Console.WriteLine($"🔄 Initializing {tableName}...");
         initAction();
         Console.WriteLine($"✅ {tableName} table initialized");
+        
+        // Verify data was actually inserted
+        VerifyTableHasData(tableName);
     }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Failed to initialize {tableName}: {ex.Message}");
         Console.WriteLine($"   Stack trace: {ex.StackTrace}");
         // Don't throw - continue with other tables
+    }
+}
+
+void VerifyTableHasData(string tableName)
+{
+    try
+    {
+        using var conn = new System.Data.SQLite.SQLiteConnection("Data Source=" + Environment.CurrentDirectory + "/Data/databases/algespace.db");
+        conn.Open();
+        var cmd = new System.Data.SQLite.SQLiteCommand($"SELECT COUNT(*) FROM {tableName}", conn);
+        var count = Convert.ToInt32(cmd.ExecuteScalar());
+        Console.WriteLine($"   📊 {tableName} has {count} rows");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"   ⚠️ Could not verify {tableName} data: {ex.Message}");
     }
 }
 
