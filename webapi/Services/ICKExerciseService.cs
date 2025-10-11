@@ -35,7 +35,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, EqualizationDBSettings.TableName, EqualizationDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, EqualizationDBSettings.TableName, EqualizationDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string insertQuery = $"INSERT INTO {EqualizationDBSettings.TableName} {EqualizationDBSettings.TableColumns} VALUES {EqualizationDBSettings.TableValues}";
             foreach (EqualizationExercise exercise in exercises)
             {
@@ -47,7 +47,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, BarteringDBSettings.TableName, BarteringDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, BarteringDBSettings.TableName, BarteringDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string insertQuery = $"INSERT INTO {BarteringDBSettings.TableName} {BarteringDBSettings.TableColumns} VALUES {BarteringDBSettings.TableValues}";
             foreach (BarteringExercise exercise in exercises)
             {
@@ -59,7 +59,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, SubstitutionDBSettings.TableName, SubstitutionDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, SubstitutionDBSettings.TableName, SubstitutionDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string insertQuery = $"INSERT INTO {SubstitutionDBSettings.TableName} {SubstitutionDBSettings.TableColumns} VALUES {SubstitutionDBSettings.TableValues}";
             foreach (SubstitutionExercise exercise in exercises)
             {
@@ -71,7 +71,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, EliminationDBSettings.TableName, EliminationDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, EliminationDBSettings.TableName, EliminationDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string insertQuery = $"INSERT INTO {EliminationDBSettings.TableName} {EliminationDBSettings.TableColumns} VALUES {EliminationDBSettings.TableValues}";
             foreach (EliminationExercise exercise in exercises)
             {

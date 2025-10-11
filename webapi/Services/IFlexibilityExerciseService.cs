@@ -39,7 +39,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, SuitabilityDBSettings.TableName, SuitabilityDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, SuitabilityDBSettings.TableName, SuitabilityDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string insertQuery = $"INSERT INTO {SuitabilityDBSettings.TableName} {SuitabilityDBSettings.TableColumns} VALUES {SuitabilityDBSettings.TableValues}";
             foreach (ExtendedSuitabilityExercise exercise in exercises)
             {
@@ -61,7 +61,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, EfficiencyDBSettings.TableName, EfficiencyDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, EfficiencyDBSettings.TableName, EfficiencyDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string insertQuery = $"INSERT INTO {EfficiencyDBSettings.TableName} {EfficiencyDBSettings.TableColumns} VALUES {EfficiencyDBSettings.TableValues}";
             foreach (ExtendedEfficiencyExercise exercise in exercises)
             {
@@ -81,7 +81,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, MatchingDBSettings.TableName, MatchingDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, MatchingDBSettings.TableName, MatchingDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string insertQuery = $"INSERT INTO {MatchingDBSettings.TableName} {MatchingDBSettings.TableColumns} VALUES {MatchingDBSettings.TableValues}";
             foreach (ExtendedMatchingExercise exercise in exercises)
             {
@@ -101,7 +101,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, TipExerciseDBSettings.TableName, TipExerciseDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, TipExerciseDBSettings.TableName, TipExerciseDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string insertQuery = $"INSERT INTO {TipExerciseDBSettings.TableName} {TipExerciseDBSettings.TableColumns} VALUES {TipExerciseDBSettings.TableValues}";
             foreach (ExtendedTipExercise exercise in exercises)
             {
@@ -121,7 +121,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, PlainExerciseDBSettings.TableName, PlainExerciseDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, PlainExerciseDBSettings.TableName, PlainExerciseDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string insertQuery = $"INSERT INTO {PlainExerciseDBSettings.TableName} {PlainExerciseDBSettings.TableColumns} VALUES {PlainExerciseDBSettings.TableValues}";
             foreach (ExtendedPlainExercise exercise in exercises)
             {
@@ -141,7 +141,7 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
-            DBUtils.CreateOrClearTable(connection, FlexibilityExerciseDBSettings.TableName, FlexibilityExerciseDBSettings.TableScheme);
+            DBUtils.CreateOrClearTable(connection, FlexibilityExerciseDBSettings.TableName, FlexibilityExerciseDBSettings.TableScheme, clearTable: true, forceRecreate: true);
             string inserQuery = $"INSERT INTO {FlexibilityExerciseDBSettings.TableName} {FlexibilityExerciseDBSettings.TableColumns} VALUES {FlexibilityExerciseDBSettings.TableValues}";
             foreach (FlexibilityExerciseEntry exercise in exercises)
             {

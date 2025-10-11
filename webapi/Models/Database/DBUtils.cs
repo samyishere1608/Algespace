@@ -5,14 +5,26 @@ namespace webapi.Models.Database
 {
     public static class DBUtils
     {
-        public static void CreateOrClearTable(SQLiteConnection connection, string tableName, string tableScheme, bool clearTable = true)
+        public static void CreateOrClearTable(SQLiteConnection connection, string tableName, string tableScheme, bool clearTable = true, bool forceRecreate = false)
         {
             string checkTableExistsQuery = "SELECT name FROM sqlite_master WHERE type='table' AND name=@TableName;";
             var result = connection.Query<string>(checkTableExistsQuery, new { TableName = tableName });
 
             if (result != null && result.Any())
             {
-                if (clearTable)
+                if (forceRecreate)
+                {
+                    // Drop and recreate the table to apply schema changes
+                    string dropTableQuery = $"DROP TABLE {tableName};";
+                    connection.Execute(dropTableQuery);
+                    string createTableQuery = $@"
+                CREATE TABLE {tableName}
+                (
+                    {tableScheme}
+                );";
+                    connection.Execute(createTableQuery);
+                }
+                else if (clearTable)
                 {
                     // If the table exists, clear it
                     string clearTableQuery = $"DELETE FROM {tableName};";
