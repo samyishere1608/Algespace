@@ -159,6 +159,16 @@ void InitializeDatabaseTables(IServiceProvider services)
         
         Console.WriteLine("🔄 Starting database initialization...");
         
+        // Verify database files exist
+        var currentDir = Environment.CurrentDirectory;
+        Console.WriteLine($"📁 Current directory: {currentDir}");
+        var algespaceDbPath = Path.Combine(currentDir, "Data", "databases", "algespace.db");
+        var studiesDbPath = Path.Combine(currentDir, "Data", "databases", "studies.db");
+        Console.WriteLine($"📊 Checking for algespace.db at: {algespaceDbPath}");
+        Console.WriteLine($"📊 algespace.db exists: {File.Exists(algespaceDbPath)}");
+        Console.WriteLine($"📊 Checking for studies.db at: {studiesDbPath}");
+        Console.WriteLine($"📊 studies.db exists: {File.Exists(studiesDbPath)}");
+        
         // Create Goals and PretestAnswers tables in studies.db
         CreateStudiesDBTables(config);
         
@@ -282,12 +292,15 @@ void InitializeTable(string tableName, Action initAction)
 {
     try
     {
+        Console.WriteLine($"🔄 Initializing {tableName}...");
         initAction();
         Console.WriteLine($"✅ {tableName} table initialized");
     }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Failed to initialize {tableName}: {ex.Message}");
+        Console.WriteLine($"   Stack trace: {ex.StackTrace}");
+        // Don't throw - continue with other tables
     }
 }
 
