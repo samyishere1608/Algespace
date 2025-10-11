@@ -3,6 +3,7 @@ using System.Threading.RateLimiting;
 using webapi.AuthHelpers;
 using webapi.Authorization;
 using webapi.Services;
+using webapi.Data.examples;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,6 +102,9 @@ var app = builder.Build();
 // Copy database to volume on first run (for Railway deployment)
 EnsureDatabaseInVolume(app.Configuration);
 
+// Initialize database tables with sample data
+InitializeDatabaseTables(app.Services);
+
 void EnsureDatabaseInVolume(IConfiguration config)
 {
     try
@@ -143,6 +147,52 @@ void EnsureDatabaseInVolume(IConfiguration config)
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Error setting up database: {ex.Message}");
+    }
+}
+
+void InitializeDatabaseTables(IServiceProvider services)
+{
+    try
+    {
+        using var scope = services.CreateScope();
+        
+        Console.WriteLine("🔄 Starting database initialization...");
+        
+        // Initialize Flexibility Exercise Service tables
+        var flexService = scope.ServiceProvider.GetRequiredService<IFlexibilityExerciseService>();
+        InitializeTable("Suitability", () => flexService.SetSuitabilityExercises(SuitabilityExamples.GetExamples()));
+        InitializeTable("Efficiency", () => flexService.SetEfficiencyExercises(EfficiencyExamples.GetExamples()));
+        InitializeTable("Matching", () => flexService.SetMatchingExercises(MatchingExamples.GetExamples()));
+        InitializeTable("TipExercises", () => flexService.SetTipExercises(TipExercisesExamples.GetExamples()));
+        InitializeTable("PlainExercises", () => flexService.SetPlainExercises(PlainExerciseExamples.GetExamples()));
+        InitializeTable("FlexibilityExercises", () => flexService.SetFlexibilityExercises(FlexibilityExamples.GetFlexibilityExercises()));
+        
+        // Initialize CK Exercise Service tables
+        var ckService = scope.ServiceProvider.GetRequiredService<ICKExerciseService>();
+        InitializeTable("Equalization", () => ckService.SetEqualizationExercises(EqualizationExamples.GetExamples()));
+        InitializeTable("Bartering", () => ckService.SetBarteringExercises(BarteringExamples.GetExamples()));
+        InitializeTable("Substitution", () => ckService.SetSubstitutionExercises(SubstitutionExamples.GetExamples()));
+        InitializeTable("Elimination", () => ckService.SetEliminationExercises(EliminationExamples.GetExamples()));
+        
+        Console.WriteLine("✅ Database initialization completed successfully!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error initializing database tables: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    }
+}
+
+void InitializeTable(string tableName, Action initAction)
+{
+    try
+    {
+        initAction();
+        Console.WriteLine($"✅ {tableName} table initialized");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Failed to initialize {tableName}: {ex.Message}");
     }
 }
 
