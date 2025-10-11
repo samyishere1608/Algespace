@@ -51,7 +51,9 @@ namespace webapi.Services
         {
             using var connection = DBSettings.GetSQLiteConnectionForExercisesDB();
             connection.Open();
+            Console.WriteLine($"🔍 Querying SuitabilityExercises table for id={id}");
             var serializedExercise = connection.QueryFirstOrDefault<SerializedExtendedSuitabilityExercise>(DBUtils.GetObjectByIdQuery(SuitabilityDBSettings.TableName), new { Id = id });
+            Console.WriteLine($"📊 Query result: {(serializedExercise == null ? "NULL" : "Found")}");
             return serializedExercise?.Deserialize(language);
         }
 

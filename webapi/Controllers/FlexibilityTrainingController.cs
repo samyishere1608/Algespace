@@ -31,11 +31,14 @@ namespace webapi.Controllers
         {
             try
             {
+                Console.WriteLine($"🔍 GetSuitabilityExercise called: id={id}, language={language}");
                 var exercise = _exerciseService.GetSuitabilityExerciseById(id, language);
                 if (exercise == null)
                 {
+                    Console.WriteLine($"❌ Exercise not found: id={id}");
                     return NotFound();
                 }
+                Console.WriteLine($"✅ Exercise found: id={id}");
                 return exercise;
             }
             catch (Exception exception)
