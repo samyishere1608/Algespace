@@ -130,7 +130,7 @@ namespace webapi.Models.Flexibility
     {
         public const string TableName = "MatchingExercises";
 
-        public const string TableScheme = "Id INTEGER PRIMARY KEY AUTOINCREMENT, Ordering INTEGER, FirstEquation TEXT, SecondEquation TEXT, FirstEquationIsIsolatedIn TEXT, SecondEquationIsIsolatedIn TEXT, FirstVariable TEXT, SecondVariable TEXT, "
+        public const string TableScheme = "Id INTEGER PRIMARY KEY, Ordering INTEGER, FirstEquation TEXT, SecondEquation TEXT, FirstEquationIsIsolatedIn TEXT, SecondEquationIsIsolatedIn TEXT, FirstVariable TEXT, SecondVariable TEXT, "
         + "Method TEXT, AlternativeSystems TEXT, SelfExplanationTask TEXT, QuestionDE TEXT, QuestionEN TEXT, AgentMessageForSelfExplanationDE TEXT, AgentMessageForSelfExplanationEN TEXT, "
         + "AgentMessageForFirstSolutionDE TEXT, AgentMessageForFirstSolutionEN TEXT, AgentMessageForSecondSolutionDE TEXT, AgentMessageForSecondSolutionEN TEXT";
 

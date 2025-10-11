@@ -25,7 +25,7 @@ namespace webapi.Models.Flexibility
     {
         public const string TableName = "FlexibilityExercises";
 
-        public const string TableScheme = "Id INTEGER PRIMARY KEY AUTOINCREMENT, ExerciseType TEXT, ExerciseId INTEGER";
+        public const string TableScheme = "Id INTEGER PRIMARY KEY, ExerciseType TEXT, ExerciseId INTEGER";
 
         public const string TableColumns = "(Id, ExerciseType, ExerciseId)";
 

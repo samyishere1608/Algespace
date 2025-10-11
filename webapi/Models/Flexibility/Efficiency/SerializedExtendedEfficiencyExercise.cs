@@ -131,7 +131,7 @@ namespace webapi.Models.Flexibility
     {
         public const string TableName = "EfficiencyExercises";
 
-        public const string TableScheme = "Id INTEGER PRIMARY KEY AUTOINCREMENT, Ordering INTEGER, TransformationRequired INTEGER, UseWithTip INTEGER, FirstEquation TEXT, SecondEquation TEXT, FirstEquationIsIsolatedIn TEXT, SecondEquationIsIsolatedIn TEXT, FirstVariable TEXT, SecondVariable TEXT, "
+        public const string TableScheme = "Id INTEGER PRIMARY KEY, Ordering INTEGER, TransformationRequired INTEGER, UseWithTip INTEGER, FirstEquation TEXT, SecondEquation TEXT, FirstEquationIsIsolatedIn TEXT, SecondEquationIsIsolatedIn TEXT, FirstVariable TEXT, SecondVariable TEXT, "
         + "EfficientMethods TEXT, SelfExplanationTasks TEXT, QuestionDE TEXT, QuestionEN TEXT, AgentMessageForSelfExplanationDE TEXT, AgentMessageForSelfExplanationEN TEXT, "
         + "AgentMessageForFirstSolutionDE TEXT, AgentMessageForFirstSolutionEN TEXT, AgentMessageForSecondSolutionDE TEXT, AgentMessageForSecondSolutionEN TEXT";
 

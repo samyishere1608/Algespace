@@ -59,7 +59,7 @@ namespace webapi.Models.Substitution.Bartering
     {
         public const string TableName = "BarteringExercises";
 
-        public const string TableScheme = "Id INTEGER PRIMARY KEY AUTOINCREMENT, Ordering INTEGER, Level INTEGER, LinearEquation TEXT, FirstMerchant TEXT, SecondMerchant TEXT, ThirdMerchant TEXT";
+        public const string TableScheme = "Id INTEGER PRIMARY KEY, Ordering INTEGER, Level INTEGER, LinearEquation TEXT, FirstMerchant TEXT, SecondMerchant TEXT, ThirdMerchant TEXT";
 
         public const string TableColumns = "(Id, Ordering, Level, LinearEquation, FirstMerchant, SecondMerchant, ThirdMerchant)";
 

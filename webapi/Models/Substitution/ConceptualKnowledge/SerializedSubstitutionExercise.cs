@@ -58,7 +58,7 @@ namespace webapi.Models.Substitution.ConceptualKnowledge
     {
         public const string TableName = "SubstitutionExercises";
 
-        public const string TableScheme = "Id INTEGER PRIMARY KEY AUTOINCREMENT, Ordering INTEGER, Level INTEGER, FirstEquation TEXT, SecondEquation TEXT, IsolatedVariable TEXT, SecondVariable TEXT";
+        public const string TableScheme = "Id INTEGER PRIMARY KEY, Ordering INTEGER, Level INTEGER, FirstEquation TEXT, SecondEquation TEXT, IsolatedVariable TEXT, SecondVariable TEXT";
 
         public const string TableColumns = "(Id, Ordering, Level, FirstEquation, SecondEquation, IsolatedVariable, SecondVariable)";
 

@@ -118,7 +118,7 @@ namespace webapi.Models.Flexibility
         {
             public const string TableName = "TipExercises";
 
-            public const string TableScheme = "Id INTEGER PRIMARY KEY AUTOINCREMENT, Ordering INTEGER, Method TEXT, FirstEquation TEXT, SecondEquation TEXT, FirstEquationIsIsolatedIn TEXT, SecondEquationIsIsolatedIn TEXT, FirstVariable TEXT, SecondVariable TEXT, "
+            public const string TableScheme = "Id INTEGER PRIMARY KEY, Ordering INTEGER, Method TEXT, FirstEquation TEXT, SecondEquation TEXT, FirstEquationIsIsolatedIn TEXT, SecondEquationIsIsolatedIn TEXT, FirstVariable TEXT, SecondVariable TEXT, "
             + "QuestionDE TEXT, QuestionEN TEXT, AgentMessageForTaskDE TEXT, AgentMessageForTaskEN TEXT, AgentMessageForFirstSolutionDE TEXT, AgentMessageForFirstSolutionEN TEXT, AgentMessageForSecondSolutionDE TEXT, AgentMessageForSecondSolutionEN TEXT";
 
             public const string TableColumns = "(Id, Ordering, Method, FirstEquation, SecondEquation, FirstEquationIsIsolatedIn, SecondEquationIsIsolatedIn, FirstVariable, SecondVariable, "

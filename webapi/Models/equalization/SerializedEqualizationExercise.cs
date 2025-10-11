@@ -91,7 +91,7 @@ namespace webapi.Models.Equalization
     {
         public const string TableName = "EqualizationExercises";
 
-        public const string TableScheme = "Id INTEGER PRIMARY KEY AUTOINCREMENT, Ordering INTEGER, Level INTEGER, FirstEquation TEXT, SecondEquation TEXT, IsolatedVariable TEXT, SecondVariable TEXT, EqualizedScale TEXT, SimplifiedScale TEXT, AdditionalWeights TEXT, ScaleAllocation TEXT, MaximumCapacity INTEGER";
+        public const string TableScheme = "Id INTEGER PRIMARY KEY, Ordering INTEGER, Level INTEGER, FirstEquation TEXT, SecondEquation TEXT, IsolatedVariable TEXT, SecondVariable TEXT, EqualizedScale TEXT, SimplifiedScale TEXT, AdditionalWeights TEXT, ScaleAllocation TEXT, MaximumCapacity INTEGER";
 
         public const string TableColumns = "(Id, Ordering, Level, FirstEquation, SecondEquation, IsolatedVariable, SecondVariable, EqualizedScale, SimplifiedScale, AdditionalWeights, ScaleAllocation, MaximumCapacity)";
 

@@ -59,7 +59,7 @@ namespace webapi.Models.Elimination
     {
         public const string TableName = "EliminationExercise";
 
-        public const string TableScheme = "Id INTEGER PRIMARY KEY AUTOINCREMENT, Ordering INTEGER, Level INTEGER, FirstEquation TEXT, SecondEquation TEXT, FirstVariable TEXT, SecondVariable TEXT";
+        public const string TableScheme = "Id INTEGER PRIMARY KEY, Ordering INTEGER, Level INTEGER, FirstEquation TEXT, SecondEquation TEXT, FirstVariable TEXT, SecondVariable TEXT";
 
         public const string TableColumns = "(Id, Ordering, Level, FirstEquation, SecondEquation, FirstVariable, SecondVariable)";
 
