@@ -16,7 +16,14 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+# Copy initialization script
+COPY init-db.sh /app/init-db.sh
+RUN chmod +x /app/init-db.sh
+
 # Create directory for SQLite database with proper permissions
 RUN mkdir -p /app/Data/databases && chmod -R 777 /app/Data/databases
 
-ENTRYPOINT ["dotnet", "webapi.dll"]
+# Explicitly copy database files from build context
+COPY --from=build /src/Data/databases/*.db /app/Data/databases/
+
+ENTRYPOINT ["/app/init-db.sh"]
