@@ -19,6 +19,11 @@ namespace webapi.Authorization
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // Temporarily disabled for public access - allow all requests
+            await _next(context);
+            return;
+            
+            /* Original API key check - commented out for public access
             if (string.IsNullOrWhiteSpace(context.Request.Headers[Settings.ApiKeyHeaderName]))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -34,6 +39,7 @@ namespace webapi.Authorization
             }
 
             await _next(context);
+            */
         }
 
         public bool IsValidApiKey(HttpContext context, string userApiKey)
