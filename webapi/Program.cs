@@ -3,7 +3,7 @@ using System.Threading.RateLimiting;
 using webapi.AuthHelpers;
 using webapi.Authorization;
 using webapi.Services;
-using webapi.Data.examples;
+using webapi.Data.Examples;
 
 var builder = WebApplication.CreateBuilder(args);
 
