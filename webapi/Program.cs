@@ -174,19 +174,19 @@ void InitializeDatabaseTables(IServiceProvider services)
         
         // Initialize Flexibility Exercise Service tables
         var flexService = scope.ServiceProvider.GetRequiredService<IFlexibilityExerciseService>();
-        InitializeTable("Suitability", () => flexService.SetSuitabilityExercises(SuitabilityExamples.GetExamples()));
-        InitializeTable("Efficiency", () => flexService.SetEfficiencyExercises(EfficiencyExamples.GetExamples()));
-        InitializeTable("Matching", () => flexService.SetMatchingExercises(MatchingExamples.GetExamples()));
+        InitializeTable("SuitabilityExercises", () => flexService.SetSuitabilityExercises(SuitabilityExamples.GetExamples()));
+        InitializeTable("EfficiencyExercises", () => flexService.SetEfficiencyExercises(EfficiencyExamples.GetExamples()));
+        InitializeTable("MatchingExercises", () => flexService.SetMatchingExercises(MatchingExamples.GetExamples()));
         InitializeTable("TipExercises", () => flexService.SetTipExercises(TipExercisesExamples.GetExamples()));
         InitializeTable("PlainExercises", () => flexService.SetPlainExercises(PlainExerciseExamples.GetExamples()));
         InitializeTable("FlexibilityExercises", () => flexService.SetFlexibilityExercises(FlexibilityExamples.GetFlexibilityExercises()));
         
         // Initialize CK Exercise Service tables
         var ckService = scope.ServiceProvider.GetRequiredService<ICKExerciseService>();
-        InitializeTable("Equalization", () => ckService.SetEqualizationExercises(EqualizationExamples.GetExamples()));
-        InitializeTable("Bartering", () => ckService.SetBarteringExercises(BarteringExamples.GetExamples()));
-        InitializeTable("Substitution", () => ckService.SetSubstitutionExercises(SubstitutionExamples.GetExamples()));
-        InitializeTable("Elimination", () => ckService.SetEliminationExercises(EliminationExamples.GetExamples()));
+        InitializeTable("EqualizationExercises", () => ckService.SetEqualizationExercises(EqualizationExamples.GetExamples()));
+        InitializeTable("BarteringExercises", () => ckService.SetBarteringExercises(BarteringExamples.GetExamples()));
+        InitializeTable("SubstitutionExercises", () => ckService.SetSubstitutionExercises(SubstitutionExamples.GetExamples()));
+        InitializeTable("EliminationExercises", () => ckService.SetEliminationExercises(EliminationExamples.GetExamples()));
         
         Console.WriteLine("✅ Database initialization completed successfully!");
     }
