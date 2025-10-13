@@ -202,10 +202,17 @@ namespace webapi.Controllers
         {
             try
             {
+                Console.WriteLine($"🔍 GetFlexibilityExercises called");
                 var exercises = _exerciseService.GetFlexibilityExercises();
                 if (exercises == null)
                 {
+                    Console.WriteLine($"❌ No flexibility exercises found");
                     return NotFound();
+                }
+                Console.WriteLine($"✅ Found {exercises.Count} flexibility exercises");
+                foreach (var ex in exercises)
+                {
+                    Console.WriteLine($"   📝 Exercise ID:{ex.Id}, Type:{ex.ExerciseType}, ExerciseId:{ex.ExerciseId}");
                 }
                 return exercises;
             }
