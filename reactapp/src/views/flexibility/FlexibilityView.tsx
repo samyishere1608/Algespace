@@ -469,12 +469,16 @@ function ExerciseList({ completedExercises }: { completedExercises?: (number | s
 
     const getDifficultyLevel = (exerciseType: any) => {
         switch (exerciseType) {
-            case FlexibilityExerciseType.Suitability:
+            case FlexibilityExerciseType.Suitability:     // 2
                 return "Easy";
-            case FlexibilityExerciseType.Efficiency:
+            case FlexibilityExerciseType.Efficiency:      // 1
                 return "Medium";
-            case FlexibilityExerciseType.Matching:
+            case FlexibilityExerciseType.Matching:        // 3
                 return "Hard";
+            case FlexibilityExerciseType.TipExercise:     // 4
+                return "Medium";
+            case FlexibilityExerciseType.PlainExercise:   // 5
+                return "Easy";
             default:
                 return "Medium";
         }
@@ -482,12 +486,16 @@ function ExerciseList({ completedExercises }: { completedExercises?: (number | s
 
     const getDifficultyColor = (exerciseType: any) => {
         switch (exerciseType) {
-            case FlexibilityExerciseType.Suitability:
+            case FlexibilityExerciseType.Suitability:     // 2
                 return { color: "green" };
-            case FlexibilityExerciseType.Efficiency:
+            case FlexibilityExerciseType.Efficiency:      // 1
                 return { color: "orange" };
-            case FlexibilityExerciseType.Matching:
+            case FlexibilityExerciseType.Matching:        // 3
                 return { color: "red" };
+            case FlexibilityExerciseType.TipExercise:     // 4
+                return { color: "orange" };
+            case FlexibilityExerciseType.PlainExercise:   // 5
+                return { color: "green" };
             default:
                 return { color: "orange" };
         }

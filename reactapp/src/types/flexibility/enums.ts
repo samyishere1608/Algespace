@@ -1,7 +1,10 @@
 export enum FlexibilityExerciseType {
-    Efficiency,
-    Suitability,
-    Matching
+    WorkedExamples,  // 0
+    Efficiency,      // 1
+    Suitability,     // 2
+    Matching,        // 3
+    TipExercise,     // 4
+    PlainExercise    // 5
 }
 
 export enum Method {
