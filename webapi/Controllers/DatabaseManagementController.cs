@@ -30,6 +30,15 @@ namespace webapi.Controllers
                     return NotFound("Database file not found");
                 }
 
+                // Force WAL checkpoint to merge changes into main database file
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    var command = new SQLiteCommand("PRAGMA wal_checkpoint(TRUNCATE);", connection);
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("✅ WAL checkpoint completed before download");
+                }
+
                 var fileBytes = System.IO.File.ReadAllBytes(dbPath);
                 return File(fileBytes, "application/x-sqlite3", "studies.db");
             }
@@ -194,6 +203,50 @@ namespace webapi.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"Error exporting data: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Vacuum the database to reclaim space and optimize
+        /// </summary>
+        [HttpPost("vacuum")]
+        public IActionResult VacuumDatabase()
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                using var connection = new SQLiteConnection(connectionString);
+                connection.Open();
+
+                // First checkpoint the WAL
+                var checkpointCmd = new SQLiteCommand("PRAGMA wal_checkpoint(TRUNCATE);", connection);
+                checkpointCmd.ExecuteNonQuery();
+                Console.WriteLine("✅ WAL checkpoint completed");
+
+                // Get file size before vacuum
+                var dbPath = connectionString.Split(';')[0].Replace("Data Source=", "").Trim();
+                var sizeBefore = new FileInfo(dbPath).Length;
+
+                // Vacuum to reclaim space
+                var vacuumCmd = new SQLiteCommand("VACUUM;", connection);
+                vacuumCmd.ExecuteNonQuery();
+                Console.WriteLine("✅ VACUUM completed");
+
+                // Get file size after vacuum
+                var sizeAfter = new FileInfo(dbPath).Length;
+                var spaceReclaimed = sizeBefore - sizeAfter;
+
+                return Ok(new
+                {
+                    message = "Database vacuumed successfully",
+                    sizeBefore = $"{sizeBefore / 1024} KB",
+                    sizeAfter = $"{sizeAfter / 1024} KB",
+                    spaceReclaimed = $"{spaceReclaimed / 1024} KB"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error vacuuming database: {ex.Message}");
             }
         }
     }
