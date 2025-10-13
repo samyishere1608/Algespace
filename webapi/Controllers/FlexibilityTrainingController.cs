@@ -66,15 +66,19 @@ namespace webapi.Controllers
         {
             try
             {
+                Console.WriteLine($"🔍 GetEfficiencyExercise called: id={id}, language={language}");
                 var exercise = _exerciseService.GetEfficiencyExerciseById(id, language);
                 if (exercise == null)
                 {
+                    Console.WriteLine($"❌ Efficiency Exercise not found: id={id}");
                     return NotFound();
                 }
+                Console.WriteLine($"✅ Efficiency Exercise found: id={id}");
                 return exercise;
             }
             catch (Exception exception)
             {
+                Console.WriteLine($"💥 Error in GetEfficiencyExercise: {exception.Message}");
                 return BadRequest(exception.Message);
             }
         }
@@ -98,15 +102,19 @@ namespace webapi.Controllers
         {
             try
             {
+                Console.WriteLine($"🔍 GetMatchingExercise called: id={id}, language={language}");
                 var exercise = _exerciseService.GetMatchingExerciseById(id, language);
                 if (exercise == null)
                 {
+                    Console.WriteLine($"❌ Matching Exercise not found: id={id}");
                     return NotFound();
                 }
+                Console.WriteLine($"✅ Matching Exercise found: id={id}");
                 return exercise;
             }
             catch (Exception exception)
             {
+                Console.WriteLine($"💥 Error in GetMatchingExercise: {exception.Message}");
                 return BadRequest(exception.Message);
             }
         }
