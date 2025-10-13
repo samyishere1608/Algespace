@@ -228,7 +228,16 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
     const concreteExerciseType: FlexibilityExerciseType | FlexibilityStudyExerciseType | undefined = location.state?.exerciseType;
     const concreteExerciseId: number | undefined = location.state?.exerciseId;
 
+    console.log(`🎯 FlexibilityExercise loaded:`, {
+        exerciseId,
+        concreteExerciseType,
+        concreteExerciseTypeName: concreteExerciseType !== undefined ? FlexibilityExerciseType[concreteExerciseType] : 'undefined',
+        concreteExerciseId,
+        locationState: location.state
+    });
+
     if (exerciseId === undefined || exerciseId === "undefined" || concreteExerciseType === undefined || concreteExerciseId === undefined) {
+        console.error(`❌ Missing required parameters:`, { exerciseId, concreteExerciseType, concreteExerciseId });
         return <ErrorScreen text={ErrorTranslations.ERROR_EXERCISE_ID} routeToReturn={Paths.FlexibilityStudyExamplesPath} showFrownIcon={true} />;
     }
 
@@ -413,13 +422,23 @@ function Exercise({ concreteExerciseType, concreteExerciseId, flexibilityId, nav
     navigateBackTo: string;
     exerciseCompletionFunction: (title: string) => void;
 }): ReactElement {
+    console.log(`🔍 Exercise component - Type: ${concreteExerciseType}, ID: ${concreteExerciseId}, FlexibilityID: ${flexibilityId}`);
+    console.log(`🔍 Exercise type enum value:`, FlexibilityExerciseType[concreteExerciseType]);
+    console.log(`🔍 Full enum mapping:`, FlexibilityExerciseType);
+    
     switch (concreteExerciseType) {
         case FlexibilityExerciseType.Suitability :
+            console.log(`✅ Rendering Suitability exercise`);
             return <ExerciseForSuitability concreteExerciseId={concreteExerciseId} flexibilityId={flexibilityId} navigateBackTo={navigateBackTo} exerciseCompletionFunction={exerciseCompletionFunction} />;
         case FlexibilityExerciseType.Efficiency:
+            console.log(`✅ Rendering Efficiency exercise`);
             return <ExerciseForEfficiency concreteExerciseId={concreteExerciseId} flexibilityId={flexibilityId} navigateBackTo={navigateBackTo} exerciseCompletionFunction={exerciseCompletionFunction} />;
         case FlexibilityExerciseType.Matching:
+            console.log(`✅ Rendering Matching exercise`);
             return <ExerciseForMatching concreteExerciseId={concreteExerciseId} flexibilityId={flexibilityId} navigateBackTo={navigateBackTo} exerciseCompletionFunction={exerciseCompletionFunction} />;
+        default:
+            console.error(`❌ Unknown exercise type: ${concreteExerciseType} (${FlexibilityExerciseType[concreteExerciseType]})`);
+            return <ErrorScreen text={`Unknown exercise type: ${concreteExerciseType}`} routeToReturn={Paths.FlexibilityPath} showFrownIcon={true} />;
     }
 }
 
