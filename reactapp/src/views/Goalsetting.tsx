@@ -43,7 +43,7 @@ const goalCompletionGuide: Record<string, string> = {
   "Maintain accuracy under pressure": "� How to Complete:\n• Complete 5+ exercises with average ≤1 error across all exercises\n• Shows consistent accuracy over time\n• Demonstrates skill under sustained challenge\n\n🎯 Completes when your overall error average ≤1.0 across 5+ exercises!",
 
   // Learning & Growth (5 goals)  
-  "Reflect on method effectiveness": "🤔 How to Complete:\n• Complete an exercise with self-explanation in Matching Exercise\n• Provide thoughtful reasoning about method choices\n• Shows deeper analytical thinking\n\n� Completes when you engage with self-explanation features!",
+  "Reflect on method effectiveness": "🤔 How to Complete:\n• Complete an exercise with self-explanation in Matching Exercise or Efficiency Exercise\n• Provide thoughtful reasoning about method choices\n• Shows deeper analytical thinking\n\n📖 Completes when you engage with self-explanation features!",
   
   "Learn from mistakes effectively": "📈 How to Complete:\n• Complete exercises where recent performance shows fewer errors than earlier attempts\n• Demonstrates improvement over time through learning\n• Shows growth mindset in action\n\n� Completes when error tracking shows clear improvement trend!",
   
