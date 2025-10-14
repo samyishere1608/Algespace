@@ -41,9 +41,9 @@ export default function Home(): ReactElement {
                     <div className={"homepage__navigation-item flexibility-item"} onClick={() => navigate(Paths.FlexibilityPath)}>
                         <p> {t(GeneralTranslations.FLEXIBILITY_TRAINING, { ns: TranslationNamespaces.General })}</p>
                     </div>
-                    <div className={"homepage__navigation-item goal-item"} onClick={() => navigate(Paths.GoalSettingPath)}>
+                    {/* <div className={"homepage__navigation-item goal-item"} onClick={() => navigate(Paths.GoalSettingPath)}>
                         <p> {t(GeneralTranslations.GOAL_SETTING, { ns: TranslationNamespaces.General })}</p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
