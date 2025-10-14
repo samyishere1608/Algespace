@@ -35,6 +35,59 @@ interface Props {
 }
 import PostTaskAppraisal from "../PostTaskAppraisal";
 
+// Goal completion guidance mapping
+const goalCompletionGuide: Record<string, string> = {
+  // Basic Understanding (5 goals)
+  "Learn what linear equations are": "🎯 How to Complete:\n• Start any Flexibility Exercise (Suitability, Efficiency, or Matching)\n• This goal completes automatically when you first access linear equation content\n\n📚 Completes on first exercise access!",
+  
+  "Understand how substitution works": "🔄 How to Complete:\n• Complete 1 exercise using the Substitution method\n• Choose substitution in any Flexibility Exercise\n• Successfully solve the problem\n\n📚 Specific Exercises for Substitution:\n• Exercise #2 (Efficiency) - Substitution focus\n• Exercise #9 (Matching) - Substitution practice\n• Any Suitability exercise - Choose substitution when appropriate\n\n💡 Completes after your first successful substitution exercise!",
+  
+  "Understand how elimination works": "⚖️ How to Complete:\n• Complete 1 exercise using the Elimination method\n• Choose elimination in any Flexibility Exercise\n• Successfully solve the problem\n\n📚 Specific Exercises for Elimination:\n• Exercise #6 (Efficiency) - Elimination focus\n• Exercise #7 (Matching) - Elimination practice\n• Exercise #11 (Efficiency) - More elimination practice\n• Any Suitability exercise - Choose elimination when appropriate\n\n💡 Completes after your first successful elimination exercise!",
+  
+  "Understand how equalization works": "⚖️ How to Complete:\n• Complete 1 exercise using the Equalization method\n• Choose equalization in any Flexibility Exercise\n• Successfully solve the problem\n\n📚 Specific Exercises for Equalization:\n• Exercise #2 (Matching) - Equalization focus\n• Exercise #13 (Matching) - More equalization practice\n• Any Suitability exercise - Choose equalization when appropriate\n\n💡 Completes after your first successful equalization exercise!",
+  
+  "Master all three methods fluently": "🏆 How to Complete:\n• Complete 2+ exercises with each method (substitution, elimination, equalization)\n• Demonstrates comprehensive method mastery\n• Shows fluency across all solving approaches\n\n📚 Method-Specific Exercises:\n• Substitution: Efficiency #2, Matching #9\n• Elimination: Efficiency #6&#11, Matching #7\n• Equalization: Matching #2&#13\n• All Methods: Any Suitability exercise\n\n🏅 Completes when you've mastered all three methods individually!",
+
+  // Method Mastery (5 goals)
+  "Master substitution/equalization/elimination method": "🏆 How to Complete:\n• Complete 2 exercises either using Substitution/Equalization/Elimination method\n• Shows growing competence with substitution\n• Can be any combination of exercise types\n\n⭐ Completes after your second substitution exercise success!",
+  
+  "Practice with different methods": "🔄 How to Complete:\n• Use 2 different methods across any exercises\n• For example: 1 substitution exercise + 1 elimination exercise\n• Shows willingness to explore different approaches\n\n🎲 Completes when you've tried 2 different methods!",
+  
+  "Switch methods strategically": "🧠 How to Complete:\n• Complete 3 exercises using different methods each time\n• Demonstrates strategic method selection\n• Shows flexibility in problem-solving approach\n\n🎯 Completes after using 3 different methods across 3 exercises!",
+  
+  "Choose optimal methods consistently": "⚡ How to Complete:\n• Complete 3 Efficiency Exercises (where method choice matters most)\n• Focuses on optimal method selection\n• Shows consistent strategic thinking\n\n🚀 Completes after 3 successful Efficiency Exercise completions!",
+
+  // Problem Solving (5 goals)
+  "Complete exercises without hints": "🎖️ How to Complete:\n• Complete 1 exercise using 0 hints\n• Demonstrates full independence on that exercise\n• Shows confidence in your abilities\n\n💪 Completes when you finish an exercise without any hints!",
+  
+  "Solve problems with minimal errors": "⭐ How to Complete:\n• Complete 1 exercise with ≤1 error\n• Shows accuracy and careful problem-solving\n• Focus on precision over speed\n\n🎯 Completes when you make 1 or fewer errors in an exercise!",
+  
+  "Handle complex problems confidently": "🌟 How to Complete:\n• Complete 5 total exercises (any type/method)\n• Shows sustained engagement and practice\n• Builds confidence through experience\n\n📈 Completes after your 5th total exercise completion!",
+  
+  "Show exceptional problem-solving": "🏅 How to Complete:\n• Complete 1 exercise with 0 errors AND 0 hints\n• Demonstrates exceptional skill and independence\n• The perfect exercise completion\n\n✨ Completes when you achieve a flawless exercise (no errors, no hints)!",
+  
+  "Maintain accuracy under pressure": "💎 How to Complete:\n• Complete 5+ exercises with average ≤1 error across all exercises\n• Shows consistent accuracy over time\n• Demonstrates skill under sustained challenge\n\n🎯 Completes when your overall error average ≤1.0 across 5+ exercises!",
+
+  // Learning & Growth (5 goals)  
+  "Reflect on method effectiveness": "🤔 How to Complete:\n• Complete an exercise with self-explanation in Matching Exercise or Efficiency Exercise\n• Provide thoughtful reasoning about method choices\n• Shows deeper analytical thinking\n\n📖 Completes when you engage with self-explanation features!",
+  
+  "Learn from mistakes effectively": "📈 How to Complete:\n• Complete exercises where recent performance shows fewer errors than earlier attempts\n• Demonstrates improvement over time through learning\n• Shows growth mindset in action\n\n📊 Completes when error tracking shows clear improvement trend!",
+  
+  "Explain reasoning clearly": "🗣️ How to Complete:\n• Complete 3 exercises with self-explanation components\n• Consistently engage with reasoning prompts\n• Shows strong metacognitive skills\n\n🧠 Completes after 3 successful self-explanation exercises!",
+  
+  "Show consistent improvement": "📈 How to Complete:\n• Complete 4 exercises with decreasing error rates over time\n• Demonstrates sustained learning and improvement\n• Shows mastery through consistent progress\n\n🎯 Completes when error data shows consistent improvement trend!",
+  
+  "Work independently": "👑 How to Complete:\n• Complete 3 exercises with 0 hints each\n• Shows consistent independent problem-solving\n• Demonstrates true mastery and confidence\n\n🏆 The ultimate independence achievement - 3 hint-free exercises!",
+  
+  "Build confidence through success": "💪 How to Complete:\n• Complete 1 exercise using 2 or fewer hints\n• Shows growing independence\n• Focus on working with less assistance\n\n⭐ Completes when hint usage is 2 or less in an exercise!",
+  
+  "Develop problem-solving resilience": "🌱 How to Complete:\n• Complete 1 exercise after making at least 1 error\n• Shows ability to recover and persist through mistakes\n• Demonstrates growth mindset and resilience\n\n💪 Completes when you successfully finish an exercise despite making errors!",
+  
+  "Set personal learning challenges": "🎯 How to Complete:\n• Complete 10 total exercises (any type/method)\n• Shows commitment to sustained learning\n• Demonstrates self-directed challenge-seeking\n\n🏆 Completes after your 10th total exercise completion!",
+  
+  "Track progress meaningfully": "🌟 How to Complete:\n• Complete exercises using all 3 different methods (substitution, elimination, equalization)\n• Shows comprehensive engagement with all approaches\n• Demonstrates holistic learning approach\n\n🌟 Completes when you've successfully used all three methods!"
+};
+
 
 
 const categorizedGoals: Record<string, { title: string; difficulty: string }[]> = {
@@ -94,6 +147,7 @@ const [showAppraisalModal, setShowAppraisalModal] = useState<{ goalId: number } 
     perceived: number;
     actual: number;
   } | null>(null);
+  const [showGuidanceModal, setShowGuidanceModal] = useState<string | null>(null);
 
   // Helper function to get difficulty display text
   const getDifficultyDisplay = (difficulty: string) => {
@@ -1228,6 +1282,26 @@ async function removeGoal(id: number) {
                     🗑️ Delete
                   </button>
 
+                  <button
+                    onClick={() => setShowGuidanceModal(goal.title)}
+                    style={{
+                      padding: "clamp(0.25rem, 1vw, 0.4rem) clamp(0.5rem, 1.5vw, 0.8rem)",
+                      background: "#17a2b8",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "clamp(2px, 1vw, 4px)",
+                      cursor: "pointer",
+                      fontWeight: "600",
+                      fontSize: "clamp(0.65rem, 1.4vw, 0.8rem)",
+                      transition: "background 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#138496")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#17a2b8")}
+                    aria-label={`View completion guide for ${goal.title}`}
+                  >
+                    💡 How to complete
+                  </button>
+
                   {!goal.completed ? (
                     /* COMMENTED OUT: Mark as Done button removed per professor feedback
                     <button
@@ -1409,6 +1483,124 @@ async function removeGoal(id: number) {
     onSubmit={handleAppraisalSubmit}
   />
 )}
+
+      {/* Goal Completion Guidance Modal */}
+      {showGuidanceModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+          fontFamily: "'Comic Sans MS', cursive, sans-serif"
+        }}
+        onClick={() => setShowGuidanceModal(null)}
+        >
+          <div style={{
+            backgroundColor: "white",
+            padding: "2rem",
+            borderRadius: "12px",
+            maxWidth: "500px",
+            maxHeight: "80vh",
+            overflowY: "auto",
+            margin: "1rem",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+            border: "3px solid #229EBC"
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "1rem"
+            }}>
+              <h3 style={{
+                margin: 0,
+                color: "#229EBC",
+                fontSize: "1.2rem",
+                fontWeight: "bold"
+              }}>
+                🎯 How to Complete This Goal
+              </h3>
+              <button
+                onClick={() => setShowGuidanceModal(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "1.5rem",
+                  cursor: "pointer",
+                  color: "#666",
+                  padding: "0.2rem"
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div style={{
+              backgroundColor: "#f8f9ff",
+              padding: "1rem",
+              borderRadius: "8px",
+              border: "2px solid #e1e8ff",
+              marginBottom: "1rem"
+            }}>
+              <h4 style={{
+                margin: "0 0 0.5rem 0",
+                color: "#333",
+                fontSize: "1rem",
+                fontWeight: "bold"
+              }}>
+                "{showGuidanceModal}"
+              </h4>
+            </div>
+
+            <div style={{
+              backgroundColor: "#f0f8ff",
+              padding: "1.5rem",
+              borderRadius: "8px",
+              border: "2px solid #229EBC",
+              lineHeight: "1.6"
+            }}>
+              <div style={{
+                color: "#333",
+                fontSize: "0.9rem",
+                fontWeight: "500",
+                whiteSpace: "pre-line"
+              }}>
+                {goalCompletionGuide[showGuidanceModal] || "Completion guidance not available for this goal."}
+              </div>
+            </div>
+
+            <div style={{
+              marginTop: "1.5rem",
+              textAlign: "center"
+            }}>
+              <button
+                onClick={() => setShowGuidanceModal(null)}
+                style={{
+                  backgroundColor: "#229EBC",
+                  color: "white",
+                  border: "none",
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  fontSize: "0.9rem",
+                  fontFamily: "'Comic Sans MS', cursive, sans-serif"
+                }}
+              >
+                Got it! 👍
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </GoalCompletionProvider>
   );
