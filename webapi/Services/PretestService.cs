@@ -10,6 +10,7 @@ namespace webapi.Services
         void SavePretestAnswers(int userId, Dictionary<string, string> answers, List<string> suggestedGoals);
         bool HasUserCompletedPretest(int userId);
         List<string> GetUserSuggestedGoals(int userId);
+        Dictionary<string, string> GetUserPretestAnswers(int userId);
     }
 
     public class PretestService : IPretestService
@@ -101,6 +102,40 @@ namespace webapi.Services
                 {
                     Console.WriteLine($"[DEBUG] Error deserializing goals: {ex.Message}");
                     return new List<string>();
+                }
+            });
+        }
+
+        public Dictionary<string, string> GetUserPretestAnswers(int userId)
+        {
+            return SQLiteRetryHelper.ExecuteWithRetry(() =>
+            {
+                using var conn = new SQLiteConnection(_connectionString);
+                conn.Open();
+
+                using var cmd = new SQLiteCommand(@"
+                    SELECT Answers FROM PretestAnswers 
+                    WHERE UserId = @UserId 
+                    ORDER BY CompletedAt DESC 
+                    LIMIT 1", conn);
+                
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                var result = cmd.ExecuteScalar()?.ToString();
+                
+                if (string.IsNullOrEmpty(result))
+                {
+                    return new Dictionary<string, string>();
+                }
+
+                try
+                {
+                    return JsonSerializer.Deserialize<Dictionary<string, string>>(result) ?? new Dictionary<string, string>();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[DEBUG] Error deserializing pretest answers: {ex.Message}");
+                    return new Dictionary<string, string>();
                 }
             });
         }

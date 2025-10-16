@@ -241,7 +241,7 @@ public IActionResult UpdateSuggestions(int userId)
         var activeGoals = userGoals.Where(g => g.Completed == 0).ToList();
         
         // Generate new suggestions based on progress and performance
-        var newSuggestions = GenerateProgressBasedSuggestions(completedGoals, activeGoals);
+        var newSuggestions = GenerateProgressBasedSuggestions(userId, completedGoals, activeGoals);
         
         // Update user's suggested goals in pretest service
         _pretestService.SavePretestAnswers(userId, new Dictionary<string, string>(), newSuggestions);
@@ -328,15 +328,17 @@ public IActionResult GetRecommendationReasons(int userId, [FromBody] List<string
 
 // GetRecommendationInsights method removed - no longer used (replaced by GenerateRecommendationReason)
 
-private List<string> GenerateProgressBasedSuggestions(List<Goal> completedGoals, List<Goal> activeGoals)
+private List<string> GenerateProgressBasedSuggestions(int userId, List<Goal> completedGoals, List<Goal> activeGoals)
 {
     var suggestions = new List<string>();
     
     // Get performance statistics for adaptive recommendations
-    var userId = activeGoals.FirstOrDefault()?.UserId ?? completedGoals.FirstOrDefault()?.UserId ?? 1;
     var performanceStats = GetUserPerformanceStats(userId, completedGoals);
     
-    Console.WriteLine($"[RECOMMENDATIONS] User {userId} - Performance Stats: {performanceStats}");
+    // Check if user is expert level from pretest
+    bool isExpertLevel = IsUserExpertLevel(userId);
+    
+    Console.WriteLine($"[RECOMMENDATIONS] User {userId} - Performance Stats: {performanceStats}, IsExpert: {isExpertLevel}");
     
     // Define the goal progression mapping - matching frontend categorizedGoals structure from GoalForm
     var categorizedGoals = new Dictionary<string, List<(string title, string difficulty, int level)>>
@@ -379,29 +381,65 @@ private List<string> GenerateProgressBasedSuggestions(List<Goal> completedGoals,
     };
     
     // ADAPTIVE RECOMMENDATION LOGIC based on performance
-    suggestions = GenerateAdaptiveSuggestions(categorizedGoals, completedGoals, activeGoals, performanceStats);
+    suggestions = GenerateAdaptiveSuggestions(categorizedGoals, completedGoals, activeGoals, performanceStats, isExpertLevel);
     
     // If no specific progression suggestions, provide variety based on performance
     if (suggestions.Count == 0)
     {
-        suggestions = GetDefaultSuggestions(performanceStats);
+        suggestions = GetDefaultSuggestions(performanceStats, isExpertLevel);
     }
     
     // Limit to 3-4 suggestions to avoid overwhelming
     return suggestions.Take(4).ToList();
 }
 
+private bool IsUserExpertLevel(int userId)
+{
+    try
+    {
+        var pretestAnswers = _pretestService.GetUserPretestAnswers(userId);
+        
+        // Check q1 (confidence level)
+        if (pretestAnswers.ContainsKey("q1"))
+        {
+            var confidence = pretestAnswers["q1"];
+            // Expert is the highest level - not "Not confident", "Somewhat confident", or "Very confident"
+            // In the pretest logic, the else case (expert) is when confidence doesn't contain these phrases
+            if (!confidence.Contains("Not confident") && 
+                !confidence.Contains("Somewhat confident") && 
+                !confidence.Contains("Very confident"))
+            {
+                return true; // Expert level
+            }
+        }
+        
+        return false;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[DEBUG] Error checking expert level: {ex.Message}");
+        return false;
+    }
+}
+
 private List<string> GenerateAdaptiveSuggestions(
     Dictionary<string, List<(string title, string difficulty, int level)>> categorizedGoals,
     List<Goal> completedGoals,
     List<Goal> activeGoals,
-    PerformanceStats stats)
+    PerformanceStats stats,
+    bool isExpertLevel = false)
 {
     var suggestions = new List<string>();
     
     // Analyze each category for adaptive recommendations
     foreach (var category in categorizedGoals.Keys)
     {
+        // Skip Basic Understanding for expert users
+        if (isExpertLevel && category == "Basic Understanding")
+        {
+            continue;
+        }
+        
         var categoryCompleted = completedGoals.Where(g => g.Category == category).ToList();
         var categoryActive = activeGoals.Where(g => g.Category == category).ToList();
         
@@ -575,14 +613,18 @@ private string GetProblemSolvingRecommendation(List<(string title, string diffic
     return nextGoal != default ? $"Problem Solving|{nextGoal.title}|{nextGoal.difficulty}" : "";
 }
 
-private List<string> GetDefaultSuggestions(PerformanceStats stats)
+private List<string> GetDefaultSuggestions(PerformanceStats stats, bool isExpertLevel = false)
 {
     var suggestions = new List<string>();
     
     // For new users, provide beginner-friendly suggestions
     if (stats.TotalGoalsCompleted == 0)
     {
-        suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        // Expert users should not get basic understanding goals
+        if (!isExpertLevel)
+        {
+            suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        }
         suggestions.Add("Learning & Growth|Reflect on method effectiveness|very easy");
         suggestions.Add("Learning & Growth|Build confidence through success|easy");
         return suggestions;
@@ -598,16 +640,33 @@ private List<string> GetDefaultSuggestions(PerformanceStats stats)
     // Priority-based suggestions for conflicting performance issues
     if (hasHighErrors && hasHighHints)
     {
-        // Multiple severe issues: focus on fundamentals first
-        suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        // Multiple severe issues: focus on fundamentals first (but skip basics for experts)
+        if (!isExpertLevel)
+        {
+            suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        }
         suggestions.Add("Learning & Growth|Build confidence through success|easy");
-        suggestions.Add("Basic Understanding|Understand how substitution works|easy");
+        if (!isExpertLevel)
+        {
+            suggestions.Add("Basic Understanding|Understand how substitution works|easy");
+        }
+        else
+        {
+            suggestions.Add("Method Mastery|Practice with different methods|easy");
+        }
     }
     else if (hasHighErrors && hasLowSatisfaction)
     {
         // High errors + low satisfaction: make learning enjoyable while fixing accuracy
         suggestions.Add("Learning & Growth|Build confidence through success|easy");
-        suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        if (!isExpertLevel)
+        {
+            suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        }
+        else
+        {
+            suggestions.Add("Method Mastery|Practice with different methods|easy");
+        }
         suggestions.Add("Learning & Growth|Reflect on method effectiveness|very easy");
     }
     else if (hasHighHints && hasLowSatisfaction)
@@ -619,8 +678,15 @@ private List<string> GetDefaultSuggestions(PerformanceStats stats)
     }
     else if (hasHighErrors)
     {
-        // High errors: focus on accuracy and fundamentals
-        suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        // High errors: focus on accuracy and fundamentals (but skip basics for experts)
+        if (!isExpertLevel)
+        {
+            suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        }
+        else
+        {
+            suggestions.Add("Method Mastery|Practice with different methods|easy");
+        }
         suggestions.Add("Problem Solving|Solve problems with minimal errors|medium");
         suggestions.Add("Learning & Growth|Build confidence through success|easy");
     }
@@ -643,12 +709,22 @@ private List<string> GetDefaultSuggestions(PerformanceStats stats)
         // Low satisfaction: focus on enjoyment
         suggestions.Add("Learning & Growth|Build confidence through success|easy");
         suggestions.Add("Learning & Growth|Develop problem-solving resilience|medium");
-        suggestions.Add("Basic Understanding|Understand how substitution works|easy");
+        if (!isExpertLevel)
+        {
+            suggestions.Add("Basic Understanding|Understand how substitution works|easy");
+        }
+        else
+        {
+            suggestions.Add("Method Mastery|Switch methods strategically|medium");
+        }
     }
     else
     {
         // Good performance: provide variety and challenge
-        suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        if (!isExpertLevel)
+        {
+            suggestions.Add("Basic Understanding|Learn what linear equations are|very easy");
+        }
         suggestions.Add("Method Mastery|Practice with different methods|easy");
         suggestions.Add("Learning & Growth|Reflect on method effectiveness|very easy");
         suggestions.Add("Learning & Growth|Set personal learning challenges|hard");
