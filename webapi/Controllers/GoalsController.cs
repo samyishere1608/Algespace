@@ -403,13 +403,12 @@ private bool IsUserExpertLevel(int userId)
         if (pretestAnswers.ContainsKey("q1"))
         {
             var confidence = pretestAnswers["q1"];
-            // Expert is the highest level - not "Not confident", "Somewhat confident", or "Very confident"
-            // In the pretest logic, the else case (expert) is when confidence doesn't contain these phrases
-            if (!confidence.Contains("Not confident") && 
-                !confidence.Contains("Somewhat confident") && 
-                !confidence.Contains("Very confident"))
+            // Exclude Basic Understanding for "Very confident" and "Expert level" users
+            // Only "Not confident" and "Somewhat confident" users get Basic Understanding goals
+            if (confidence.Contains("Very confident") || 
+                (!confidence.Contains("Not confident") && !confidence.Contains("Somewhat confident")))
             {
-                return true; // Expert level
+                return true; // Very confident or Expert level
             }
         }
         
