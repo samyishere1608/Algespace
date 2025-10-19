@@ -46,8 +46,6 @@ const goalCompletionGuide: Record<string, string> = {
   
   "Set personal learning challenges": "� How to Complete:\n• Complete 10 total exercises (any type/method)\n• Shows commitment to sustained learning\n• Demonstrates self-directed challenge-seeking\n\n🏆 Completes after your 10th total exercise completion!",
   
-  "Track progress meaningfully": "📊 How to Complete:\n• Complete exercises using all 3 different methods (substitution, elimination, equalization)\n• Shows comprehensive engagement with all approaches\n• Demonstrates holistic learning approach\n\n🌟 Completes when you've successfully used all three methods!",
-  
   "Reflect on method effectiveness": "🤔 How to Complete:\n• Complete an exercise with self-explanation in Matching Exercise\n• Provide thoughtful reasoning about method choices\n• Shows deeper analytical thinking\n\n� Completes when you engage with self-explanation features!",
   
   "Explain reasoning clearly": "�️ How to Complete:\n• Complete 3 exercises with self-explanation components\n• Consistently engage with reasoning prompts\n• Shows strong metacognitive skills\n\n🧠 Completes after 3 successful self-explanation exercises!",

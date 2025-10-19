@@ -10,10 +10,11 @@ interface Props {
     postenjoyment: number,
     postanxiety: number
   ) => void;
+  goalName?: string; // Add optional goal name
 }
 // ✅ REMOVED old emotional feedback system - now using adaptive feedback
 
-export default function PostTaskAppraisal({ isOpen, onClose, onSubmit }: Props) {
+export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName }: Props) {
   const [postSatisfaction, setPostSatisfaction] = useState(3);
   const [postConfidence, setPostConfidence] = useState(3);
   const [postEffort, setPostEffort] = useState(3);
@@ -110,8 +111,13 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit }: Props) 
   const handleSubmit = () => {
     // ✅ REMOVED old emotional feedback - now handled by adaptive feedback system
     onSubmit(postSatisfaction, postConfidence, postEffort, postEnjoyment, postAnxiety);
-    onClose();
     
+    // Note: PostTaskAppraisal completion triggers goal feedback messages
+    // The actual completion event for auto-close will be dispatched by GoalList 
+    // after all adaptive feedback messages are shown
+    console.log('🎯 PostTaskAppraisal: Form submitted - goal feedback will start');
+    
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -133,7 +139,22 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit }: Props) 
       }}
       onClick={(e) => e.stopPropagation()}
       >
-        <h3 style={{ textAlign: "center", marginBottom: "1.5rem" }}>🎯 Goal Reflection</h3>
+        <h3 style={{ textAlign: "center", marginBottom: "0.5rem" }}>🎯 Goal Reflection</h3>
+        
+        {/* Display goal name if provided */}
+        {goalName && (
+          <div style={{
+            textAlign: "center",
+            marginBottom: "1rem",
+            padding: "0.75rem",
+            backgroundColor: "#f0f8ff",
+            borderRadius: "8px",
+            border: "2px solid #229EBC"
+          }}>
+            <strong style={{ color: "#229EBC" }}>Goal:</strong>{" "}
+            <span style={{ color: "#333" }}>{goalName}</span>
+          </div>
+        )}
         
         <div style={{ marginBottom: "1.5rem" }}>
           <label style={{ display: "block", marginBottom: "0.5rem" }}>How satisfied are you?</label>

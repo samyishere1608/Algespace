@@ -1,5 +1,5 @@
 import { AgentCondition, AgentType, IsolatedIn, MatchingExerciseState, Method, SelectedEquation } from "@/types/flexibility/enums.ts";
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useMemo, useState, useEffect } from "react";
 import { MatchingExercise as MatchingExerciseProps } from "@/types/flexibility/matchingExercise.ts";
 import { getRandomAgent, setPKExerciseCompleted, setFlexibilityStudyExerciseCompleted } from "@utils/storageUtils.ts";
 import { useAuth } from "@/contexts/AuthProvider.tsx";
@@ -106,6 +106,74 @@ export function MatchingExercise({ flexibilityExerciseId, exercise, condition, h
     const [substitutionInfo, setSubstitutionInfo] = useState<SubstitutionParameters | undefined>();
     const [selectedEquation, setSelectedEquation] = useState<[FlexibilityEquation, SelectedEquation] | undefined>();
     const [isExerciseCompleted, setIsExerciseCompleted] = useState<boolean>(false);
+    
+    // Auto-close state for smart feedback tracking
+    const [allFeedbackComplete, setAllFeedbackComplete] = useState<boolean>(false);
+    const [retrospectiveCompleted, setRetrospectiveCompleted] = useState<boolean>(false);
+    const [goalCompletionStarted, setGoalCompletionStarted] = useState<boolean>(false);
+    
+    // Listen for goal completion events to know when feedback is done
+    useEffect(() => {
+        const handleGoalFeedbackComplete = () => {
+            console.log('🎯 MatchingExercise: Goal feedback complete event received');
+            setAllFeedbackComplete(true);
+        };
+        
+        window.addEventListener('goalFeedbackComplete', handleGoalFeedbackComplete);
+        return () => window.removeEventListener('goalFeedbackComplete', handleGoalFeedbackComplete);
+    }, []);
+
+    // Listen for goal completion trigger (retrospective opening)
+    useEffect(() => {
+        const handleGoalCompletionTrigger = () => {
+            console.log('🎯 MatchingExercise: Goal completion flow started - RetrospectivePrompt will open');
+            setGoalCompletionStarted(true);
+        };
+        
+        window.addEventListener('triggerGoalCompletion', handleGoalCompletionTrigger);
+        return () => window.removeEventListener('triggerGoalCompletion', handleGoalCompletionTrigger);
+    }, []);
+
+    // Listen for RetrospectivePrompt completion (user clicks "Complete ✓")
+    useEffect(() => {
+        const handleRetrospectiveComplete = () => {
+            console.log('🎯 MatchingExercise: RetrospectivePrompt completed - PostTaskAppraisal will open');
+            setRetrospectiveCompleted(true);
+        };
+        
+        window.addEventListener('retrospectivePromptComplete', handleRetrospectiveComplete);
+        return () => window.removeEventListener('retrospectivePromptComplete', handleRetrospectiveComplete);
+    }, []);
+
+    // Auto-close when exercise completed AND retrospective completed AND all goal feedback shown
+    useEffect(() => {
+        if (isExerciseCompleted && retrospectiveCompleted && allFeedbackComplete) {
+            console.log('🎯 MatchingExercise: Retrospective and all goal feedback completed, auto-closing in 2 seconds...');
+            const timer = setTimeout(() => {
+                console.log('🎯 MatchingExercise: Auto-closing now!');
+                handleEnd();
+            }, 2000); // Brief delay after all feedback completion
+            
+            return () => clearTimeout(timer);
+        }
+    }, [isExerciseCompleted, retrospectiveCompleted, allFeedbackComplete, handleEnd]);
+
+    // Fallback: Auto-close if no goals are triggered within 8 seconds 
+    useEffect(() => {
+        if (isExerciseCompleted) {
+            console.log('🎯 MatchingExercise: Starting fallback timer for exercises with no goals');
+            const fallbackTimer = setTimeout(() => {
+                if (!goalCompletionStarted) {
+                    console.log('🎯 MatchingExercise: No goals triggered, auto-closing immediately');
+                    handleEnd();
+                } else {
+                    console.log('🎯 MatchingExercise: Goal completion started, canceling fallback timer');
+                }
+            }, 8000); // 8 seconds fallback to give enough time for any goal completion flow
+            
+            return () => clearTimeout(fallbackTimer);
+        }
+    }, [isExerciseCompleted, goalCompletionStarted, handleEnd]);
 
     let content: ReactElement;
     switch (exerciseState) {
@@ -373,39 +441,7 @@ export function MatchingExercise({ flexibilityExerciseId, exercise, condition, h
                 userId={getCurrentUserId()}
             />
             
-            {/* Close Exercise Button - Only show when exercise is completed */}
-            {isExerciseCompleted && (
-                <button
-                    onClick={handleEnd}
-                    style={{
-                        position: 'fixed',
-                        top: '10px',
-                        right: '880px',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        padding: '12px 20px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        zIndex: 999998,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                        transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#c82333';
-                        e.currentTarget.style.transform = 'scale(1.05)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#dc3545';
-                        e.currentTarget.style.transform = 'scale(1)';
-                    }}
-                >
-                    ✕ Close Exercise
-                </button>
-            )}
-            
+            {/* Auto-close enabled - no manual close button needed */}
             {content}
             {/* ExerciseStatsOverlay hidden per professor's request for simplification */}
             {/* <ExerciseStatsOverlay 
@@ -438,7 +474,7 @@ export function MatchingExercise({ flexibilityExerciseId, exercise, condition, h
     }
 
     async function handleExerciseEnd(): Promise<void> {
-        // Mark exercise as completed to show close button
+        // Mark exercise as completed to trigger auto-close logic
         setIsExerciseCompleted(true);
         
         console.log(`🏁 ===== HANDLE EXERCISE END CALLED =====`);

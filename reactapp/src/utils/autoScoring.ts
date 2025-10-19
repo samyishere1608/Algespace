@@ -108,7 +108,6 @@ export const GOAL_SCORING_STRATEGIES = {
       "Switch methods strategically", // 3 exercises
       "Choose optimal methods consistently", // 3 exercises
       "Master all three methods fluently", // 2+ in each method
-      "Track progress meaningfully", // 3+ methods
       "Explain reasoning clearly", // 3 exercises with self-explanation
       "Show consistent improvement", // improvement trend over 4+ exercises
       "Maintain accuracy under pressure" // avg ≤1 error over 5+ exercises
@@ -372,10 +371,6 @@ export function getContributingExercises(
       
     case "Master all three methods fluently":
       // All exercises from all methods for averaging
-      return sortedExercises;
-      
-    case "Track progress meaningfully":
-      // All exercises across 3+ methods
       return sortedExercises;
       
     case "Show consistent improvement":

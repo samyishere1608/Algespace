@@ -48,7 +48,7 @@ export function GoalSystemTestComponent() {
     // Learning & Growth
     { title: "Reflect on method effectiveness", category: "Learning & Growth", difficulty: "very easy", description: "Test reflection" },
     { title: "Build confidence through success", category: "Learning & Growth", difficulty: "easy", description: "Test confidence building" },
-    { title: "Track progress meaningfully", category: "Learning & Growth", difficulty: "medium", description: "Test progress tracking" }
+    { title: "Explain reasoning clearly", category: "Learning & Growth", difficulty: "medium", description: "Test reasoning explanation" }
   ];
 
   const runAllTests = async () => {

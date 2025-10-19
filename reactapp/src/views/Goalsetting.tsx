@@ -50,8 +50,6 @@ const goalCompletionGuide: Record<string, string> = {
   "Learn from mistakes effectively": "📈 How to Complete:\n• Complete exercises where recent performance shows fewer errors than earlier attempts\n• Demonstrates improvement over time through learning\n• Shows growth mindset in action\n\n� Completes when error tracking shows clear improvement trend!",
   
   "Set personal learning challenges": "🎯 How to Complete:\n• Complete 10 total exercises (any type/method)\n• Shows commitment to sustained learning\n• Demonstrates self-directed challenge-seeking\n\n🏆 Completes after your 10th total exercise completion!",
-  
-  "Track progress meaningfully": "🌟 How to Complete:\n• Complete exercises using all 3 different methods (substitution, elimination, equalization)\n• Shows comprehensive engagement with all approaches\n• Demonstrates holistic learning approach\n\n🌟 Completes when you've successfully used all three methods!",
 
   "Reflect on method effectiveness": "🤔 How to Complete:\n• Complete an exercise with self-explanation in Matching Exercise or Efficiency Exercise\n• Provide thoughtful reasoning about method choices\n• Shows deeper analytical thinking\n\n📖 Completes when you engage with self-explanation features!",
 
@@ -97,6 +95,7 @@ export default function GoalSettingView({ userId: propUserId }: { userId?: numbe
   const [showRecommendationReason, setShowRecommendationReason] = useState<string | null>(null);
   const [recommendationReasons, setRecommendationReasons] = useState<Record<string, string>>({});
   const [loadingReason, setLoadingReason] = useState<string | null>(null);
+  const [prefilledGoal, setPrefilledGoal] = useState<{category: string, title: string, difficulty: string} | null>(null);
   const [performanceStats, setPerformanceStats] = useState<{
     totalGoalsCompleted: number;
     averageActualScore: number;
@@ -305,6 +304,40 @@ useEffect(() => {
     return `🎯 ${goalTitle}\n\n⏳ Loading detailed recommendation based on your performance data...\n\nThis goal was selected by our adaptive recommendation system based on your progress and learning patterns.`;
   };
 
+  // Function to handle quick-add recommended goal
+  const handleQuickAddGoal = (goal: string) => {
+    const goalParts = goal.split('|');
+    
+    if (goalParts.length === 3) {
+      const [category, title, difficulty] = goalParts;
+      
+      // Check if goal already exists
+      const goalExists = goals.some(existingGoal => 
+        existingGoal.title === title && existingGoal.category === category
+      );
+      
+      if (goalExists) {
+        setAgentMessage("📌 This goal is already in your goal list!");
+        setShowCheckIn(true);
+        return;
+      }
+      
+      // Pre-fill the goal form
+      setPrefilledGoal({ category, title, difficulty });
+      
+      // Scroll to goal form
+      const goalFormElement = document.querySelector('[data-goal-form]');
+      if (goalFormElement) {
+        goalFormElement.scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      setAgentMessage(`✨ Goal form pre-filled with: "${title}". Just set your self-efficacy questions and click create!`);
+      setShowCheckIn(true);
+    } else {
+      console.warn('Invalid goal format for quick-add:', goal);
+    }
+  };
+
   return (
      <div
     style={{
@@ -415,14 +448,14 @@ useEffect(() => {
             if (goalParts.length === 3) {
               const [category, title, difficulty] = goalParts;
               
-              // Get difficulty color and emoji
+              // Get difficulty color and emoji - matching GoalForm style
               const getDifficultyStyle = (diff: string) => {
                 const diffLower = diff.toLowerCase();
-                if (diffLower.includes('very easy')) return { color: '#28a745', emoji: '🟢', label: 'Very Easy' };
-                if (diffLower.includes('easy')) return { color: '#20c997', emoji: '🟡', label: 'Easy' };
-                if (diffLower.includes('medium')) return { color: '#ffc107', emoji: '🟠', label: 'Medium' };
-                if (diffLower.includes('hard') && !diffLower.includes('very')) return { color: '#fd7e14', emoji: '🔴', label: 'Hard' };
-                if (diffLower.includes('very hard')) return { color: '#dc3545', emoji: '⚫', label: 'Very Hard' };
+                if (diffLower.includes('very easy')) return { color: '#007bff', emoji: '🟦', label: 'Very Easy' };
+                if (diffLower.includes('easy')) return { color: '#28a745', emoji: '🟢', label: 'Easy' };
+                if (diffLower.includes('medium')) return { color: '#ffc107', emoji: '🟡', label: 'Medium' };
+                if (diffLower.includes('hard') && !diffLower.includes('very')) return { color: '#dc3545', emoji: '🔴', label: 'Hard' };
+                if (diffLower.includes('very hard')) return { color: '#343a40', emoji: '⚫', label: 'Very Hard' };
                 return { color: '#6c757d', emoji: '⚪', label: difficulty };
               };
               
@@ -561,6 +594,28 @@ useEffect(() => {
                     >
                       🧠
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickAddGoal(goal)}
+                      style={{
+                        background: "#4caf50",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "0.7rem",
+                        padding: "0.25rem 0.4rem",
+                        borderRadius: "4px",
+                        color: "white",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginLeft: "4px",
+                        fontWeight: "600",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
+                      }}
+                      title="Add this goal to your list"
+                    >
+                      + Add
+                    </button>
                   </div>
                 </div>
               );
@@ -598,6 +653,28 @@ useEffect(() => {
                       }}>{title}</span>
                     )}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Convert old format to new format with default difficulty
+                      const convertedGoal = `${category}|${title || category}|easy`;
+                      handleQuickAddGoal(convertedGoal);
+                    }}
+                    style={{
+                      background: "#4caf50",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "0.7rem",
+                      padding: "0.25rem 0.4rem",
+                      borderRadius: "4px",
+                      color: "white",
+                      fontWeight: "600",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
+                    }}
+                    title="Add this goal to your list"
+                  >
+                    + Add
+                  </button>
                 </div>
               );
             }
@@ -633,7 +710,12 @@ useEffect(() => {
         maxHeight: window.innerWidth <= 768 ? "50vh" : "100%",
         overflowY: "auto"
       }}>
-        <GoalForm onCreate={handleCreateGoal} userId={userId} />
+        <GoalForm 
+          onCreate={handleCreateGoal} 
+          userId={userId} 
+          prefilledGoal={prefilledGoal}
+          onPrefilledGoalUsed={() => setPrefilledGoal(null)}
+        />
       </div>
 
       {/* Active Goals - Center */}
@@ -668,25 +750,7 @@ useEffect(() => {
     </div>
 
     {/* Make the exercise button responsive */}
-    <button
-      onClick={() => {
-        const newCount = exerciseCount + 1;
-        setExerciseCount(newCount);
-        if (newCount % 3 === 0) setShowCheckIn1(true);
-      }}
-      style={{
-        marginTop: "1rem",
-        padding: "0.6rem 1.2rem",
-        background: "#28a745",
-        color: "#fff",
-        border: "none",
-        borderRadius: "8px",
-        cursor: "pointer",
-        width: window.innerWidth <= 768 ? "100%" : "auto"
-      }}
-    >
-      ✅ Simulate Exercise Completion
-    </button>
+   
 
       {/* Check-in after exercise */}
       {showCheckIn1 && (

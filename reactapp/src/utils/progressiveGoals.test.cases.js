@@ -132,13 +132,6 @@ const learningGrowthTests = [
     explanation: "Completing 10+ total exercises shows commitment to challenges"
   },
   {
-    name: "Track Progress → 'Track progress meaningfully'", 
-    sessionData: { hints: 1, errors: 1, method: "equalization", exerciseType: "efficiency", completedWithSelfExplanation: false },
-    currentProgress: { total: 6, substitution: 2, elimination: 2, equalization: 0, errorHistory: [2, 1, 1, 0, 2, 1], selfExplanations: 2 },
-    expectedTriggeredGoals: ["Understand how equalization works", "Track progress meaningfully"],
-    explanation: "Using all 3 methods (sub>0, elim>0, equal>0) should trigger tracking goal"
-  },
-  {
     name: "Method Reflection → 'Reflect on method effectiveness'",
     sessionData: { hints: 1, errors: 2, method: "elimination", exerciseType: "matching", completedWithSelfExplanation: true },
     currentProgress: { total: 4, substitution: 2, elimination: 1, equalization: 1, errorHistory: [1, 2, 0, 1], selfExplanations: 0 },

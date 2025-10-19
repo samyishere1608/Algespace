@@ -94,6 +94,11 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
 
   const handleSubmit = () => {
     onSubmit(actualScore); // Only pass actual score (error count)
+    
+    // Notify exercises that RetrospectivePrompt is completed
+    // This triggers PostTaskAppraisal form, then goal feedback messages
+    console.log('🎯 RetrospectivePrompt: Dispatching completion event');
+    window.dispatchEvent(new CustomEvent('retrospectivePromptComplete'));
   };
 
   // Prevent accidental closing with ESC key

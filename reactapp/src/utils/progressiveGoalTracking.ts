@@ -505,18 +505,6 @@ export function checkProgressiveGoals(
     }
   }
   
-  // Track progress meaningfully (complete exercises across 3+ methods)
-  const uniqueMethodsUsed = [progress.substitution, progress.elimination, progress.equalization].filter(count => count > 0).length;
-  if (uniqueMethodsUsed >= 3) {
-    console.log(`🎯 ATTEMPTING: "Track progress meaningfully" (used ${uniqueMethodsUsed} different methods)`);
-    try {
-      completeGoalByTitle("Track progress meaningfully");
-      console.log(`✅ Successfully called completeGoalByTitle for "Track progress meaningfully"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
-  }
-  
   console.log(`✅ Progressive goal check complete for ${session.exerciseType} exercise with ${session.method} method`);
 }
 
@@ -576,7 +564,6 @@ export function displayProgressiveStats(userId: number): void {
    Ready for "Handle complex problems confidently": ${progress.total >= 5 ? '✅' : '❌'}
    Ready for "Work independently": ${hintFreeCount >= 3 ? '✅' : '❌'}
    Ready for "Set personal learning challenges": ${progress.total >= 10 ? '✅' : '❌'}
-   Ready for "Track progress meaningfully": ${progress.substitution > 0 && progress.elimination > 0 && progress.equalization > 0 ? '✅' : '❌'}
 
 ======================================================
 `);

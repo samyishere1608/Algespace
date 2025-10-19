@@ -75,7 +75,7 @@ namespace webapi.Controllers
                     {
                         // Can start with medium level, focus on analysis
                         goals.Add("Method Mastery|Switch methods strategically|medium");
-                        goals.Add("Learning & Growth|Track progress meaningfully|medium");
+                        goals.Add("Learning & Growth|Explain reasoning clearly|medium");
                     }
                     else // Expert level
                     {
@@ -142,7 +142,7 @@ namespace webapi.Controllers
                     if (confidence.Contains("Not confident"))
                         goals.Add("Learning & Growth|Reflect on method effectiveness|very easy");
                     else
-                        goals.Add("Learning & Growth|Track progress meaningfully|medium");
+                        goals.Add("Learning & Growth|Explain reasoning clearly|medium");
                 }
 
                 _logger.LogInformation("Generated {GoalCount} goals for user {UserId}: {Goals}", 

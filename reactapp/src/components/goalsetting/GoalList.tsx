@@ -32,6 +32,7 @@ interface Props {
   showOnlyActive?: boolean;
   showOnlyCompleted?: boolean;
   compact?: boolean; // For overlay/compact display mode
+  onModalTrigger?: (goalId: number, autoScore?: number, exercises?: any[]) => void; // Callback for external modal rendering
 }
 import PostTaskAppraisal from "../PostTaskAppraisal";
 
@@ -83,9 +84,7 @@ const goalCompletionGuide: Record<string, string> = {
   
   "Develop problem-solving resilience": "🌱 How to Complete:\n• Complete 1 exercise after making at least 1 error\n• Shows ability to recover and persist through mistakes\n• Demonstrates growth mindset and resilience\n\n💪 Completes when you successfully finish an exercise despite making errors!",
   
-  "Set personal learning challenges": "🎯 How to Complete:\n• Complete 10 total exercises (any type/method)\n• Shows commitment to sustained learning\n• Demonstrates self-directed challenge-seeking\n\n🏆 Completes after your 10th total exercise completion!",
-  
-  "Track progress meaningfully": "🌟 How to Complete:\n• Complete exercises using all 3 different methods (substitution, elimination, equalization)\n• Shows comprehensive engagement with all approaches\n• Demonstrates holistic learning approach\n\n🌟 Completes when you've successfully used all three methods!"
+  "Set personal learning challenges": "🎯 How to Complete:\n• Complete 10 total exercises (any type/method)\n• Shows commitment to sustained learning\n• Demonstrates self-directed challenge-seeking\n\n🏆 Completes after your 10th total exercise completion!"
 };
 
 
@@ -115,7 +114,6 @@ const categorizedGoals: Record<string, { title: string; difficulty: string }[]> 
     { title: "Reflect on method effectiveness", difficulty: "very easy" },
     { title: "Build confidence through success", difficulty: "easy" },
     { title: "Learn from mistakes effectively", difficulty: "easy" },
-    { title: "Track progress meaningfully", difficulty: "medium" },
     { title: "Develop problem-solving resilience", difficulty: "medium" },
     { title: "Explain reasoning clearly", difficulty: "medium" },
     { title: "Show consistent improvement", difficulty: "hard" },
@@ -125,11 +123,15 @@ const categorizedGoals: Record<string, { title: string; difficulty: string }[]> 
 };
 
 
-export function GoalList({ goals, onGoalsChange, userId, showOnlyActive, showOnlyCompleted, compact = false }: Props) {
+export function GoalList({ goals, onGoalsChange, userId, showOnlyActive, showOnlyCompleted, compact = false, onModalTrigger }: Props) {
   const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDifficulty, setEditDifficulty] = useState("");
   const [editCategory, setEditCategory] = useState<string>("");
+  const [editConfidenceBefore, setEditConfidenceBefore] = useState<number>(3);
+  const [editExpectedMistakes, setEditExpectedMistakes] = useState<number>(3);
+  const [editMotivationRating, setEditMotivationRating] = useState<number>(3);
+  const [showEditModal, setShowEditModal] = useState(false);
 
 const [showAppraisalModal, setShowAppraisalModal] = useState<{ goalId: number } | null>(null);
   const [reasonPrompt, setReasonPrompt] = useState<{
@@ -139,7 +141,7 @@ const [showAppraisalModal, setShowAppraisalModal] = useState<{ goalId: number } 
 
   const [Completedcount, setCompletedCount] = useState(0);
   const [showCheckIn, setShowCheckIn] = useState(false);
-  const [agentMessage, setAgentMessage] = useState<string | null>(null);
+  const [agentMessage, setAgentMessage] = useState<{ text: string; duration?: number } | null>(null);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
   const [feedbackData, setFeedbackData] = useState<{
     goalId: number;
@@ -200,9 +202,18 @@ const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     onGoalsChange,
     (goalId: number, autoScore?: number, exercises?: any[]) => {
       console.log(`🎯 Goal completion triggered with auto score: ${autoScore}, exercises:`, exercises);
-      setSelectedGoalId(goalId);
-      setAutoCalculatedScore(autoScore || null);
-      setContributingExercises(exercises || null);
+      
+      if (onModalTrigger) {
+        // Use external modal trigger (for hidden GoalList with visible modals)
+        console.log(`🎯 Using external modal trigger at parent level`);
+        onModalTrigger(goalId, autoScore, exercises);
+      } else {
+        // Use internal modal (for regular GoalList)
+        console.log(`🎯 Using internal modal rendering`);
+        setSelectedGoalId(goalId);
+        setAutoCalculatedScore(autoScore || null);
+        setContributingExercises(exercises || null);
+      }
     }
   );
 
@@ -252,10 +263,15 @@ const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     setEditTitle(goal.title);
     setEditDifficulty(goal.difficulty);
     setEditCategory(goal.category || "");
+    setEditConfidenceBefore(goal.confidenceBefore || 3);
+    setEditExpectedMistakes(goal.expectedMistakes || 3);
+    setEditMotivationRating(goal.MotivationRating || 3);
+    setShowEditModal(true);
   }
 
   function cancelEditing() {
     setEditingGoalId(null);
+    setShowEditModal(false);
   }
 
   async function saveEdit() {
@@ -266,24 +282,37 @@ const [showFeedbackModal, setShowFeedbackModal] = useState(false);
         title: editTitle,
         difficulty: editDifficulty,
         category: editCategory,
-        userId: goals.find((g) => g.id === editingGoalId)?.userId || userId, // Use dynamic userId instead of hardcoded 1
+        userId: goals.find((g) => g.id === editingGoalId)?.userId || userId,
+        confidenceBefore: editConfidenceBefore,
+        expectedMistakes: editExpectedMistakes,
+        MotivationRating: editMotivationRating,
       };
 
       await updateGoal(editingGoalId, updatedGoalInput);
 
       const newGoals = goals.map((g) =>
         g.id === editingGoalId
-          ? { ...g, title: editTitle, difficulty: editDifficulty, category: editCategory }
+          ? { 
+              ...g, 
+              title: editTitle, 
+              difficulty: editDifficulty, 
+              category: editCategory, 
+              confidenceBefore: editConfidenceBefore,
+              expectedMistakes: editExpectedMistakes,
+              MotivationRating: editMotivationRating
+            }
           : g
       );
 
       onGoalsChange(newGoals);
 
       setEditingGoalId(null);
+      setShowEditModal(false);
       setReasonPrompt({ goalId: editingGoalId, action: "Update" });
-      setAgentMessage(
-        "👍 Great! Changing goals is okay — just remember why you made the switch!"
-      );
+      setAgentMessage({
+        text: "👍 Great! Changing goals is okay — just remember why you made the switch!",
+        duration: 4000
+      });
       setShowCheckIn(true);
     } catch (error) {
       console.error("Failed to update goal", error);
@@ -451,10 +480,10 @@ async function handleAppraisalSubmit(
     }
 
     // Prepare messages array
-    const messages: string[] = [];
+    const messages: Array<{ text: string; duration?: number }> = [];
     
     // Add basic goal completion feedback
-    messages.push(`🎉 Goal completed! Great work on "${currentGoal.title}".`);
+    messages.push({ text: `🎉 Goal completed! Great work on "${currentGoal.title}".`, duration: 4000 });
 
     // Add progression feedback if suggestions were updated
     if (updatedSuggestions && updatedSuggestions.length > 0) {
@@ -625,7 +654,7 @@ async function handleAppraisalSubmit(
           const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
           
           console.log('🎯 Generated adaptive feedback for goal completion');
-          messages.push(adaptiveFeedbackMessage);
+          messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
           
           // ✅ NOW clear the session data after using it for adaptive feedback
           if (mostRecentKey) {
@@ -658,11 +687,11 @@ async function handleAppraisalSubmit(
           
           console.log('🎯 Generating adaptive feedback from reflection data:', emotionalData);
           const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
-          messages.push(adaptiveFeedbackMessage);
+          messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
         }
       } catch (error) {
         console.error('🎯 Error generating adaptive feedback:', error);
-        messages.push("📈 Your goal recommendations have been updated based on your progress!");
+        messages.push({ text: "📈 Your goal recommendations have been updated based on your progress!", duration: 4000 });
       } finally {
         // ✅ Clean up any remaining session data for this user (in case of errors)
         const allSessionKeys = Object.keys(sessionStorage).filter(key => 
@@ -693,7 +722,7 @@ async function handleAppraisalSubmit(
     const updatedCompletedGoals = newGoals.filter(g => g.completed).length;
     const isAllCompleted = updatedCompletedGoals === totalGoals;
     if (isAllCompleted) {
-      messages.push("🎉 Awesome! You've completed all your goals!");
+      messages.push({ text: "🎉 Awesome! You've completed all your goals!", duration: 4000 });
       setTimeout(() => {
         confetti({
           particleCount: 200,
@@ -710,8 +739,17 @@ async function handleAppraisalSubmit(
         setAgentMessage(message);
         setShowCheckIn(true);
       }, delay);
-      delay += 3000;
+      // Use the message's duration (or default 4000ms) plus 1 second buffer for the next message
+      delay += (message.duration || 4000) + 200; // 1 second buffer between messages
     });
+    
+    // Dispatch event when all goal feedback is complete (for auto-close in exercises)
+    if (delay > 0) { // Only if we have messages to show
+      setTimeout(() => {
+        console.log('🎯 All goal feedback complete, dispatching event for auto-close');
+        window.dispatchEvent(new CustomEvent('goalFeedbackComplete'));
+      }, delay + 1000); // Additional delay after last message finishes
+    }
 
     // Show celebration for high satisfaction
     if (postSatisfaction >= 4) {
@@ -726,7 +764,7 @@ async function handleAppraisalSubmit(
 
   } catch (error) {
     console.error("Failed to submit appraisal", error);
-    setAgentMessage("❌ Something went wrong with the submission.");
+    setAgentMessage({ text: "❌ Something went wrong with the submission.", duration: 4000 });
     setShowCheckIn(true);
   }
 }
@@ -745,14 +783,14 @@ async function removeGoal(id: number) {
         style={{
           background: "#229EBC",
           borderRadius: compact ? "clamp(4px, 1vw, 8px)" : "clamp(8px, 2vw, 12px)",
-          padding: compact ? "clamp(0.5rem, 2vw, 0.75rem)" : "clamp(0.75rem, 3vw, 2rem)",
+          padding: compact ? "0.5rem" : "clamp(0.75rem, 3vw, 2rem)",
           maxWidth: compact ? "none" : "600px",
           margin: compact ? "0" : "auto",
           boxShadow: compact ? "0 4px 12px rgba(0, 0, 0, 0.15)" : "0 10px 30px rgba(0, 0, 0, 0.1)",
           fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-          fontSize: "clamp(0.75rem, 2vw, 0.9rem)",
+          fontSize: compact ? "0.75rem" : "clamp(0.75rem, 2vw, 0.9rem)",
           height: compact ? "100%" : "auto",
-          minHeight: compact ? "500px" : "auto",
+          minHeight: compact ? "0" : "auto",
           display: compact ? "flex" : "block",
           flexDirection: compact ? "column" : "initial",
         }}
@@ -814,7 +852,7 @@ async function removeGoal(id: number) {
       <div
         style={{
           background: "white",
-          padding: "clamp(0.5rem, 2vw, 1rem)",
+          padding: compact ? "0.5rem" : "clamp(0.5rem, 2vw, 1rem)",
           borderRadius: "clamp(4px, 1.5vw, 8px)",
           marginBottom: compact ? "0" : "clamp(0.5rem, 1.5vw, 1rem)",
           border: showOnlyCompleted ? "2px solid #4caf50" : "2px solid #000000ff",
@@ -827,7 +865,7 @@ async function removeGoal(id: number) {
         <h3 style={{
           color: showOnlyCompleted ? "#4caf50" : "#1976d2",
           marginBottom: "clamp(0.5rem, 1.5vw, 0.75rem)",
-          fontSize: "clamp(0.85rem, 2.2vw, 1.1rem)",
+          fontSize: compact ? "0.85rem" : "clamp(0.85rem, 2.2vw, 1.1rem)",
           textAlign: "center",
           fontWeight: "600"
         }}>
@@ -863,285 +901,22 @@ async function removeGoal(id: number) {
               overflowY: "auto",
               display: "flex",
               flexDirection: "column",
-              gap: "clamp(0.5rem, 1.5vw, 0.75rem)",
+              gap: compact ? "0.4rem" : "clamp(0.5rem, 1.5vw, 0.75rem)",
             }}
             aria-label={showOnlyCompleted ? "Completed Goals List" : "Active Goals List"}
           >
-            {filteredGoals.map((goal) =>
-          editingGoalId === goal.id ? (
+            {filteredGoals.map((goal) => (
             <div
               key={goal.id}
               style={{
-                background: "#229EBC",
-                padding: "1rem",
-                borderRadius: "10px",
-                border: "1px solid black",
-                fontFamily: "'Comic Sans MS', cursive, sans-serif",
-                color: "white",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-              }}
-            >
-              {/* Title */}
-              <h4 style={{ 
-                textAlign: "center", 
-                marginTop: 0,
-                marginBottom: "1rem",
-                color: "white",
-                fontSize: "1rem",
-                fontWeight: "bold"
-              }}>
-                ✏️ Edit Your Goal
-              </h4>
-
-              {/* 3-Column Grid Layout */}
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr",
-                gap: "0.8rem",
-                marginBottom: "1rem"
-              }}>
-                
-                {/* Step 1: Category */}
-                <div style={{
-                  background: editCategory ? "#e8f5e8" : "#fff",
-                  padding: "0.7rem",
-                  borderRadius: "6px",
-                  border: "2px solid #333",
-                  color: "#333"
-                }}>
-                  <h5 style={{ 
-                    margin: "0 0 0.4rem 0", 
-                    color: "#333",
-                    fontSize: "0.8rem",
-                    fontWeight: "bold"
-                  }}>
-                    <span style={{ color: editCategory ? "#28a745" : "#007bff" }}>1.</span> Category
-                  </h5>
-                  <select
-                    value={editCategory}
-                    onChange={(e) => {
-                      const newCategory = e.target.value;
-                      setEditCategory(newCategory);
-                      setEditTitle("");
-                      // Set first available difficulty for the new category
-                      const availableDifficulties = categorizedGoals[newCategory]
-                        ? [...new Set(categorizedGoals[newCategory].map(g => g.difficulty))]
-                        : [];
-                      if (availableDifficulties.length > 0) {
-                        setEditDifficulty(availableDifficulties[0]);
-                      }
-                    }}
-                    style={{
-                      width: "100%",
-                      padding: "0.4rem",
-                      borderRadius: "4px",
-                      border: "1px solid #ccc",
-                      fontSize: "0.75rem",
-                      cursor: "pointer",
-                      backgroundColor: editCategory ? "#f8fff8" : "white"
-                    }}
-                  >
-                    <option value="">Select...</option>
-                    {Object.keys(categorizedGoals).map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                  {editCategory && (
-                    <div style={{ 
-                      marginTop: "0.3rem", 
-                      fontSize: "0.65rem", 
-                      color: "#28a745",
-                      fontWeight: "bold"
-                    }}>
-                      ✓ Selected
-                    </div>
-                  )}
-                </div>
-
-                {/* Step 2: Difficulty */}
-                <div style={{
-                  background: (editCategory && editDifficulty) ? "#e8f5e8" : editCategory ? "#fff" : "#f5f5f5",
-                  padding: "0.7rem",
-                  borderRadius: "6px",
-                  border: "2px solid #333",
-                  color: "#333",
-                  opacity: editCategory ? 1 : 0.6
-                }}>
-                  <h5 style={{ 
-                    margin: "0 0 0.4rem 0", 
-                    color: "#333",
-                    fontSize: "0.8rem",
-                    fontWeight: "bold"
-                  }}>
-                    <span style={{ color: (editCategory && editDifficulty) ? "#28a745" : "#007bff" }}>2.</span> Difficulty
-                  </h5>
-                  <select
-                    value={editDifficulty}
-                    onChange={(e) => {
-                      setEditDifficulty(e.target.value);
-                      setEditTitle("");
-                    }}
-                    disabled={!editCategory}
-                    style={{
-                      width: "100%",
-                      padding: "0.4rem",
-                      borderRadius: "4px",
-                      border: "1px solid #ccc",
-                      fontSize: "0.75rem",
-                      cursor: editCategory ? "pointer" : "not-allowed",
-                      backgroundColor: (editCategory && editDifficulty) ? "#f8fff8" : editCategory ? "white" : "#f0f0f0"
-                    }}
-                  >
-                    {editCategory && (() => {
-                      const availableDifficulties = [...new Set(categorizedGoals[editCategory].map(g => g.difficulty))].sort((a, b) => {
-                        const order = { "very easy": 0, "easy": 1, "medium": 2, "hard": 3, "very hard": 4 };
-                        return (order[a as keyof typeof order] || 0) - (order[b as keyof typeof order] || 0);
-                      });
-                      const difficultyEmojis: Record<string, string> = {
-                        "very easy": "🟦", "easy": "🟢", "medium": "🟡", "hard": "🔴", "very hard": "⚫"
-                      };
-                      const difficultyLabels: Record<string, string> = {
-                        "very easy": "Very Easy", "easy": "Easy", "medium": "Medium", "hard": "Hard", "very hard": "Very Hard"
-                      };
-                      return availableDifficulties.map(diff => (
-                        <option key={diff} value={diff}>
-                          {difficultyEmojis[diff]} {difficultyLabels[diff]}
-                        </option>
-                      ));
-                    })()}
-                  </select>
-                  {editCategory && editDifficulty && (
-                    <div style={{ 
-                      marginTop: "0.3rem", 
-                      fontSize: "0.65rem", 
-                      color: "#28a745",
-                      fontWeight: "bold"
-                    }}>
-                      ✓ Selected
-                    </div>
-                  )}
-                </div>
-
-                {/* Step 3: Goal */}
-                <div style={{
-                  background: editTitle ? "#e8f5e8" : (editCategory && editDifficulty) ? "#fff" : "#f5f5f5",
-                  padding: "0.7rem",
-                  borderRadius: "6px",
-                  border: "2px solid #333",
-                  color: "#333",
-                  opacity: (editCategory && editDifficulty) ? 1 : 0.6
-                }}>
-                  <h5 style={{ 
-                    margin: "0 0 0.4rem 0", 
-                    color: "#333",
-                    fontSize: "0.8rem",
-                    fontWeight: "bold"
-                  }}>
-                    <span style={{ color: editTitle ? "#28a745" : "#007bff" }}>3.</span> Goal
-                  </h5>
-                  <select
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    disabled={!editCategory || !editDifficulty}
-                    style={{
-                      width: "100%",
-                      padding: "0.4rem",
-                      borderRadius: "4px",
-                      border: "1px solid #ccc",
-                      fontSize: "0.75rem",
-                      cursor: (editCategory && editDifficulty) ? "pointer" : "not-allowed",
-                      backgroundColor: editTitle ? "#f8fff8" : (editCategory && editDifficulty) ? "white" : "#f0f0f0"
-                    }}
-                  >
-                    <option value="">Select...</option>
-                    {editCategory && editDifficulty && 
-                      categorizedGoals[editCategory]
-                        .filter(g => g.difficulty === editDifficulty)
-                        .map((goalOption, i) => (
-                          <option key={i} value={goalOption.title}>{goalOption.title}</option>
-                        ))}
-                  </select>
-                  {editTitle && (
-                    <div style={{ 
-                      marginTop: "0.3rem", 
-                      fontSize: "0.65rem", 
-                      color: "#28a745",
-                      fontWeight: "bold"
-                    }}>
-                      ✓ Selected
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div style={{ 
-                display: "flex", 
-                justifyContent: "center", 
-                gap: "0.8rem",
-                marginTop: "0.5rem"
-              }}>
-                <button
-                  onClick={saveEdit}
-                  disabled={!editTitle}
-                  style={{
-                    backgroundColor: editTitle ? "#28a745" : "#6c757d",
-                    color: "white",
-                    border: "none",
-                    padding: "0.6rem 1.5rem",
-                    borderRadius: "8px",
-                    fontWeight: "700",
-                    fontSize: "0.85rem",
-                    cursor: editTitle ? "pointer" : "not-allowed",
-                    boxShadow: editTitle ? "0 3px 6px rgba(40,167,69,0.5)" : "none",
-                    transition: "all 0.3s ease",
-                    opacity: editTitle ? 1 : 0.6
-                  }}
-                  onMouseEnter={(e) => {
-                    if (editTitle) e.currentTarget.style.backgroundColor = "#218838";
-                  }}
-                  onMouseLeave={(e) => {
-                    if (editTitle) e.currentTarget.style.backgroundColor = "#28a745";
-                  }}
-                  aria-label="Save goal edit"
-                >
-                  💾 Save Changes
-                </button>
-
-                <button
-                  onClick={cancelEditing}
-                  style={{
-                    backgroundColor: "#dc3545",
-                    color: "white",
-                    border: "none",
-                    padding: "0.6rem 1.5rem",
-                    borderRadius: "8px",
-                    fontWeight: "700",
-                    fontSize: "0.85rem",
-                    cursor: "pointer",
-                    boxShadow: "0 3px 6px rgba(220,53,69,0.5)",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#c82333")}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#dc3545")}
-                  aria-label="Cancel goal edit"
-                >
-                  ❌ Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div
-              key={goal.id}
-              style={{
-                padding: "clamp(0.5rem, 1.5vw, 0.75rem)",
+                padding: compact ? "0.4rem" : "clamp(0.5rem, 1.5vw, 0.75rem)",
                 border: "2px solid #e0e0e0",
                 borderRadius: "clamp(4px, 1vw, 6px)",
                 background: "white",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                fontSize: "clamp(0.75rem, 1.8vw, 0.9rem)",
+                fontSize: compact ? "0.7rem" : "clamp(0.75rem, 1.8vw, 0.9rem)",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = "#2196f3";
@@ -1153,30 +928,30 @@ async function removeGoal(id: number) {
               }}
               aria-label={`Goal: ${goal.title}, difficulty: ${goal.difficulty}, category: ${goal.category}, status: ${goal.completed ? "completed" : "pending"}`}
             >
-              <div style={{ marginBottom: "clamp(0.5rem, 2vw, 1rem)" }}>
+              <div style={{ marginBottom: compact ? "0.3rem" : "clamp(0.5rem, 2vw, 1rem)" }}>
                 <div style={{
                   display: "grid",
                   gridTemplateColumns: "auto 1fr auto",
-                  gap: "clamp(0.3rem, 1vw, 0.5rem)",
+                  gap: compact ? "0.3rem" : "clamp(0.3rem, 1vw, 0.5rem)",
                   alignItems: "start",
-                  marginBottom: "clamp(0.3rem, 1vw, 0.5rem)"
+                  marginBottom: compact ? "0.2rem" : "clamp(0.3rem, 1vw, 0.5rem)"
                 }}>
                   <div>
                     <div style={{ 
-                      fontSize: "clamp(0.5rem, 1.2vw, 0.65rem)", 
+                      fontSize: compact ? "0.5rem" : "clamp(0.5rem, 1.2vw, 0.65rem)", 
                       fontWeight: "600", 
                       color: "#666",
                       textTransform: "uppercase",
                       letterSpacing: "0.3px",
-                      marginBottom: "clamp(0.1rem, 0.5vw, 0.2rem)"
+                      marginBottom: compact ? "0.1rem" : "clamp(0.1rem, 0.5vw, 0.2rem)"
                     }}>
                       Category
                     </div>
                     <div style={{ 
                       color: "#2196f3", 
                       fontWeight: "600",
-                      fontSize: "clamp(0.65rem, 1.4vw, 0.75rem)",
-                      padding: "clamp(0.1rem, 0.3vw, 0.15rem) clamp(0.2rem, 0.8vw, 0.4rem)",
+                      fontSize: compact ? "0.6rem" : "clamp(0.65rem, 1.4vw, 0.75rem)",
+                      padding: compact ? "0.1rem 0.3rem" : "clamp(0.1rem, 0.3vw, 0.15rem) clamp(0.2rem, 0.8vw, 0.4rem)",
                       backgroundColor: "#e3f2fd",
                       borderRadius: "3px",
                       display: "inline-block"
@@ -1187,18 +962,18 @@ async function removeGoal(id: number) {
                   
                   <div>
                     <div style={{ 
-                      fontSize: "clamp(0.5rem, 1.2vw, 0.65rem)", 
+                      fontSize: compact ? "0.5rem" : "clamp(0.5rem, 1.2vw, 0.65rem)", 
                       fontWeight: "600", 
                       color: "#666",
                       textTransform: "uppercase",
                       letterSpacing: "0.3px",
-                      marginBottom: "clamp(0.1rem, 0.5vw, 0.2rem)"
+                      marginBottom: compact ? "0.1rem" : "clamp(0.1rem, 0.5vw, 0.2rem)"
                     }}>
                       Goal
                     </div>
                     <div style={{
                       fontWeight: "600",
-                      fontSize: "clamp(0.7rem, 1.6vw, 0.8rem)",
+                      fontSize: compact ? "0.65rem" : "clamp(0.7rem, 1.6vw, 0.8rem)",
                       color: "#333",
                       lineHeight: "1.2"
                     }}>
@@ -1208,20 +983,20 @@ async function removeGoal(id: number) {
                   
                   <div>
                     <div style={{ 
-                      fontSize: "clamp(0.5rem, 1.2vw, 0.65rem)", 
+                      fontSize: compact ? "0.5rem" : "clamp(0.5rem, 1.2vw, 0.65rem)", 
                       fontWeight: "600", 
                       color: "#666",
                       textTransform: "uppercase",
                       letterSpacing: "0.3px",
-                      marginBottom: "clamp(0.1rem, 0.5vw, 0.2rem)"
+                      marginBottom: compact ? "0.1rem" : "clamp(0.1rem, 0.5vw, 0.2rem)"
                     }}>
                       Difficulty
                     </div>
                     <div style={{ 
-                      fontSize: "clamp(0.6rem, 1.3vw, 0.7rem)", 
+                      fontSize: compact ? "0.6rem" : "clamp(0.6rem, 1.3vw, 0.7rem)", 
                       fontWeight: "600",
                       color: "#555",
-                      padding: "clamp(0.1rem, 0.3vw, 0.15rem) clamp(0.2rem, 0.8vw, 0.4rem)",
+                      padding: compact ? "0.1rem 0.3rem" : "clamp(0.1rem, 0.3vw, 0.15rem) clamp(0.2rem, 0.8vw, 0.4rem)",
                       backgroundColor: "#f5f5f5",
                       borderRadius: "3px",
                       display: "inline-block"
@@ -1237,22 +1012,22 @@ async function removeGoal(id: number) {
                 <div
                   style={{
                     display: "flex",
-                    gap: "clamp(0.25rem, 1vw, 0.4rem)",
-                    marginTop: "clamp(0.5rem, 1.5vw, 0.75rem)",
+                    gap: compact ? "0.25rem" : "clamp(0.25rem, 1vw, 0.4rem)",
+                    marginTop: compact ? "0.3rem" : "clamp(0.5rem, 1.5vw, 0.75rem)",
                     flexWrap: "wrap",
                   }}
                 >
                   <button
                     onClick={() => startEditing(goal)}
                     style={{
-                      padding: "clamp(0.25rem, 1vw, 0.4rem) clamp(0.5rem, 1.5vw, 0.8rem)",
+                      padding: compact ? "0.25rem 0.5rem" : "clamp(0.25rem, 1vw, 0.4rem) clamp(0.5rem, 1.5vw, 0.8rem)",
                       background: "#ffc107",
                       color: "white",
                       border: "none",
                       borderRadius: "clamp(2px, 1vw, 4px)",
                       cursor: "pointer",
                       fontWeight: "600",
-                      fontSize: "clamp(0.65rem, 1.4vw, 0.8rem)",
+                      fontSize: compact ? "0.65rem" : "clamp(0.65rem, 1.4vw, 0.8rem)",
                       transition: "background 0.3s ease",
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "#e0a800")}
@@ -1265,14 +1040,14 @@ async function removeGoal(id: number) {
                   <button
                     onClick={() => removeGoal(goal.id)}
                     style={{
-                      padding: "clamp(0.25rem, 1vw, 0.4rem) clamp(0.5rem, 1.5vw, 0.8rem)",
+                      padding: compact ? "0.25rem 0.5rem" : "clamp(0.25rem, 1vw, 0.4rem) clamp(0.5rem, 1.5vw, 0.8rem)",
                       background: "#dc3545",
                       color: "white",
                       border: "none",
                       borderRadius: "clamp(2px, 1vw, 4px)",
                       cursor: "pointer",
                       fontWeight: "600",
-                      fontSize: "clamp(0.65rem, 1.4vw, 0.8rem)",
+                      fontSize: compact ? "0.65rem" : "clamp(0.65rem, 1.4vw, 0.8rem)",
                       transition: "background 0.3s ease",
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "#c82333")}
@@ -1285,14 +1060,14 @@ async function removeGoal(id: number) {
                   <button
                     onClick={() => setShowGuidanceModal(goal.title)}
                     style={{
-                      padding: "clamp(0.25rem, 1vw, 0.4rem) clamp(0.5rem, 1.5vw, 0.8rem)",
+                      padding: compact ? "0.25rem 0.5rem" : "clamp(0.25rem, 1vw, 0.4rem) clamp(0.5rem, 1.5vw, 0.8rem)",
                       background: "#17a2b8",
                       color: "white",
                       border: "none",
                       borderRadius: "clamp(2px, 1vw, 4px)",
                       cursor: "pointer",
                       fontWeight: "600",
-                      fontSize: "clamp(0.65rem, 1.4vw, 0.8rem)",
+                      fontSize: compact ? "0.65rem" : "clamp(0.65rem, 1.4vw, 0.8rem)",
                       transition: "background 0.3s ease",
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "#138496")}
@@ -1373,6 +1148,439 @@ async function removeGoal(id: number) {
         )}
       </div>
 
+      {/* Edit Goal Modal */}
+      {showEditModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 2000,
+          fontFamily: "'Comic Sans MS', cursive, sans-serif"
+        }}
+        onClick={cancelEditing}
+        >
+          <div style={{
+            backgroundColor: "#229EBC",
+            padding: "1.5rem",
+            borderRadius: "12px",
+            maxWidth: "600px",
+            width: "90%",
+            maxHeight: "90vh",
+            overflowY: "auto",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+            border: "3px solid #000"
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "1rem"
+            }}>
+              <h3 style={{
+                margin: 0,
+                color: "white",
+                fontSize: "1.2rem",
+                fontWeight: "bold"
+              }}>
+                ✏️ Edit Your Goal
+              </h3>
+              <button
+                onClick={cancelEditing}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "1.5rem",
+                  cursor: "pointer",
+                  color: "white",
+                  padding: "0.2rem"
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* 3-Column Grid Layout */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              gap: "0.8rem",
+              marginBottom: "1rem"
+            }}>
+              
+              {/* Step 1: Category */}
+              <div style={{
+                background: editCategory ? "#e8f5e8" : "#fff",
+                padding: "0.7rem",
+                borderRadius: "6px",
+                border: "2px solid #333",
+                color: "#333"
+              }}>
+                <h5 style={{ 
+                  margin: "0 0 0.4rem 0", 
+                  color: "#333",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold"
+                }}>
+                  <span style={{ color: editCategory ? "#28a745" : "#007bff" }}>1.</span> Category
+                </h5>
+                <select
+                  value={editCategory}
+                  onChange={(e) => {
+                    const newCategory = e.target.value;
+                    setEditCategory(newCategory);
+                    setEditTitle("");
+                    const availableDifficulties = categorizedGoals[newCategory]
+                      ? [...new Set(categorizedGoals[newCategory].map(g => g.difficulty))]
+                      : [];
+                    if (availableDifficulties.length > 0) {
+                      setEditDifficulty(availableDifficulties[0]);
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "0.4rem",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    backgroundColor: editCategory ? "#f8fff8" : "white"
+                  }}
+                >
+                  <option value="">Select...</option>
+                  {Object.keys(categorizedGoals).map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+                {editCategory && (
+                  <div style={{ 
+                    marginTop: "0.3rem", 
+                    fontSize: "0.65rem", 
+                    color: "#28a745",
+                    fontWeight: "bold"
+                  }}>
+                    ✓ Selected
+                  </div>
+                )}
+              </div>
+
+              {/* Step 2: Difficulty */}
+              <div style={{
+                background: (editCategory && editDifficulty) ? "#e8f5e8" : editCategory ? "#fff" : "#f5f5f5",
+                padding: "0.7rem",
+                borderRadius: "6px",
+                border: "2px solid #333",
+                color: "#333",
+                opacity: editCategory ? 1 : 0.6
+              }}>
+                <h5 style={{ 
+                  margin: "0 0 0.4rem 0", 
+                  color: "#333",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold"
+                }}>
+                  <span style={{ color: (editCategory && editDifficulty) ? "#28a745" : "#007bff" }}>2.</span> Difficulty
+                </h5>
+                <select
+                  value={editDifficulty}
+                  onChange={(e) => {
+                    setEditDifficulty(e.target.value);
+                    setEditTitle("");
+                  }}
+                  disabled={!editCategory}
+                  style={{
+                    width: "100%",
+                    padding: "0.4rem",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    fontSize: "0.75rem",
+                    cursor: editCategory ? "pointer" : "not-allowed",
+                    backgroundColor: (editCategory && editDifficulty) ? "#f8fff8" : editCategory ? "white" : "#f0f0f0"
+                  }}
+                >
+                  {editCategory && (() => {
+                    const availableDifficulties = [...new Set(categorizedGoals[editCategory].map(g => g.difficulty))].sort((a, b) => {
+                      const order = { "very easy": 0, "easy": 1, "medium": 2, "hard": 3, "very hard": 4 };
+                      return (order[a as keyof typeof order] || 0) - (order[b as keyof typeof order] || 0);
+                    });
+                    const difficultyEmojis: Record<string, string> = {
+                      "very easy": "🟦", "easy": "🟢", "medium": "🟡", "hard": "🔴", "very hard": "⚫"
+                    };
+                    const difficultyLabels: Record<string, string> = {
+                      "very easy": "Very Easy", "easy": "Easy", "medium": "Medium", "hard": "Hard", "very hard": "Very Hard"
+                    };
+                    return availableDifficulties.map(diff => (
+                      <option key={diff} value={diff}>
+                        {difficultyEmojis[diff]} {difficultyLabels[diff]}
+                      </option>
+                    ));
+                  })()}
+                </select>
+                {editCategory && editDifficulty && (
+                  <div style={{ 
+                    marginTop: "0.3rem", 
+                    fontSize: "0.65rem", 
+                    color: "#28a745",
+                    fontWeight: "bold"
+                  }}>
+                    ✓ Selected
+                  </div>
+                )}
+              </div>
+
+              {/* Step 3: Goal */}
+              <div style={{
+                background: editTitle ? "#e8f5e8" : (editCategory && editDifficulty) ? "#fff" : "#f5f5f5",
+                padding: "0.7rem",
+                borderRadius: "6px",
+                border: "2px solid #333",
+                color: "#333",
+                opacity: (editCategory && editDifficulty) ? 1 : 0.6
+              }}>
+                <h5 style={{ 
+                  margin: "0 0 0.4rem 0", 
+                  color: "#333",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold"
+                }}>
+                  <span style={{ color: editTitle ? "#28a745" : "#007bff" }}>3.</span> Goal
+                </h5>
+                <select
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  disabled={!editCategory || !editDifficulty}
+                  style={{
+                    width: "100%",
+                    padding: "0.4rem",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    fontSize: "0.75rem",
+                    cursor: (editCategory && editDifficulty) ? "pointer" : "not-allowed",
+                    backgroundColor: editTitle ? "#f8fff8" : (editCategory && editDifficulty) ? "white" : "#f0f0f0"
+                  }}
+                >
+                  <option value="">Select...</option>
+                  {editCategory && editDifficulty && 
+                    categorizedGoals[editCategory]
+                      .filter(g => g.difficulty === editDifficulty)
+                      .map((goalOption, i) => (
+                        <option key={i} value={goalOption.title}>{goalOption.title}</option>
+                      ))}
+                </select>
+                {editTitle && (
+                  <div style={{ 
+                    marginTop: "0.3rem", 
+                    fontSize: "0.65rem", 
+                    color: "#28a745",
+                    fontWeight: "bold"
+                  }}>
+                    ✓ Selected
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Self-Efficacy Questions - Similar to GoalForm */}
+            <div style={{
+              background: "white",
+              padding: "1rem",
+              borderRadius: "8px",
+              border: "2px solid #333",
+              color: "#333"
+            }}>
+              <h4 style={{ 
+                margin: "0 0 0.75rem 0", 
+                color: "#333",
+                fontSize: "0.9rem",
+                fontWeight: "bold",
+                textAlign: "center"
+              }}>
+                📊 Self-Efficacy Questions
+              </h4>
+
+              {/* Confidence */}
+              <div style={{ marginBottom: "0.75rem" }}>
+                <label style={{ 
+                  fontSize: "0.75rem", 
+                  fontWeight: "bold", 
+                  display: "block", 
+                  marginBottom: "0.3rem",
+                  color: "#333"
+                }}>
+                  Confidence? 🌟
+                </label>
+                <input
+                  type="range"
+                  min={1}
+                  max={5}
+                  step={1}
+                  value={editConfidenceBefore}
+                  onChange={(e) => setEditConfidenceBefore(Number(e.target.value))}
+                  style={{
+                    width: "100%",
+                    cursor: "pointer",
+                  }}
+                />
+                <div style={{
+                  fontSize: "1.2rem",
+                  textAlign: "center",
+                  marginTop: "0.2rem"
+                }}>
+                  {
+                    {
+                      1: "😟",
+                      2: "🙁", 
+                      3: "😐",
+                      4: "🙂",
+                      5: "😄",
+                    }[editConfidenceBefore]
+                  }
+                </div>
+              </div>
+
+              {/* Expected Mistakes */}
+              <div style={{ marginBottom: "0.75rem" }}>
+                <label style={{ 
+                  fontSize: "0.75rem", 
+                  fontWeight: "bold", 
+                  display: "block", 
+                  marginBottom: "0.3rem",
+                  color: "#333"
+                }}>
+                  Expected Mistakes? 🎯
+                </label>
+                <input
+                  type="range"
+                  min={0}
+                  max={10}
+                  step={1}
+                  value={editExpectedMistakes}
+                  onChange={(e) => setEditExpectedMistakes(Number(e.target.value))}
+                  style={{
+                    width: "100%",
+                    cursor: "pointer",
+                  }}
+                />
+                <div style={{
+                  textAlign: "center",
+                  marginTop: "0.2rem",
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  color: editExpectedMistakes <= 2 ? "#27ae60" : 
+                        editExpectedMistakes <= 5 ? "#f39c12" : "#e74c3c"
+                }}>
+                  {editExpectedMistakes} mistakes
+                </div>
+              </div>
+
+              {/* Motivation Rating */}
+              <div style={{ marginBottom: "0.5rem" }}>
+                <label style={{ 
+                  fontSize: "0.75rem", 
+                  fontWeight: "bold", 
+                  display: "block", 
+                  marginBottom: "0.3rem",
+                  color: "#333"
+                }}>
+                  How committed are you to achieving your goal? 🔥
+                </label>
+                <input
+                  type="range"
+                  min={1}
+                  max={5}
+                  step={1}
+                  value={editMotivationRating}
+                  onChange={(e) => setEditMotivationRating(Number(e.target.value))}
+                  style={{
+                    width: "100%",
+                    cursor: "pointer",
+                  }}
+                />
+                <div style={{
+                  fontSize: "1.2rem",
+                  textAlign: "center",
+                  marginTop: "0.2rem"
+                }}>
+                  {
+                    {
+                      1: "😴",
+                      2: "😕", 
+                      3: "😐",
+                      4: "😊",
+                      5: "🔥",
+                    }[editMotivationRating]
+                  }
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ 
+              display: "flex", 
+              justifyContent: "center", 
+              gap: "1rem",
+              marginTop: "1rem"
+            }}>
+              <button
+                onClick={saveEdit}
+                disabled={!editTitle}
+                style={{
+                  backgroundColor: editTitle ? "#28a745" : "#6c757d",
+                  color: "white",
+                  border: "none",
+                  padding: "0.75rem 2rem",
+                  borderRadius: "8px",
+                  fontWeight: "700",
+                  fontSize: "0.9rem",
+                  cursor: editTitle ? "pointer" : "not-allowed",
+                  boxShadow: editTitle ? "0 3px 6px rgba(40,167,69,0.5)" : "none",
+                  transition: "all 0.3s ease",
+                  opacity: editTitle ? 1 : 0.6,
+                  fontFamily: "'Comic Sans MS', cursive, sans-serif"
+                }}
+                onMouseEnter={(e) => {
+                  if (editTitle) e.currentTarget.style.backgroundColor = "#218838";
+                }}
+                onMouseLeave={(e) => {
+                  if (editTitle) e.currentTarget.style.backgroundColor = "#28a745";
+                }}
+              >
+                💾 Save Changes
+              </button>
+
+              <button
+                onClick={cancelEditing}
+                style={{
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  padding: "0.75rem 2rem",
+                  borderRadius: "8px",
+                  fontWeight: "700",
+                  fontSize: "0.9rem",
+                  cursor: "pointer",
+                  boxShadow: "0 3px 6px rgba(220,53,69,0.5)",
+                  transition: "background-color 0.3s ease",
+                  fontFamily: "'Comic Sans MS', cursive, sans-serif"
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#c82333")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#dc3545")}
+              >
+                ❌ Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Move modals outside the goals container */}
       {reasonPrompt && (
         <ReasonPrompt
@@ -1388,9 +1596,10 @@ async function removeGoal(id: number) {
                 await deleteGoal(reasonPrompt.goalId);
                 const newGoals = goals.filter((g) => g.id !== reasonPrompt.goalId);
                 onGoalsChange(newGoals);
-                setAgentMessage(
-                  "🗑️ It's okay to remove goals if they feel too much, just remember to complete what you have!"
-                );
+                setAgentMessage({
+                  text: "🗑️ It's okay to remove goals if they feel too much, just remember to complete what you have!",
+                  duration: 4000
+                });
                 setShowCheckIn(true);
               }
               
@@ -1416,27 +1625,31 @@ async function removeGoal(id: number) {
         />
       )}
 
-      {/* Retrospective modal - moved outside goals.map for proper rendering */}
-      {(() => {
-        const isModalOpen = selectedGoalId !== null;
-        console.log(`🎯 Rendering RetrospectiveModal with isOpen: ${isModalOpen}, selectedGoalId: ${selectedGoalId}`);
-        console.log(`🎯 Modal props check: isOpen=${isModalOpen}, hasOnClose=${!!handleSubmitRetrospective}, hasOnSubmit=${!!setSelectedGoalId}`);
-        return null;
-      })()}
-      <RetrospectiveModal
-        isOpen={selectedGoalId !== null}
-        onClose={() => {
-          console.log(`🎯 RetrospectiveModal onClose called`);
-          setSelectedGoalId(null);
-          setAutoCalculatedScore(null); // Reset auto score when closing
-          setContributingExercises(null); // Reset contributing exercises when closing
-        }}
-        onSubmit={handleSubmitRetrospective}
-        goalTitle={selectedGoalId ? goals.find(g => g.id === selectedGoalId)?.title : undefined}
-        autoCalculatedScore={autoCalculatedScore || undefined}
-        expectedMistakes={selectedGoalId ? goals.find(g => g.id === selectedGoalId)?.expectedMistakes : undefined}
-        contributingExercises={contributingExercises || undefined}
-      />
+      {/* Retrospective modal - only render if no external modal trigger */}
+      {!onModalTrigger && (
+        <>
+          {(() => {
+            const isModalOpen = selectedGoalId !== null;
+            console.log(`🎯 Rendering internal RetrospectiveModal with isOpen: ${isModalOpen}, selectedGoalId: ${selectedGoalId}`);
+            console.log(`🎯 Modal props check: isOpen=${isModalOpen}, hasOnClose=${!!handleSubmitRetrospective}, hasOnSubmit=${!!setSelectedGoalId}`);
+            return null;
+          })()}
+          <RetrospectiveModal
+            isOpen={selectedGoalId !== null}
+            onClose={() => {
+              console.log(`🎯 Internal RetrospectiveModal onClose called`);
+              setSelectedGoalId(null);
+              setAutoCalculatedScore(null);
+              setContributingExercises(null);
+            }}
+            onSubmit={handleSubmitRetrospective}
+            goalTitle={selectedGoalId ? goals.find(g => g.id === selectedGoalId)?.title : undefined}
+            autoCalculatedScore={autoCalculatedScore || undefined}
+            expectedMistakes={selectedGoalId ? goals.find(g => g.id === selectedGoalId)?.expectedMistakes : undefined}
+            contributingExercises={contributingExercises || undefined}
+          />
+        </>
+      )}
 
       {/* Simulate Auto-Complete Button
       <button
@@ -1467,12 +1680,13 @@ async function removeGoal(id: number) {
       {/* Agent popup */}
       {showCheckIn && agentMessage && (
         <AgentPopup
-          message={agentMessage}
+          message={agentMessage.text}
           image={FemaleAfricanSmiling}
           onClose={() => {
             setShowCheckIn(false);
             setAgentMessage(null);
           }}
+          duration={agentMessage.duration || 4000}
         />
       )}
 
@@ -1481,6 +1695,7 @@ async function removeGoal(id: number) {
     isOpen={true}
     onClose={() => setShowAppraisalModal(null)}
     onSubmit={handleAppraisalSubmit}
+    goalName={goals.find(g => g.id === showAppraisalModal.goalId)?.title}
   />
 )}
 

@@ -371,7 +371,6 @@ private List<string> GenerateProgressBasedSuggestions(int userId, List<Goal> com
             ("Reflect on method effectiveness", "very easy", 1),
             ("Build confidence through success", "easy", 2),
             ("Learn from mistakes effectively", "easy", 2),
-            ("Track progress meaningfully", "medium", 3),
             ("Develop problem-solving resilience", "medium", 3),
             ("Explain reasoning clearly", "medium", 3),
             ("Show consistent improvement", "hard", 4),
@@ -673,7 +672,7 @@ private List<string> GetDefaultSuggestions(PerformanceStats stats, bool isExpert
         // High hints + low satisfaction: build confidence then independence
         suggestions.Add("Learning & Growth|Build confidence through success|easy");
         suggestions.Add("Method Mastery|Practice with different methods|easy");
-        suggestions.Add("Learning & Growth|Track progress meaningfully|medium");
+        suggestions.Add("Learning & Growth|Develop problem-solving resilience|medium");
     }
     else if (hasHighErrors)
     {
@@ -701,7 +700,7 @@ private List<string> GetDefaultSuggestions(PerformanceStats stats, bool isExpert
         // Hint dependency: focus on independence
         suggestions.Add("Method Mastery|Practice with different methods|easy");
         suggestions.Add("Problem Solving|Complete exercises without hints|easy");
-        suggestions.Add("Learning & Growth|Track progress meaningfully|medium");
+        suggestions.Add("Learning & Growth|Build confidence through success|easy");
     }
     else if (hasLowSatisfaction)
     {

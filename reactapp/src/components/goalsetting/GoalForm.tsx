@@ -4,6 +4,8 @@ import { GoalInput } from "@/types/goal";
 interface Props {
   onCreate: (goal: GoalInput) => void;
   userId: number;
+  prefilledGoal?: {category: string, title: string, difficulty: string} | null;
+  onPrefilledGoalUsed?: () => void;
 }
 
 // Goal completion guidance mapping
@@ -48,8 +50,6 @@ const goalCompletionGuide: Record<string, string> = {
   "Learn from mistakes effectively": "📈 How to Complete:\n• Complete exercises where recent performance shows fewer errors than earlier attempts\n• Demonstrates improvement over time through learning\n• Shows growth mindset in action\n\n� Completes when error tracking shows clear improvement trend!",
   
   "Set personal learning challenges": "🎯 How to Complete:\n• Complete 10 total exercises (any type/method)\n• Shows commitment to sustained learning\n• Demonstrates self-directed challenge-seeking\n\n🏆 Completes after your 10th total exercise completion!",
-  
-  "Track progress meaningfully": "🌟 How to Complete:\n• Complete exercises using all 3 different methods (substitution, elimination, equalization)\n• Shows comprehensive engagement with all approaches\n• Demonstrates holistic learning approach\n\n🌟 Completes when you've successfully used all three methods!",
 
   "Reflect on method effectiveness": "🤔 How to Complete:\n• Complete an exercise with self-explanation in Matching Exercise or Efficiency Exercise\n• Provide thoughtful reasoning about method choices\n• Shows deeper analytical thinking\n\n📖 Completes when you engage with self-explanation features!",
 
@@ -86,7 +86,6 @@ const categorizedGoals: Record<string, { title: string; difficulty: string }[]> 
     { title: "Reflect on method effectiveness", difficulty: "very easy" },
     { title: "Build confidence through success", difficulty: "easy" },
     { title: "Learn from mistakes effectively", difficulty: "easy" },
-    { title: "Track progress meaningfully", difficulty: "medium" },
     { title: "Develop problem-solving resilience", difficulty: "medium" },
     { title: "Explain reasoning clearly", difficulty: "medium" },
     { title: "Show consistent improvement", difficulty: "hard" },
@@ -95,7 +94,7 @@ const categorizedGoals: Record<string, { title: string; difficulty: string }[]> 
   ],
 };
 
-export function GoalForm({ onCreate, userId }: Props) {
+export function GoalForm({ onCreate, userId, prefilledGoal, onPrefilledGoalUsed }: Props) {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedGoal, setSelectedGoal] = useState("");
   const [difficulty, setDifficulty] = useState("easy");
@@ -103,6 +102,20 @@ export function GoalForm({ onCreate, userId }: Props) {
   const [expectedMistakes, setExpectedMistakes] = useState<number>(3); // Initialize with default value 3
   const [motivationRating, setMotivationRating] = useState<number>(3); // Initialize with default value 3
   const [showGuidance, setShowGuidance] = useState<string | null>(null);
+
+  // Effect to handle prefilled goal data
+  React.useEffect(() => {
+    if (prefilledGoal) {
+      setSelectedCategory(prefilledGoal.category);
+      setSelectedGoal(prefilledGoal.title);
+      setDifficulty(prefilledGoal.difficulty);
+      
+      // Notify parent that prefilled goal has been used
+      if (onPrefilledGoalUsed) {
+        onPrefilledGoalUsed();
+      }
+    }
+  }, [prefilledGoal, onPrefilledGoalUsed]);
 
   // Helper function to get unique difficulties for a category
   const getAvailableDifficulties = (category: string): string[] => {
@@ -137,16 +150,19 @@ export function GoalForm({ onCreate, userId }: Props) {
   };
 
   return (
-    <div style={{
-      background: "#229EBC",
-      padding: "1rem",
-      borderRadius: "10px",
-      border: "1px solid black",
-      fontFamily: "'Comic Sans MS', cursive, sans-serif",
-      color: "white",
-      maxHeight: "80vh",
-      overflowY: "auto"
-    }}>
+    <div 
+      data-goal-form
+      style={{
+        background: "#229EBC",
+        padding: "1rem",
+        borderRadius: "10px",
+        border: prefilledGoal ? "3px solid #4caf50" : "1px solid black",
+        fontFamily: "'Comic Sans MS', cursive, sans-serif",
+        color: "white",
+        maxHeight: "80vh",
+        overflowY: "auto",
+        boxShadow: prefilledGoal ? "0 0 20px rgba(76, 175, 80, 0.5)" : "none"
+      }}>
       <h3 style={{ 
         textAlign: "center", 
         marginBottom: "1rem",
@@ -154,8 +170,29 @@ export function GoalForm({ onCreate, userId }: Props) {
         fontSize: "1.1rem",
         fontWeight: "bold"
       }}>
-        🎯 Create Your Learning Goal
+        {prefilledGoal ? "✨ Quick Add Recommended Goal" : "🎯 Create Your Learning Goal"}
       </h3>
+      
+      {prefilledGoal && (
+        <div style={{
+          backgroundColor: "rgba(76, 175, 80, 0.2)",
+          padding: "0.75rem",
+          borderRadius: "8px",
+          marginBottom: "1rem",
+          border: "1px solid #4caf50",
+          textAlign: "center"
+        }}>
+          <div style={{ fontSize: "0.9rem", color: "#e8f5e9", marginBottom: "0.25rem" }}>
+            📌 <strong>Pre-filled from recommendation:</strong>
+          </div>
+          <div style={{ fontSize: "0.8rem", color: "#c8e6c9" }}>
+            <strong>{prefilledGoal.category}</strong> • {prefilledGoal.title} • {prefilledGoal.difficulty}
+          </div>
+          <div style={{ fontSize: "0.75rem", color: "#a5d6a7", marginTop: "0.25rem" }}>
+            Just fill in your self-efficacy questions below and click create!
+          </div>
+        </div>
+      )}
 
       {/* 2x2 Grid Layout */}
       <div style={{

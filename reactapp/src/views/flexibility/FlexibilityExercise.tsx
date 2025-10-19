@@ -21,10 +21,15 @@ import { EfficiencyExercise } from "@components/flexibility/exercises/Efficiency
 import { Goal } from "@/types/goal";
 import { fetchGoals } from "@/utils/api.ts";
 import GoalListOverlay from "@/components/GoalListOverlay.tsx";
+import { GoalList } from "@/components/goalsetting/GoalList.tsx";
 import { GoalCompletionProvider } from "@/contexts/GoalCompletionContext.tsx";
+import RetrospectiveModal from "@/components/RetrospectivePrompt.tsx";
 import PostTaskAppraisal from "@/components/PostTaskAppraisal.tsx";
-import { Agent } from "@components/flexibility/interventions/Agent.tsx";
-import { AgentExpression, AgentType } from "@/types/flexibility/enums.ts";
+import { generateAdaptiveFeedback } from "@/utils/adaptiveFeedback";
+import AgentPopup from "@/components/PedologicalAgent";
+import FemaleAfricanSmiling from "@images/flexibility/AfroAmerican_F_Smiling.png";
+import confetti from "canvas-confetti";
+
 import { EfficiencyExercise as EfficiencyExerciseProps } from "@/types/flexibility/efficiencyExercise.ts";
 import { MatchingExercise as MatchingExerciseProps } from "@/types/flexibility/matchingExercise.ts";
 import { TipExercise as TipExerciseProps } from "@/types/flexibility/tipExercise.ts";
@@ -33,7 +38,6 @@ import { WorkedExamples } from "@components/flexibility/exercises/WorkedExamples
 import { TipExercise } from "@components/flexibility/exercises/TipExercise.tsx";
 import { PlainExercise as PlainExerciseProps } from "@/types/flexibility/plainExercise.ts";
 import { PlainExercise } from "@components/flexibility/exercises/PlainExercise.tsx";
-import confetti from "canvas-confetti";
 import { getStudySession } from "@/utils/studySession";
 
 export default function FlexibilityExercise({ isStudyExample }: { isStudyExample: boolean }): ReactElement {
@@ -41,7 +45,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
     const location = useLocation();
     const { exerciseId } = useParams();
 
-    const [showOverlay, setShowOverlay] = useState(true);
+    const [showOverlay, setShowOverlay] = useState(false);
     const [goals, setGoals] = useState<Goal[]>([]);
     // Dynamic user ID - initialize with study session if available, otherwise default to 1
     const [userId, setUserId] = useState(() => {
@@ -50,6 +54,20 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
         console.log(`🔧 FlexibilityExercise initialized with userId: ${initialUserId}`);
         return initialUserId;
     });
+
+    // Modal states for goal completion - moved from hidden GoalList to visible level
+    const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+    const [autoCalculatedScore, setAutoCalculatedScore] = useState<number | null>(null);
+    const [contributingExercises, setContributingExercises] = useState<any[] | null>(null);
+    
+    // PostTaskAppraisal modal state
+    const [showAppraisalModal, setShowAppraisalModal] = useState(false);
+    const [tempScores, setTempScores] = useState<{ actualScore: number } | null>(null);
+    const [completingGoalId, setCompletingGoalId] = useState<number | null>(null);
+    
+    // Agent message state for adaptive feedback
+    const [showCheckIn, setShowCheckIn] = useState(false);
+    const [agentMessage, setAgentMessage] = useState<{ text: string; duration?: number } | null>(null);
 
     // Study session detection - check for study mode on component mount and periodically
     useEffect(() => {
@@ -81,45 +99,462 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
         return () => clearInterval(interval);
     }, [isStudyExample, userId]);
 
-    // Modal states for goal completion flow
-    const [showAppraisalModal, setShowAppraisalModal] = useState(false);
-    const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
-    const [tempScores, setTempScores] = useState<any>(null);
-    const [showCelebration, setShowCelebration] = useState(false);
-    const [agentMessage, setAgentMessage] = useState<string | null>(null);
-
-    // Auto-hide agent message after 3 seconds
-    useEffect(() => {
-        if (agentMessage) {
-            const timer = setTimeout(() => {
-                setAgentMessage(null);
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-        return undefined;
-    }, [agentMessage]);
-
-    // Note: Adaptive feedback is now handled by GoalList.tsx after goal completion
-
     useEffect(() => {
         console.log(`🎯 FlexibilityExercise fetching goals for userId: ${userId}`);
         fetchGoals(userId).then((fetchedGoals) => {
             console.log(`🎯 FlexibilityExercise fetched ${fetchedGoals.length} goals for userId: ${userId}`);
+            console.log(`🎯 Fetched goals:`, fetchedGoals.map(g => ({ id: g.id, title: g.title, completed: g.completed })));
+            console.log(`🎯 Active goals:`, fetchedGoals.filter(g => !g.completed).length);
             setGoals(fetchedGoals);
-        }).catch(console.error);
+            
+            // Verify hidden GoalList will get these goals
+            console.log(`🎯 Goals state will be updated, hidden GoalList should receive them`);
+        }).catch((error) => {
+            console.error(`❌ Failed to fetch goals:`, error);
+        });
     }, [userId]);
+
+    // Debug: Monitor when goals change to ensure hidden GoalList gets them
+    useEffect(() => {
+        console.log(`🎯 FlexibilityExercise: goals state changed, count: ${goals.length}`);
+        console.log(`🎯 Hidden GoalList should now have access to these goals`);
+        if (goals.length > 0) {
+            console.log(`🎯 Goals available for completion:`, goals.filter(g => !g.completed).map(g => g.title));
+        }
+    }, [goals]);
+
+    // Callback to handle modal triggering at FlexibilityExercise level (visible)
+    const handleModalTrigger = (goalId: number, autoScore?: number, exercises?: any[]) => {
+        console.log(`🎯 FlexibilityExercise: Modal trigger received for goal ${goalId}`);
+        console.log(`🎯 Setting modal state at FlexibilityExercise level (should be visible)`);
+        
+        // Dispatch event to notify exercises that goal completion flow has started
+        console.log('🎯 Dispatching triggerGoalCompletion event for auto-close tracking');
+        window.dispatchEvent(new CustomEvent('triggerGoalCompletion'));
+        
+        setSelectedGoalId(goalId);
+        setAutoCalculatedScore(autoScore || null);
+        setContributingExercises(exercises || null);
+    };
+
+    // Handle retrospective modal submission
+    const handleRetrospectiveSubmit = (actualScore: number) => {
+        console.log(`🎯 FlexibilityExercise: Retrospective submitted with score ${actualScore}`);
+        
+        if (selectedGoalId) {
+            // Store the goal ID and score for PostTaskAppraisal
+            setCompletingGoalId(selectedGoalId);
+            setTempScores({ actualScore });
+            setShowAppraisalModal(true);
+            
+            // Close the retrospective modal
+            setSelectedGoalId(null);
+            setAutoCalculatedScore(null);
+            setContributingExercises(null);
+            
+            console.log(`🎯 Moving to PostTaskAppraisal phase for goal ID: ${selectedGoalId}`);
+        }
+    };
+
+    // Handle PostTaskAppraisal submission
+    const handleAppraisalSubmit = async (
+        postSatisfaction: number,
+        postConfidence: number,
+        postEffort: number,
+        postEnjoyment: number,
+        postAnxiety: number
+    ) => {
+        if (!completingGoalId || !tempScores) return;
+        
+        try {
+            console.log(`🎯 FlexibilityExercise: PostTaskAppraisal submitted for goal ID: ${completingGoalId}`);
+            
+            // Calculate hints and errors from exercise session data before completing the goal
+            let calculatedHints = 0;
+            let calculatedErrors = 0;
+            
+            try {
+                // Import auto-scoring utilities to get exercise performance data
+                const { getExerciseScores, getContributingExercises } = await import('@/utils/autoScoring');
+                const currentGoal = goals.find(g => g.id === completingGoalId);
+                
+                if (currentGoal) {
+                    const allExerciseScores = getExerciseScores(userId);
+                    const contributingExercises = getContributingExercises(currentGoal.title, allExerciseScores);
+                    
+                    if (contributingExercises.length > 0) {
+                        // For multi-exercise goals, use averaged data
+                        const totalHints = contributingExercises.reduce((sum, ex) => sum + ex.hints, 0);
+                        const totalErrors = contributingExercises.reduce((sum, ex) => sum + ex.errors, 0);
+                        calculatedHints = Math.round(totalHints / contributingExercises.length);
+                        calculatedErrors = Math.round(totalErrors / contributingExercises.length);
+                        console.log(`🎯 Using averaged performance for multi-exercise goal: ${calculatedHints} hints, ${calculatedErrors} errors`);
+                    } else {
+                        // For single-exercise goals, get from most recent session
+                        const allSessionKeys = Object.keys(sessionStorage).filter(key => 
+                            key.startsWith(`exerciseSession_${userId}_`)
+                        );
+                        
+                        const sessionKeys = allSessionKeys.filter(key => 
+                            key.includes('efficiency') || key.includes('suitability') || key.includes('matching')
+                        );
+                        
+                        let mostRecentKey = '';
+                        let mostRecentTimestamp = 0;
+                        let exerciseSession = null;
+                        
+                        for (const key of sessionKeys) {
+                            const sessionData = sessionStorage.getItem(key);
+                            if (sessionData) {
+                                try {
+                                    const session = JSON.parse(sessionData);
+                                    if (session && typeof session.hints === 'number' && typeof session.errors === 'number') {
+                                        const sessionTimestamp = session.timestamp || session.completedAt || 0;
+                                        if (sessionTimestamp > mostRecentTimestamp) {
+                                            mostRecentKey = key;
+                                            exerciseSession = session;
+                                            mostRecentTimestamp = sessionTimestamp;
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.warn('🎯 Failed to parse session:', key, error);
+                                }
+                            }
+                        }
+                        
+                        if (exerciseSession) {
+                            calculatedHints = (typeof exerciseSession.hints === 'number' && !isNaN(exerciseSession.hints)) ? 
+                                             exerciseSession.hints : 0;
+                            calculatedErrors = (typeof exerciseSession.errors === 'number' && !isNaN(exerciseSession.errors)) ? 
+                                              exerciseSession.errors : 0;
+                            console.log(`🎯 Using single session performance: ${calculatedHints} hints, ${calculatedErrors} errors`);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('🎯 Failed to calculate hints/errors for goal completion:', error);
+            }
+            
+            // Import the API function to complete the goal
+            const { completeGoalWithScore } = await import("@/utils/api");
+            
+            // Call with correct parameter order: id, actualScore, hintsUsed, errorsMade, then emotional data
+            await completeGoalWithScore(
+                completingGoalId,
+                tempScores.actualScore,
+                calculatedHints,        // ← Now in correct position
+                calculatedErrors,       // ← Now in correct position  
+                postSatisfaction,
+                postConfidence,
+                postEffort,
+                postEnjoyment,
+                postAnxiety
+            );
+            
+            console.log(`🎯 Goal completed with performance data: ${calculatedHints} hints, ${calculatedErrors} errors`);
+            
+            // Refresh goals
+            const updatedGoals = await fetchGoals(userId);
+            setGoals(updatedGoals);
+
+            console.log(`🎯 Goal ${completingGoalId} completed successfully with performance: hints=${calculatedHints}, errors=${calculatedErrors}`);
+
+            // Generate adaptive feedback message
+            await generateAdaptiveFeedbackForGoal(
+                completingGoalId, 
+                postSatisfaction, 
+                postConfidence, 
+                postEffort, 
+                postEnjoyment, 
+                postAnxiety,
+                updatedGoals  // Pass updated goals to check if all completed
+            );        } catch (error) {
+            console.error("Failed to complete goal:", error);
+        }
+        
+        // Close the appraisal modal
+        setShowAppraisalModal(false);
+        setTempScores(null);
+        setCompletingGoalId(null);
+    };
+
+    const generateAdaptiveFeedbackForGoal = async (
+        goalId: number,
+        postSatisfaction: number,
+        postConfidence: number,
+        postEffort: number,
+        postEnjoyment: number,
+        postAnxiety: number,
+        updatedGoals: Goal[]
+    ) => {
+        const messages: Array<{ text: string; duration?: number }> = [];
+        
+        try {
+            console.log('🎯 Goal completed successfully - generating adaptive feedback');
+            
+            const currentGoal = goals.find(g => g.id === goalId);
+            if (!currentGoal) {
+                console.error('🎯 Goal not found for adaptive feedback:', goalId);
+                return;
+            }
+
+            // Add completion celebration message first
+            messages.push({ text: `🎉 Goal completed! Great work on "${currentGoal.title}".`, duration: 4000 });
+
+            // Update dynamic goal suggestions based on new progress
+            let updatedSuggestions: string[] = [];
+            try {
+                const { updateGoalSuggestions } = await import("@/utils/api");
+                
+                // Small delay to ensure goal completion is processed by backend before updating suggestions
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                updatedSuggestions = await updateGoalSuggestions(userId);
+                console.log('Updated goal suggestions:', updatedSuggestions);
+                
+                // Dispatch a custom event to notify the parent component about updated suggestions
+                window.dispatchEvent(new CustomEvent('goalSuggestionsUpdated', { 
+                    detail: { suggestions: updatedSuggestions } 
+                }));
+            } catch (error) {
+                console.error('Failed to update goal suggestions:', error);
+            }
+
+            // Add progression feedback message if suggestions were updated
+            const hasSuggestionUpdates = updatedSuggestions && updatedSuggestions.length > 0;
+            if (hasSuggestionUpdates) {
+                console.log('🎯 Goal suggestions updated - will include progression feedback');
+            }
+
+            console.log('🎯 Goal suggestions updated - generating adaptive feedback');
+
+            // Generate adaptive feedback using the same logic as GoalList
+            let averagedHints: number | undefined = undefined;
+            let averagedErrors: number | undefined = undefined;
+
+            // Import auto-scoring utilities
+            const { getExerciseScores, getContributingExercises } = await import('@/utils/autoScoring');
+            const allExerciseScores = getExerciseScores(userId);
+            const contributingExercises = getContributingExercises(currentGoal.title, allExerciseScores);
+
+            if (contributingExercises.length > 0) {
+                console.log('🎯 Found', contributingExercises.length, 'contributing exercises for adaptive feedback');
+
+                // Calculate average hints and errors across all contributing exercises
+                const totalHints = contributingExercises.reduce((sum, ex) => sum + ex.hints, 0);
+                const totalErrors = contributingExercises.reduce((sum, ex) => sum + ex.errors, 0);
+                averagedHints = Math.round(totalHints / contributingExercises.length);
+                averagedErrors = Math.round(totalErrors / contributingExercises.length);
+
+                console.log('🎯 Averaged performance data:', {
+                    contributingCount: contributingExercises.length,
+                    totalHints,
+                    totalErrors,
+                    averagedHints,
+                    averagedErrors
+                });
+            }
+
+            // Try to find exercise session data
+            let exerciseSession = null;
+            const allSessionKeys = Object.keys(sessionStorage).filter(key => 
+                key.startsWith(`exerciseSession_${userId}_`)
+            );
+
+            console.log('🎯 Session keys for userId', userId, ':', allSessionKeys);
+
+            const sessionKeys = allSessionKeys.filter(key => 
+                key.includes('efficiency') || key.includes('suitability') || key.includes('matching')
+            );
+
+            console.log('🎯 Filtered exercise session keys:', sessionKeys);
+
+            let mostRecentKey = '';
+            let mostRecentTimestamp = 0;
+
+            if (sessionKeys.length > 0) {
+                for (const key of sessionKeys) {
+                    const sessionData = sessionStorage.getItem(key);
+                    if (sessionData) {
+                        try {
+                            const session = JSON.parse(sessionData);
+                            if (session && typeof session.hints === 'number' && typeof session.errors === 'number') {
+                                const sessionTimestamp = session.timestamp || session.completedAt || 0;
+                                if (sessionTimestamp > mostRecentTimestamp) {
+                                    mostRecentKey = key;
+                                    exerciseSession = session;
+                                    mostRecentTimestamp = sessionTimestamp;
+                                }
+                            }
+                        } catch (error) {
+                            console.warn('🎯 Failed to parse session:', key, error);
+                        }
+                    }
+                }
+            }
+
+            if (exerciseSession && mostRecentKey) {
+                const actualExerciseType = mostRecentKey.includes('suitability') ? 'suitability' : 
+                                         mostRecentKey.includes('matching') ? 'matching' : 'efficiency';
+
+                const hints = (typeof exerciseSession.hints === 'number' && !isNaN(exerciseSession.hints)) ? 
+                             exerciseSession.hints : 0;
+                const errors = (typeof exerciseSession.errors === 'number' && !isNaN(exerciseSession.errors)) ? 
+                              exerciseSession.errors : 0;
+
+                if (hints >= 0 && errors >= 0) {
+                    const sessionData = {
+                        hints: hints,
+                        errors: errors,
+                        method: exerciseSession.method || 'substitution',
+                        exerciseType: actualExerciseType,
+                        completedWithSelfExplanation: exerciseSession.completedWithSelfExplanation || false
+                    };
+
+                    const emotionalData = {
+                        postSatisfaction,
+                        postConfidence,
+                        postEffort,
+                        postEnjoyment,
+                        postAnxiety
+                    };
+
+                    const finalHints = averagedHints !== undefined ? averagedHints : sessionData.hints;
+                    const finalErrors = averagedErrors !== undefined ? averagedErrors : sessionData.errors;
+
+                    const feedbackData = {
+                        hints: finalHints,
+                        errors: finalErrors,
+                        method: sessionData.method,
+                        exerciseType: sessionData.exerciseType,
+                        completedWithSelfExplanation: sessionData.completedWithSelfExplanation,
+                        userId: userId,
+                        ...emotionalData
+                    };
+
+                    const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
+                    messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+
+                    // Clear the used session data after using it for adaptive feedback
+                    if (mostRecentKey) {
+                        sessionStorage.removeItem(mostRecentKey);
+                        console.log('🧹 Cleared used session data after adaptive feedback:', mostRecentKey);
+                    }
+                } else {
+                    throw new Error('Invalid session data');
+                }
+            } else {
+                console.log('🎯 No exercise session found, generating adaptive feedback from reflection data only');
+
+                const emotionalData = {
+                    postSatisfaction,
+                    postConfidence,
+                    postEffort,
+                    postEnjoyment,
+                    postAnxiety
+                };
+
+                const feedbackData = {
+                    hints: 0,
+                    errors: 0,
+                    method: 'substitution',
+                    exerciseType: 'efficiency',
+                    completedWithSelfExplanation: false,
+                    userId: userId,
+                    ...emotionalData
+                };
+
+                const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
+                messages.push({ text: adaptiveFeedbackMessage, duration: 15000 });
+            }
+        } catch (error) {
+            console.error('🎯 Error generating adaptive feedback:', error);
+            messages.push({ text: "📈 Your goal recommendations have been updated based on your progress!", duration: 4000 });
+        }
+
+        // Check if all goals completed
+        const completedGoals = updatedGoals.filter(g => g.completed).length;
+        const totalGoals = updatedGoals.length;
+        const isAllCompleted = completedGoals === totalGoals && totalGoals > 0;
+        
+        if (isAllCompleted) {
+            console.log('🎉 All goals completed! Adding celebration message');
+            messages.push({ text: "🎉 Awesome! You've completed all your goals!", duration: 4000 });
+            
+            // Add confetti celebration
+            setTimeout(() => {
+                confetti({
+                    particleCount: 200,
+                    spread: 90,
+                    origin: { y: 0.6 }
+                });
+            }, 1000); // Small delay for dramatic effect
+        }
+
+        // Show messages sequentially
+        let delay = 0;
+        messages.forEach((message) => {
+            setTimeout(() => {
+                setAgentMessage(message);
+                setShowCheckIn(true);
+            }, delay);
+            delay += (message.duration || 4000) + 200; // 200ms buffer between messages
+        });
+
+        // Dispatch event when all goal feedback is complete (for auto-close in exercises)
+        if (delay > 0) { // Only if we have messages to show
+            setTimeout(() => {
+                console.log('🎯 All goal feedback complete, dispatching event for auto-close');
+                window.dispatchEvent(new CustomEvent('goalFeedbackComplete'));
+            }, delay + 1000); // Additional delay after last message finishes
+        } else {
+            // If no messages to show, dispatch immediately
+            console.log('🎯 No feedback messages to show, dispatching goalFeedbackComplete immediately');
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('goalFeedbackComplete'));
+            }, 500); // Small delay
+        }
+    };
 
     // Completion function for exercises - trigger the RetrospectiveModal via auto-scoring
     const exerciseCompletionFunction = (title: string) => {
         console.log(`🎯 ===== EXERCISE COMPLETION FUNCTION CALLED =====`);
         console.log(`🎯 Looking for goal with title: "${title}"`);
+        console.log(`🎯 Total goals available: ${goals.length}`);
         console.log(`🎯 Available goals:`, goals.map(g => ({ id: g.id, title: g.title, completed: g.completed })));
         console.log(`🎯 Current overlay state: ${showOverlay}`);
+        console.log(`🎯 Hidden GoalList should be present regardless of overlay state`);
+        
+        // Debug: Show unique goal titles and their counts
+        const goalCounts = goals.reduce((counts, goal) => {
+            counts[goal.title] = (counts[goal.title] || 0) + 1;
+            return counts;
+        }, {} as Record<string, number>);
+        console.log(`🎯 Goal title counts:`, goalCounts);
+        
+        // Debug: Show active (non-completed) goals
+        const activeGoals = goals.filter(g => !g.completed);
+        console.log(`🎯 Active goals (${activeGoals.length}):`, activeGoals.map(g => ({ id: g.id, title: g.title })));
         
         // Check if the goal actually exists before trying to complete it  
-        const goal = goals.find(g => g.title === title && !g.completed);
+        // Try exact match first
+        let goal = goals.find(g => g.title === title && !g.completed);
+        
+        // If no exact match, try case-insensitive match
+        if (!goal) {
+            console.log(`🔍 No exact match for "${title}", trying case-insensitive match...`);
+            goal = goals.find(g => g.title.toLowerCase() === title.toLowerCase() && !g.completed);
+        }
+        
+        // If still no match, try partial matching
+        if (!goal) {
+            console.log(`🔍 No case-insensitive match for "${title}", trying partial match...`);
+            goal = goals.find(g => g.title.toLowerCase().includes(title.toLowerCase()) && !g.completed);
+        }
+        
         if (goal) {
-            console.log(`🎯 ✅ FOUND MATCHING GOAL! Triggering auto-scoring completion for: "${title}"`);
+            console.log(`🎯 ✅ FOUND MATCHING GOAL! ID: ${goal.id}, Title: "${title}"`);
+            console.log(`🎯 Goal details:`, goal);
             console.log(`🎯 Dispatching custom event with auto-scoring for goal ID: ${goal.id}`);
             
             // Create and dispatch the event
@@ -129,101 +564,46 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
             
             console.log(`🎯 Event created:`, event);
             console.log(`🎯 Event detail:`, event.detail);
-            console.log(`🎯 About to dispatch event...`);
+            console.log(`🎯 Event type: ${event.type}`);
+            console.log(`🎯 About to dispatch event to window...`);
+            
+            // Check if there are any event listeners
+            console.log(`🎯 Checking if any listeners are registered for 'triggerGoalCompletion'`);
             
             window.dispatchEvent(event);
             
-            console.log(`🎯 ✅ Event dispatched successfully!`);
+            console.log(`🎯 ✅ Event dispatched successfully to window!`);
             
             // Add a small delay to check if event was received
             setTimeout(() => {
-                console.log(`🎯 Checking if event was processed... (1 second later)`);
+                console.log(`🎯 POST-DISPATCH CHECK: Event should have been processed by now`);
+                console.log(`🎯 If you don't see GoalList logs above, the hidden GoalList is not receiving events`);
             }, 1000);
             
         } else {
             console.log(`🎯 ❌ GOAL NOT FOUND: "${title}" does not exist or is already completed`);
             console.log(`🎯 Available goal titles:`, goals.map(g => g.title));
+            console.log(`🎯 Completed goals:`, goals.filter(g => g.completed).map(g => g.title));
+            
+            // Try to find similar goals for better debugging
+            const uniqueTitles = [...new Set(goals.map(g => g.title))];
+            const similarGoals = uniqueTitles.filter(goalTitle => 
+                goalTitle.toLowerCase().includes(title.toLowerCase().split(' ').slice(0, 2).join(' '))
+            );
+            
+            if (similarGoals.length > 0) {
+                console.log(`🔍 Similar goal titles found:`, similarGoals);
+                console.log(`💡 The progressive system expects "${title}" but you have similar goals. This suggests a goal title mismatch.`);
+            } else {
+                console.log(`💡 No similar goals found for "${title}". This goal may not be in your current goal set.`);
+            }
+            
+            // Log suggestion
+            console.log(`💡 SUGGESTION: Either update the progressive system to use your actual goal titles, or ensure your goals match the expected titles.`);
         }
     };
 
-    // Handle PostTaskAppraisal submission
-    const handleAppraisalSubmit = async (
-        postSatisfaction: number,
-        postConfidence: number,
-        posteffort: number,
-        postenjoyment: number,
-        postanxiety: number
-    ) => {
-        if (!selectedGoalId) return;
-        
-        try {
-            // Import the API function here to complete the goal
-            const { completeGoalWithScore } = await import("@/utils/api");
-            
-            await completeGoalWithScore(
-                selectedGoalId,
-                tempScores?.actualScore || 0,
-                postSatisfaction,
-                postConfidence,
-                posteffort,
-                postenjoyment,
-                postanxiety
-            );
-            
-            // Refresh goals to show the completed goal
-            const updatedGoals = await fetchGoals(userId);
-            setGoals(updatedGoals);
-            
-            // Trigger confetti celebration animation
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#229EBC', '#007bff', '#00ff00', '#ffff00', '#ff00ff']
-            });
-            
-            // Show celebration for high satisfaction
-            if (postSatisfaction >= 4) {
-                confetti({
-                    particleCount: 200,
-                    spread: 100,
-                    origin: { y: 0.6 },
-                    colors: ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4']
-                });
-            }
-            
-            // Show gamified celebration text
-            setShowCelebration(true);
-            setTimeout(() => {
-                setShowCelebration(false);
-            }, 3000); // Hide after 3 seconds
-            
-            // Show agent congratulations message
-            const celebrationMessages = [
-                "🎉 Fantastic work! You've achieved your goal! Keep up the amazing effort!",
-                "🌟 Outstanding! Another goal completed! You're doing brilliantly!",
-                "🎯 Excellent job! You hit your target perfectly! Well done!",
-                "✨ Wonderful achievement! You're making great progress!",
-                "🚀 Superb! Another step closer to success! Keep going!"
-            ];
-            const randomMessage = celebrationMessages[Math.floor(Math.random() * celebrationMessages.length)];
-            setAgentMessage(randomMessage);
-            
-            // ❌ REMOVED: Duplicate adaptive feedback system 
-            // The GoalList.tsx now handles all adaptive feedback to prevent conflicts
-            // This ensures single source of truth for adaptive messaging
-            
-            console.log('🎯 Goal completion processed - adaptive feedback handled by GoalList.tsx');
-            
-            console.log(`🎯 Goal ${selectedGoalId} marked as completed!`);
-        } catch (error) {
-            console.error("Failed to complete goal:", error);
-        }
-        
-        setShowAppraisalModal(false);
-        setSelectedGoalId(null);
-        setTempScores(null);
-    };
+
 
     const concreteExerciseType: FlexibilityExerciseType | FlexibilityStudyExerciseType | undefined = location.state?.exerciseType;
     const concreteExerciseId: number | undefined = location.state?.exerciseId;
@@ -268,13 +648,14 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                 </div>
             </div>
 
+            {/* Toggle Goals Overlay Button */}
             <button
-                onClick={() => setShowOverlay(true)}
+                onClick={() => setShowOverlay(!showOverlay)}
                 style={{
                     position: "fixed",
                     top: "1rem",    
                     right: "1rem",
-                    backgroundColor: "#007bff",
+                    backgroundColor: showOverlay ? "#28a745" : "#007bff",
                     color: "#fff",
                     border: "none",
                     borderRadius: "50%",
@@ -284,13 +665,36 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     cursor: "pointer",
                     boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
                     zIndex: 1500,
+                    transition: "all 0.3s ease",
                 }}
-                title="View Goals"
+                title={showOverlay ? "Hide Goals" : "View Goals"}
             >
-                📋
+                {showOverlay ? "👁️" : "📋"}
             </button>
 
-            {/* Goal List Overlay */}
+
+
+            {/* Hidden GoalList for event listeners - modals rendered at FlexibilityExercise level */}
+            <div style={{ 
+                position: "fixed", 
+                top: "-9999px", 
+                left: "-9999px", 
+                visibility: "hidden",
+                pointerEvents: "none",
+                width: "1px",
+                height: "1px"
+            }}>
+                <GoalList 
+                    goals={goals} 
+                    onGoalsChange={setGoals} 
+                    userId={userId}
+                    showOnlyActive={true} 
+                    compact={true}
+                    onModalTrigger={handleModalTrigger}
+                />
+            </div>
+
+            {/* Goal List Overlay - Pure Visual */}
             {showOverlay && (
                 <GoalListOverlay
                     goals={goals}
@@ -300,113 +704,46 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                 />
             )}
 
-            {/* Goal Completion Modals - Always rendered at FlexibilityExercise level */}
+            {/* RetrospectiveModal rendered at FlexibilityExercise level - VISIBLE */}
+            <RetrospectiveModal
+                isOpen={selectedGoalId !== null}
+                onClose={() => {
+                    console.log(`🎯 FlexibilityExercise: RetrospectiveModal closed`);
+                    setSelectedGoalId(null);
+                    setAutoCalculatedScore(null);
+                    setContributingExercises(null);
+                }}
+                onSubmit={handleRetrospectiveSubmit}
+                goalTitle={selectedGoalId ? goals.find(g => g.id === selectedGoalId)?.title : undefined}
+                autoCalculatedScore={autoCalculatedScore || undefined}
+                expectedMistakes={selectedGoalId ? goals.find(g => g.id === selectedGoalId)?.expectedMistakes : undefined}
+                contributingExercises={contributingExercises || undefined}
+            />
+
+            {/* PostTaskAppraisal rendered at FlexibilityExercise level - VISIBLE */}
             <PostTaskAppraisal
                 isOpen={showAppraisalModal}
                 onClose={() => {
+                    console.log(`🎯 FlexibilityExercise: PostTaskAppraisal closed`);
                     setShowAppraisalModal(false);
-                    setSelectedGoalId(null);
                     setTempScores(null);
+                    setCompletingGoalId(null);
                 }}
                 onSubmit={handleAppraisalSubmit}
+                goalName={completingGoalId ? goals.find(g => g.id === completingGoalId)?.title : undefined}
             />
 
-            {/* Gamified Goal Completion Celebration */}
-            {showCelebration && (
-                <div style={{
-                    position: "fixed",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    zIndex: 10000,
-                    textAlign: "center",
-                    animation: "celebrationBounce 3s ease-out",
-                    pointerEvents: "none"
-                }}>
-                    <div style={{
-                        fontSize: "4rem",
-                        fontWeight: "bold",
-                        fontFamily: "'Comic Sans MS', cursive, sans-serif",
-                        background: "linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4)",
-                        backgroundSize: "400% 400%",
-                        animation: "gradientShift 1s ease-in-out infinite, textGlow 1s ease-in-out infinite",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                        textShadow: "0 0 20px rgba(255, 215, 0, 0.5)",
-                        filter: "drop-shadow(0 0 10px rgba(255, 215, 0, 0.8))",
-                        marginBottom: "1rem"
-                    }}>
-                        🎉 GOAL COMPLETED! 🎉
-                    </div>
-                    <div style={{
-                        fontSize: "2rem",
-                        fontWeight: "bold",
-                        fontFamily: "'Comic Sans MS', cursive, sans-serif",
-                        color: "#229EBC",
-                        textShadow: "0 0 10px rgba(34, 158, 188, 0.5)",
-                        animation: "bounce 1s infinite"
-                    }}>
-                        Amazing work! 🌟
-                    </div>
-                </div>
-            )}
-
-            {/* CSS Animations for Celebration */}
-            <style>{`
-                @keyframes celebrationBounce {
-                    0% {
-                        transform: translate(-50%, -50%) scale(0) rotate(-180deg);
-                        opacity: 0;
-                    }
-                    50% {
-                        transform: translate(-50%, -50%) scale(1.2) rotate(0deg);
-                        opacity: 1;
-                    }
-                    70% {
-                        transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
-                        opacity: 1;
-                    }
-                    100% {
-                        transform: translate(-50%, -50%) scale(1) rotate(0deg);
-                        opacity: 0;
-                    }
-                }
-                
-                @keyframes gradientShift {
-                    0% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
-                }
-                
-                @keyframes textGlow {
-                    0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8)); }
-                    50% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1)) drop-shadow(0 0 30px rgba(255, 107, 107, 0.8)); }
-                }
-                
-                @keyframes bounce {
-                    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-                    40% { transform: translateY(-10px); }
-                    60% { transform: translateY(-5px); }
-                }
-            `}</style>
-
-            {/* Agent Message for Goal Completion */}
-            {agentMessage && (
-                <>
-                    <Agent type={AgentType.FemaleAfrican} expression={AgentExpression.Smiling} />
-                    <div className="flexibility-popover agent-popover" style={{ maxWidth: "300px" }}>
-                        <button 
-                            className="span-button primary-button hint-popover__button" 
-                            onClick={() => setAgentMessage(null)}
-                        >
-                            ✕
-                        </button>
-                        <div className="hint-popover__container agent-popover__container">
-                            <p>{agentMessage}</p>
-                        </div>
-                    </div>
-                </>
+            {/* Agent popup for adaptive feedback */}
+            {showCheckIn && agentMessage && (
+                <AgentPopup
+                    message={agentMessage.text}
+                    image={FemaleAfricanSmiling}
+                    onClose={() => {
+                        setShowCheckIn(false);
+                        setAgentMessage(null);
+                    }}
+                    duration={agentMessage.duration || 4000}
+                />
             )}
 
             {!isStudyExample && exitOverlay[0] &&
