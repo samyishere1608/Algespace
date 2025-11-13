@@ -28,6 +28,9 @@ export interface AdaptiveFeedbackData {
   
   // User context
   userId: number;
+  
+  // Goal context (for goal-aware feedback)
+  activeGoalTitles?: string[];
 }
 
 export interface FeedbackPattern {
@@ -257,9 +260,48 @@ export function detectPerformancePattern(data: AdaptiveFeedbackData): FeedbackPa
 }
 
 /**
+ * Goal-aware feedback prefix - overrides contradictory feedback for specific goal achievements
+ */
+function getGoalAwarePrefix(data: AdaptiveFeedbackData): string | null {
+  if (!data.activeGoalTitles || data.activeGoalTitles.length === 0) {
+    return null; // No active goals, use normal feedback
+  }
+
+  // Handle hint-free goal achievements
+  if (data.hints === 0) {
+    if (data.activeGoalTitles.includes("Complete exercises without hints")) {
+      return "🎯 Perfect! You achieved your goal of completing without hints! ";
+    }
+    if (data.activeGoalTitles.includes("Work independently")) {
+      return "💪 Great independence! You're working without hints as your goal requires! ";
+    }
+    if (data.activeGoalTitles.includes("Show exceptional problem-solving") && data.errors === 0) {
+      return "✨ Flawless! You achieved exceptional problem-solving with 0 hints AND 0 errors! ";
+    }
+    if (data.activeGoalTitles.includes("Show exceptional problem-solving")) {
+      return "🏆 Excellent hint-free completion! You're halfway to exceptional problem-solving! ";
+    }
+  }
+
+  // Handle accuracy goal achievements  
+  if (data.errors <= 1 && data.activeGoalTitles.includes("Solve problems with minimal errors")) {
+    return "⭐ Excellent accuracy! You kept errors minimal as your goal was targeted! ";
+  }
+
+  return null; // Use normal feedback
+}
+
+/**
  * Generates adaptive motivational feedback message
  */
 export function generateAdaptiveFeedback(data: AdaptiveFeedbackData): string {
+  // Check for goal-aware feedback first
+  const goalPrefix = getGoalAwarePrefix(data);
+  if (goalPrefix) {
+    console.log(`🎯 Goal-aware feedback triggered: ${goalPrefix}`);
+    return goalPrefix + "Keep up the excellent work toward your learning objectives! 🌟";
+  }
+
   const pattern = detectPerformancePattern(data);
   const progress = getExerciseProgress(data.userId);
   
@@ -402,7 +444,7 @@ function generateNotUsingHintsFeedback(data: AdaptiveFeedbackData): string {
 }
 
 function generateHintDependentFeedback(data: AdaptiveFeedbackData): string {
-  return `🎯 Great job getting a perfect score, but I noticed you used ${data.hints} hints to get there. Hints are valuable learning tools, but try challenging yourself to use fewer hints next time - it will help you build independent problem-solving skills and confidence! I've updated your goals to help you gradually reduce hint dependency while maintaining your success. You're capable of more than you think! 💪`;
+  return `🎯 Great job getting a perfect score, but I noticed you used ${data.hints} hints to get there. Hints are helpful for learning, but try challenging yourself to use fewer hints next time - it will help you build independent problem-solving skills and confidence! I've updated your goals to help you gradually reduce hint dependency while maintaining your success. You're capable of more than you think! 💪`;
 }
 
 /**

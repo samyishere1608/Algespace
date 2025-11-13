@@ -484,21 +484,41 @@ function ExerciseList({ completedExercises }: { completedExercises?: (number | s
         }
     };
 
-    const getDifficultyColor = (exerciseType: any) => {
+    const getDifficultyStyle = (exerciseType: any) => {
         switch (exerciseType) {
-            case FlexibilityExerciseType.Suitability:     // 2
-                return { color: "green" };
-            case FlexibilityExerciseType.Efficiency:      // 1
-                return { color: "orange" };
-            case FlexibilityExerciseType.Matching:        // 3
-                return { color: "red" };
-            case FlexibilityExerciseType.TipExercise:     // 4
-                return { color: "orange" };
-            case FlexibilityExerciseType.PlainExercise:   // 5
-                return { color: "green" };
+            case FlexibilityExerciseType.Suitability:     // Easy
+            case FlexibilityExerciseType.PlainExercise:   
+                return { 
+                    color: "#2a412bff",  // Green text
+                    glowColor: "rgba(76, 175, 80, 0.6)",  // Green glow
+                    emoji: "🟢"
+                };
+            case FlexibilityExerciseType.Efficiency:      // Medium
+            case FlexibilityExerciseType.TipExercise:     
+                return { 
+                    color: "#ff9800",  // Orange text
+                    glowColor: "rgba(255, 152, 0, 0.6)",  // Orange glow
+                    emoji: "🟡"
+                };
+            case FlexibilityExerciseType.Matching:        // Hard
+                return { 
+                    color: "#f44336",  // Red text
+                    glowColor: "rgba(244, 67, 54, 0.6)",  // Red glow
+                    emoji: "🔴"
+                };
             default:
-                return { color: "orange" };
+                return { 
+                    color: "#ff9800", 
+                    glowColor: "rgba(255, 152, 0, 0.6)",
+                    emoji: "🟡"
+                };
         }
+    };
+
+    const getDifficultyColor = (exerciseType: any) => {
+        // Keep for backward compatibility, but now returns style object
+        const style = getDifficultyStyle(exerciseType);
+        return { color: style.color };
     };
 
     const getExerciseName = (exerciseType: any) => {
@@ -537,6 +557,8 @@ function ExerciseList({ completedExercises }: { completedExercises?: (number | s
                 };
 
                 const isCompleted: boolean = isExerciseCompleted(entry.id, completedExercises);
+                const difficultyStyle = getDifficultyStyle(entry.exerciseType);
+                const difficulty = getDifficultyLevel(entry.exerciseType);
                     
                 return (
                     <div
@@ -548,8 +570,21 @@ function ExerciseList({ completedExercises }: { completedExercises?: (number | s
                             {t(GeneralTranslations.NAV_EXERCISE)} {index + 1}
                         </p>
                         <p>{getExerciseName(entry.exerciseType)}</p>
-                        <p style={getDifficultyColor(entry.exerciseType)} className={"exercise-font"}>
-                            Difficulty: {getDifficultyLevel(entry.exerciseType)}
+                        <p className={"exercise-font"} style={{ 
+                            display: "flex", 
+                            alignItems: "center", 
+                            gap: "8px",
+                            fontWeight: "600",
+                            color: difficultyStyle.color
+                        }}>
+                            <span style={{ 
+                                fontSize: "1.2rem",
+                                filter: `drop-shadow(0 0 8px ${difficultyStyle.glowColor}) drop-shadow(0 0 12px ${difficultyStyle.glowColor})`,
+                                animation: "pulse 2s ease-in-out infinite"
+                            }}>
+                                {difficultyStyle.emoji}
+                            </span>
+                            <span>{difficulty}</span>
                         </p>
                         <p className={"exercise-list__status"}>{isCompleted ? t(GeneralTranslations.COMPLETED) : "To-Do"}</p>
                         <FontAwesomeIcon className={"exercise-font"} icon={faChevronRight} />

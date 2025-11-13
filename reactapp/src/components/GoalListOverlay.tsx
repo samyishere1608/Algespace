@@ -4,7 +4,7 @@ import { Goal, GoalInput } from "@/types/goal";
 import { updateGoal, deleteGoal, logReason } from "@/utils/api";
 import ReasonPrompt from "./ReasonPrompt";
 import AgentPopup from "./PedologicalAgent";
-import FemaleAfricanSmiling from "@images/flexibility/AfroAmerican_F_Smiling.png";
+import FemaleAfricanSmiling from "@images/flexibility/Agent 3.png";
 
 interface GoalListOverlayProps {
   goals: Goal[];

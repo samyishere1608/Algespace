@@ -154,18 +154,11 @@ export function calculateGoalScore(
     // Use the single exercise score
     finalScore = contributingExercises[0].performanceScore;
   } else if (scoringMethod === 'average') {
-    // Average all exercise scores
-    const sum = contributingExercises.reduce((acc, ex) => acc + ex.performanceScore, 0);
-    finalScore = Math.round(sum / contributingExercises.length);
+    // Sum all exercise scores (total errors across all exercises)
+    finalScore = contributingExercises.reduce((acc, ex) => acc + ex.performanceScore, 0);
   } else if (scoringMethod === 'improvement') {
-    // Weight later exercises more heavily (showing improvement)
-    const weights = contributingExercises.map((_, i) => i + 1); // 1, 2, 3, 4, 5...
-    const totalWeight = weights.reduce((a, b) => a + b, 0);
-    
-    const weightedSum = contributingExercises.reduce((acc, ex, i) => 
-      acc + (ex.performanceScore * weights[i]), 0
-    );
-    finalScore = Math.round(weightedSum / totalWeight);
+    // Sum all exercise scores (total errors) - no weighting needed since we want total
+    finalScore = contributingExercises.reduce((acc, ex) => acc + ex.performanceScore, 0);
   }
   
   const goalScore: GoalScoreData = {

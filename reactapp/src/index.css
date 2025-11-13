@@ -104,3 +104,15 @@ strong {
     font-weight: 550;
     color: var(--tint-primary-blue);
 }
+
+/* Journey Map Pulse Animation */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.7);
+    }
+}

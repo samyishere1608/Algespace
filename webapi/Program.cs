@@ -99,14 +99,22 @@ builder.Services.AddScoped<IPretestService>(provider =>
 
 var app = builder.Build();
 
-// Copy database to volume on first run (for Railway deployment)
-EnsureDatabaseInVolume(app.Configuration);
+// ===== RAILWAY DEPLOYMENT CONFIGURATION =====
+// Uncomment the following line for Railway deployment (copies database to persistent volume)
+// EnsureDatabaseInVolume(app.Configuration);
+
+// ===== LOCAL DEVELOPMENT CONFIGURATION =====
+// For localhost: Database is already in Data/databases/ folder, no need to copy
 
 // Initialize database tables with sample data
 InitializeDatabaseTables(app.Services);
 
 void EnsureDatabaseInVolume(IConfiguration config)
 {
+    // ===== RAILWAY DEPLOYMENT ONLY =====
+    // This function copies the database to Railway's persistent volume (/app/Data/databases/)
+    // Comment out the call above when running on localhost
+    
     try
     {
         var connectionString = config.GetConnectionString("DefaultConnection");

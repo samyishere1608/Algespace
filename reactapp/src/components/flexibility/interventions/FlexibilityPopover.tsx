@@ -1,6 +1,6 @@
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { ReactElement, useCallback, useEffect, useRef } from "react";
+import React, { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 import { AgentExpression, AgentType } from "@/types/flexibility/enums.ts";
 import { Agent } from "@components/flexibility/interventions/Agent.tsx";
 import useWindowDimensions from "@hooks/useWindowDimensions.ts";
@@ -10,6 +10,33 @@ export function FlexibilityPopover({ children, agentType, agentExpression }: { c
     const useAgent = agentType !== undefined && agentExpression !== undefined;
     const { windowWidth } = useWindowDimensions();
     const width = getFlexibilityFeedbackOrHintWidth(windowWidth, useAgent);
+    
+    // State to hide popover when exercise ends or goal completion starts
+    const [isHidden, setIsHidden] = useState(false);
+
+    // Listen for exercise end and goal completion events
+    useEffect(() => {
+        const handleHidePopover = () => {
+            console.log('🎯 FlexibilityPopover: Hiding continue button agent - exercise/goal completion triggered');
+            setIsHidden(true);
+        };
+
+        // Hide when goal completion flow starts
+        window.addEventListener('triggerGoalCompletion', handleHidePopover);
+        
+        // Hide when goal feedback is complete (retrospective opening)
+        window.addEventListener('goalFeedbackComplete', handleHidePopover);
+
+        return () => {
+            window.removeEventListener('triggerGoalCompletion', handleHidePopover);
+            window.removeEventListener('goalFeedbackComplete', handleHidePopover);
+        };
+    }, []);
+
+    // Don't render if hidden
+    if (isHidden) {
+        return <React.Fragment />;
+    }
 
     return (
         <React.Fragment>
@@ -27,6 +54,9 @@ export function ClosableFlexibilityPopover({ children, setShowContent, agentType
     const width = getFlexibilityFeedbackOrHintWidth(windowWidth, useAgent);
 
     const contentRef = useRef<HTMLDivElement>(null);
+    
+    // State to hide popover when exercise ends or goal completion starts
+    const [isHidden, setIsHidden] = useState(false);
 
     const handleClickOutside = useCallback(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,6 +74,31 @@ export function ClosableFlexibilityPopover({ children, setShowContent, agentType
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [handleClickOutside]);
+
+    // Listen for exercise end and goal completion events
+    useEffect(() => {
+        const handleHidePopover = () => {
+            console.log('🎯 ClosableFlexibilityPopover: Hiding continue button agent - exercise/goal completion triggered');
+            setIsHidden(true);
+            setShowContent(false);
+        };
+
+        // Hide when goal completion flow starts
+        window.addEventListener('triggerGoalCompletion', handleHidePopover);
+        
+        // Hide when goal feedback is complete (retrospective opening)
+        window.addEventListener('goalFeedbackComplete', handleHidePopover);
+
+        return () => {
+            window.removeEventListener('triggerGoalCompletion', handleHidePopover);
+            window.removeEventListener('goalFeedbackComplete', handleHidePopover);
+        };
+    }, [setShowContent]);
+
+    // Don't render if hidden
+    if (isHidden) {
+        return <React.Fragment />;
+    }
 
     return (
         <React.Fragment>

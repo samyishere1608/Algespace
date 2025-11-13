@@ -285,6 +285,7 @@ export async function getUserPerformanceStats(userId: number): Promise<{
     averageConfidence: number;
     averageSatisfaction: number;
     averageEffort: number;
+    averageAnxiety: number; // NEW: anxiety metric
     averageHintsPerGoal: number;
     averageErrorsPerGoal: number;
   };

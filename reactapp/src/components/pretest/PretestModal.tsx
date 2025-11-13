@@ -73,6 +73,41 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
   const [showResults, setShowResults] = useState(false);
   const [suggestedGoals, setSuggestedGoals] = useState<string[]>([]);
   const [showGuidance, setShowGuidance] = useState<string | null>(null);
+  const [showReasonModal, setShowReasonModal] = useState<string | null>(null);
+
+  // Generate recommendation reasoning based on pretest answers
+  const getRecommendationReason = (goalTitle: string): string => {
+    const confidence = answers['q1'] || '';
+    const goalType = answers['q2'] || '';
+
+    let reason = '';
+
+    // Line 1: Confidence match
+    if (confidence.includes('Not confident')) {
+      reason += `• You're not confident yet, so this goal provides a supportive starting point.`;
+    } else if (confidence.includes('Somewhat confident')) {
+      reason += `• You're somewhat confident, this goal strengthens your foundation.`;
+    } else if (confidence.includes('Very confident')) {
+      reason += `• With your high confidence, this goal offers the right level of challenge.`;
+    } else if (confidence.includes('Expert')) {
+      reason += `• As an expert, this goal targets advanced skills.`;
+    }
+
+    reason += '\n\n';
+
+    // Line 2: Goal preference match
+    if (goalType.includes('Quick practice')) {
+      reason += `• You prefer quick sessions. This goal fits short, focused exercises.`;
+    } else if (goalType.includes('Deep understanding')) {
+      reason += `• You value deep understanding. This goal encourages thorough comprehension.`;
+    } else if (goalType.includes('Problem variety')) {
+      reason += `• You enjoy variety. This goal exposes you to different approaches.`;
+    } else if (goalType.includes('Skill building')) {
+      reason += `• You focus on skill building. This goal develops specific competencies.`;
+    }
+
+    return reason;
+  };
 
   const handleAnswer = () => {
     if (!selectedOption) return;
@@ -124,9 +159,6 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
             <div className="pretest-header">
               <h2>📚 Quick Assessment</h2>
               <p>Help us suggest the best goals for your learning journey!</p>
-              <button onClick={onClose} className="skip-button">
-                Skip Assessment
-              </button>
             </div>
 
             <div className="progress-bar">
@@ -169,18 +201,12 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
           <div className="results-container">
             <h3>🎯 Assessment Complete!</h3>
             
-            <div className="score-display">
-              <p><strong>Questions Answered:</strong> {questions.length}</p>
-              <p><strong>Personalized learning path ready!</strong></p>
-            </div>
 
             <div className="suggested-goals">
               <h4>🎯 Recommended Goals for You:</h4>
               {suggestedGoals && suggestedGoals.length > 0 ? (
                 <div className="goals-list">
-                  <p style={{ marginBottom: '16px', color: '#666', fontSize: '0.9rem' }}>
-                    Based on your assessment, here are {suggestedGoals.length} personalized goals that match your learning level:
-                  </p>
+    
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {suggestedGoals.map((goal: string, index: number) => {
                       // Parse the new format "Category|Title|Difficulty"
@@ -205,18 +231,32 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                         return (
                           <div key={index} style={{ 
                             padding: '14px',
-                            backgroundColor: '#f8f9ff',
+                            backgroundColor: 'white',
                             borderRadius: '8px',
-                            border: '1px solid #e1e8ff',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                            border: '2px solid #e3f2fd',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
                           }}>
+                            {/* Goal Title - Large and Blue at Top */}
+                            <div style={{ 
+                              fontSize: '1.05rem',
+                              color: '#1976d2',
+                              fontWeight: 'bold',
+                              lineHeight: '1.4',
+                              marginBottom: '10px',
+                              paddingBottom: '10px',
+                              borderBottom: '1px solid #e3f2fd'
+                            }}>
+                              {title}
+                            </div>
+
+                            {/* Category and Difficulty Below Title */}
                             <div style={{ 
                               display: 'flex', 
                               justifyContent: 'space-between', 
                               alignItems: 'center',
-                              marginBottom: '8px'
+                              marginBottom: '12px'
                             }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <span style={{ 
                                   fontSize: '0.7rem',
                                   fontWeight: '600',
@@ -226,10 +266,10 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                                   Category:
                                 </span>
                                 <span style={{ 
-                                  fontSize: '0.85rem',
+                                  fontSize: '0.8rem',
                                   fontWeight: '600',
-                                  color: '#007bff',
-                                  padding: '2px 8px',
+                                  color: '#1976d2',
+                                  padding: '3px 10px',
                                   backgroundColor: '#e3f2fd',
                                   borderRadius: '4px'
                                 }}>
@@ -239,7 +279,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                               <div style={{ 
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '4px'
+                                gap: '6px'
                               }}>
                                 <span style={{ 
                                   fontSize: '0.7rem',
@@ -256,62 +296,54 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                                   fontSize: '0.75rem',
                                   fontWeight: '600',
                                   color: diffStyle.color,
-                                  padding: '2px 6px',
-                                  backgroundColor: 'white',
+                                  padding: '3px 8px',
+                                  backgroundColor: 'rgba(255,255,255,0.8)',
                                   borderRadius: '4px',
-                                  border: `1px solid ${diffStyle.color}40`
+                                  border: `1.5px solid ${diffStyle.color}40`
                                 }}>
-                                  <span>{diffStyle.emoji}</span>
+                                  <span style={{ fontSize: '0.8rem' }}>{diffStyle.emoji}</span>
                                   <span>{diffStyle.label}</span>
                                 </div>
                               </div>
                             </div>
-                            <div style={{ marginBottom: '4px' }}>
-                              <span style={{ 
-                                fontSize: '0.7rem',
-                                fontWeight: '600',
-                                color: '#64748b',
-                                textTransform: 'uppercase'
-                              }}>
-                                Goal:
-                              </span>
-                            </div>
+
+                            {/* Why Recommended Button */}
                             <div style={{ 
                               display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              paddingLeft: '8px'
+                              justifyContent: 'center',
+                              gap: '8px'
                             }}>
-                              <div style={{ 
-                                fontSize: '0.95rem',
-                                color: '#1e293b',
-                                fontWeight: '500',
-                                lineHeight: '1.4',
-                                flex: 1
-                              }}>
-                                {title}
-                              </div>
                               <button
                                 type="button"
-                                onClick={() => setShowGuidance(showGuidance === title ? null : title)}
+                                onClick={() => setShowReasonModal(showReasonModal === title ? null : title)}
                                 style={{
-                                  background: "none",
+                                  background: "linear-gradient(135deg, #ff9800 0%, #f57c00 100%)",
                                   border: "none",
                                   cursor: "pointer",
-                                  fontSize: "1rem",
-                                  padding: "0.3rem",
-                                  borderRadius: "50%",
-                                  color: "#007bff",
+                                  fontSize: "0.75rem",
+                                  padding: "0.4rem 0.8rem",
+                                  borderRadius: "5px",
+                                  color: "white",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
-                                  width: "24px",
-                                  height: "24px",
-                                  marginLeft: "8px"
+                                  gap: "4px",
+                                  fontWeight: "600",
+                                  boxShadow: "0 2px 4px rgba(255, 152, 0, 0.25)",
+                                  transition: "all 0.2s"
                                 }}
-                                title="How to complete this goal"
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform = "scale(1.03)";
+                                  e.currentTarget.style.boxShadow = "0 3px 8px rgba(255, 152, 0, 0.35)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = "scale(1)";
+                                  e.currentTarget.style.boxShadow = "0 2px 4px rgba(255, 152, 0, 0.25)";
+                                }}
+                                title="Why is this goal recommended for you?"
                               >
-                                ℹ️
+                                <span style={{ fontSize: '0.9rem' }}>💡</span>
+                                <span>Why Recommended?</span>
                               </button>
                             </div>
                           </div>
@@ -335,22 +367,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                       }
                     })}
                   </div>
-                  <div style={{ 
-                    marginTop: '16px', 
-                    padding: '12px',
-                    backgroundColor: '#e8f4fd',
-                    borderRadius: '6px',
-                    border: '1px solid #bee5eb'
-                  }}>
-                    <p style={{ 
-                      margin: '0', 
-                      color: '#0c5460', 
-                      fontSize: '0.85rem', 
-                      fontWeight: '500'
-                    }}>
-                      💡 <strong>Progressive Learning:</strong> Start with the first goal, and once you complete it successfully, you'll get suggestions for the next level of difficulty!
-                    </p>
-                  </div>
+                 
                 </div>
               ) : (
                 <div style={{ 
@@ -378,7 +395,121 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
         )}
       </div>
 
-      {/* Completion Guidance Modal */}
+      {/* Why Recommended Modal */}
+      {showReasonModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 2000
+        }}
+        onClick={() => setShowReasonModal(null)}
+        >
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "16px",
+            padding: "0",
+            maxWidth: "600px",
+            width: "90%",
+            maxHeight: "80vh",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
+            overflow: "hidden"
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{
+              background: "linear-gradient(135deg, #ff9800 0%, #f57c00 100%)",
+              padding: "1.5rem",
+              color: "white",
+              textAlign: "center"
+            }}>
+              <h2 style={{
+                margin: 0,
+                fontSize: "1.5rem",
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem"
+              }}>
+                💡 Why This Goal Was Recommended
+              </h2>
+              <p style={{
+                margin: "0.5rem 0 0 0",
+                fontSize: "0.9rem",
+                opacity: 0.95
+              }}>
+                Based on your pretest answers
+              </p>
+            </div>
+            
+            {/* Content - Scrollable */}
+            <div style={{
+              padding: "2rem",
+              maxHeight: "calc(80vh - 180px)",
+              overflowY: "auto"
+            }}>
+              <div style={{
+                backgroundColor: "#fff3e0",
+                padding: "2rem",
+                borderRadius: "12px",
+                border: "2px solid #ff9800",
+                lineHeight: "2",
+                whiteSpace: "pre-line",
+                fontSize: "1.1rem",
+                fontWeight: "bold",
+                color: "#915b15ff",
+                textAlign: "left"
+              }}>
+                {getRecommendationReason(showReasonModal)}
+              </div>
+            </div>
+
+            {/* Footer Button */}
+            <div style={{
+              padding: "1.5rem",
+              borderTop: "1px solid #e0e0e0",
+              textAlign: "center",
+              backgroundColor: "#f5f5f5"
+            }}>
+              <button
+                onClick={() => setShowReasonModal(null)}
+                style={{
+                  background: "linear-gradient(135deg, #ff9800 0%, #f57c00 100%)",
+                  color: "white",
+                  border: "none",
+                  padding: "0.75rem 2rem",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  boxShadow: "0 2px 8px rgba(255, 152, 0, 0.3)",
+                  transition: "all 0.2s"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.05)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(255, 152, 0, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(255, 152, 0, 0.3)";
+                }}
+              >
+                Got it! 👍
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* How to Complete Modal - Kept for reference if needed */}
       {showGuidance && (
         <div style={{
           position: "fixed",

@@ -27,7 +27,7 @@ import RetrospectiveModal from "@/components/RetrospectivePrompt.tsx";
 import PostTaskAppraisal from "@/components/PostTaskAppraisal.tsx";
 import { generateAdaptiveFeedback } from "@/utils/adaptiveFeedback";
 import AgentPopup from "@/components/PedologicalAgent";
-import FemaleAfricanSmiling from "@images/flexibility/AfroAmerican_F_Smiling.png";
+import FemaleAfricanSmiling from "@images/flexibility/Agent 3.png";
 import confetti from "canvas-confetti";
 
 import { EfficiencyExercise as EfficiencyExerciseProps } from "@/types/flexibility/efficiencyExercise.ts";
@@ -429,6 +429,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                         exerciseType: sessionData.exerciseType,
                         completedWithSelfExplanation: sessionData.completedWithSelfExplanation,
                         userId: userId,
+                        activeGoalTitles: goals.filter(g => !g.completed).map(g => g.title),
                         ...emotionalData
                     };
 
@@ -461,6 +462,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     exerciseType: 'efficiency',
                     completedWithSelfExplanation: false,
                     userId: userId,
+                    activeGoalTitles: goals.filter(g => !g.completed).map(g => g.title),
                     ...emotionalData
                 };
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AgentPopup from "./PedologicalAgent";
-import FemaleAfricanSmiling from "@images/flexibility/AfroAmerican_F_Smiling.png";
+import FemaleAfricanSmiling from "@images/flexibility/Agent 3.png";
 
 interface EmotionPromptProps {
   onSubmit: (emotion: string) => void;

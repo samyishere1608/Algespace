@@ -155,11 +155,34 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
             padding: "0.5rem",
             backgroundColor: "#e8f4f8",
             borderRadius: "8px",
-            border: "1px solid #b8e6f0"
+            border: "1px solid #b8e6f0",
+            position: "relative"
           }}>
             <strong style={{ color: "#2c5aa0", fontSize: "0.9rem" }}>
               🎯 Goal: "{goalTitle}"
             </strong>
+            
+            {/* Progressive Goal Indicator */}
+            {contributingExercises && contributingExercises.length > 1 && (
+              <div 
+                style={{ 
+                  display: "inline-block",
+                  marginLeft: "0.5rem",
+                  padding: "0.2rem 0.5rem",
+                  backgroundColor: "#fff3cd",
+                  border: "1px solid #ffc107",
+                  borderRadius: "12px",
+                  fontSize: "0.7rem",
+                  fontWeight: "600",
+                  color: "#856404",
+                  cursor: "help",
+                  verticalAlign: "middle"
+                }}
+                title="This is a progressive goal tracked across multiple exercises. Hover over your score below to see the breakdown."
+              >
+                📈 Progressive Goal
+              </div>
+            )}
           </div>
         )}
         
@@ -217,7 +240,7 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
                       📊 Score Calculation
                     </div>
                     <div style={{ marginBottom: "0.5rem", fontSize: "0.75rem", color: "#666", textAlign: "center" }}>
-                      Average of {contributingExercises.length} exercises:
+                      Sum of {contributingExercises.length} exercises:
                     </div>
                     {contributingExercises.map((ex, idx) => (
                       <div key={idx} style={{ 
@@ -244,7 +267,7 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
                       fontWeight: "bold",
                       color: "#28a745"
                     }}>
-                      Average: {autoCalculatedScore || 0} mistakes
+                      Sum: {autoCalculatedScore || 0} mistakes
                     </div>
                   </div>
                 )}
