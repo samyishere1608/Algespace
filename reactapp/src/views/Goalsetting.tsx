@@ -635,7 +635,7 @@ useEffect(() => {
                           }}
                         >
                           <span style={{ fontSize: '0.8rem' }}>✓</span>
-                          <span>Condition fullfilled</span>
+                          <span style={{fontSize: '0.80rem',fontFamily:"Comic Sans MS"}}>Condition fullfilled</span>
                         </button>
                       )}
                       
