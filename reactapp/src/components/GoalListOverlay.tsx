@@ -60,28 +60,52 @@ const categorizedGoals: Record<string, { title: string; difficulty: string }[]> 
 
 // Goal completion guide (copied from GoalList.tsx)
 const goalCompletionGuide: { [key: string]: string } = {
-  "Learn what linear equations are": "🎯 How to Complete:\n• Start any Flexibility Exercise (Suitability, Efficiency, or Matching)\n• This goal completes automatically when you first access linear equation content\n\n📚 Completes on first exercise access!",
-  "Understand how substitution works": "🔄 How to Complete:\n• Complete 1 exercise using the Substitution method\n• Choose substitution in any Flexibility Exercise\n• Successfully solve the problem\n\n📚 Specific Exercises for Substitution:\n• Exercise #2 (Efficiency) - Substitution focus\n• Exercise #9 (Matching) - Substitution practice\n• Any Suitability exercise - Choose substitution when appropriate\n\n💡 Completes after your first successful substitution exercise!",
-  "Understand how elimination works": "⚖️ How to Complete:\n• Complete 1 exercise using the Elimination method\n• Choose elimination in any Flexibility Exercise\n• Successfully solve the problem\n\n📚 Specific Exercises for Elimination:\n• Exercise #6 (Efficiency) - Elimination focus\n• Exercise #7 (Matching) - Elimination practice\n• Exercise #11 (Efficiency) - More elimination practice\n• Any Suitability exercise - Choose elimination when appropriate\n\n💡 Completes after your first successful elimination exercise!",
-  "Understand how equalization works": "⚖️ How to Complete:\n• Complete 1 exercise using the Equalization method\n• Choose equalization in any Flexibility Exercise\n• Successfully solve the problem\n\n📚 Specific Exercises for Equalization:\n• Exercise #2 (Matching) - Equalization focus\n• Exercise #13 (Matching) - More equalization practice\n• Any Suitability exercise - Choose equalization when appropriate\n\n💡 Completes after your first successful equalization exercise!",
-  "Master all three methods fluently": "🏆 How to Complete:\n• Complete 2+ exercises with each method (substitution, elimination, equalization)\n• Demonstrates comprehensive method mastery\n• Shows fluency across all solving approaches\n\n📚 Method-Specific Exercises:\n• Substitution: Efficiency #2, Matching #9\n• Elimination: Efficiency #6&#11, Matching #7\n• Equalization: Matching #2&#13\n• All Methods: Any Suitability exercise\n\n🏅 Completes when you've mastered all three methods individually!",
-  "Complete exercises without hints": "🎖️ How to Complete:\n• Complete 1 exercise using 0 hints\n• Demonstrates full independence on that exercise\n• Shows confidence in your abilities\n\n💪 Completes when you finish an exercise without any hints!",
-  "Solve problems with minimal errors": "⭐ How to Complete:\n• Complete 1 exercise with ≤1 error\n• Shows accuracy and careful problem-solving\n• Focus on precision over speed\n\n🎯 Completes when you make 1 or fewer errors in an exercise!",
-  "Handle complex problems confidently": "🌟 How to Complete:\n• Complete 5 total exercises (any type/method)\n• Shows sustained engagement and practice\n• Builds confidence through experience\n\n📈 Completes after your 5th total exercise completion!",
-  "Show exceptional problem-solving": "🏅 How to Complete:\n• Complete 1 exercise with 0 errors AND 0 hints\n• Demonstrates exceptional skill and independence\n• The perfect exercise completion\n\n✨ Completes when you achieve a flawless exercise (no errors, no hints)!",
-  "Work independently": "👑 How to Complete:\n• Complete 3 exercises with 0 hints each\n• Shows consistent independent problem-solving\n• Demonstrates true mastery and confidence\n\n🏆 The ultimate independence achievement - 3 hint-free exercises!",
-  "Build confidence through success": "💪 How to Complete:\n• Complete 1 exercise using 2 or fewer hints\n• Shows growing independence\n• Focus on working with less assistance\n\n⭐ Completes when hint usage is 2 or less in an exercise!",
-  "Master substitution/equalization/elimination method": "🎯 How to Complete:\n• Complete 2+ exercises using any one method consistently\n• Focus on mastering one method at a time\n• Build confidence in your chosen approach\n\n💡 Choose your strongest method and practice it!",
-  "Practice with different methods": "🔄 How to Complete:\n• Try at least 2 different methods across exercises\n• Experience substitution, elimination, and equalization\n• Compare which methods work best for you\n\n📚 Variety is key - experiment with different approaches!",
-  "Switch methods strategically": "🧠 How to Complete:\n• Complete exercises using 2+ different methods\n• Show you can choose the best method for each problem\n• Demonstrate strategic thinking\n\n⚡ Smart method selection shows true understanding!",
-  "Choose optimal methods consistently": "🎯 How to Complete:\n• Complete 5+ exercises with consistently good method choices\n• Show pattern recognition and strategic thinking\n• Demonstrate mastery of method selection\n\n🏆 Consistency in method choice shows expertise!",
-  "Maintain accuracy under pressure": "💎 How to Complete:\n• Complete 10+ exercises with minimal errors\n• Show consistent performance over time\n• Demonstrate resilience and focus\n\n🔥 The ultimate accuracy challenge!",
-  "Reflect on method effectiveness": "🤔 How to Complete:\n• Complete any exercise and think about which method worked best\n• Consider why you chose that method\n• This goal completes automatically as you practice\n\n💭 Reflection happens naturally as you learn!",
-  "Learn from mistakes effectively": "📚 How to Complete:\n• Make and correct mistakes in exercises\n• Show improvement after errors\n• Demonstrate growth mindset\n\n✨ Mistakes are learning opportunities!",
-  "Develop problem-solving resilience": "💪 How to Complete:\n• Complete exercises even after making errors\n• Show persistence through challenges\n• Keep trying when problems get difficult\n\n🔄 Resilience is built through practice!",
-  "Explain reasoning clearly": "💬 How to Complete:\n• Think about your method choices while solving\n• Consider why each step makes sense\n• Develop clear problem-solving logic\n\n🧩 Clear thinking leads to better solutions!",
-  "Show consistent improvement": "📈 How to Complete:\n• Complete multiple exercises over time\n• Show progress in speed, accuracy, or confidence\n• Demonstrate learning curve growth\n\n⭐ Improvement comes with consistent practice!",
-  "Set personal learning challenges": "🎯 How to Complete:\n• Choose goals that stretch your abilities\n• Push yourself to try harder problems\n• Set ambitious but achievable targets\n\n🚀 Challenge yourself to grow!"
+  "Learn what linear equations are": "✅ What to do:\nStart any Flexibility Exercise\n\n📚 Exercises you can choose:\n• Suitability Exercise\n• Efficiency Exercise\n• Matching Exercise\n\n✓ Completes automatically on first exercise",
+  
+  "Understand how substitution works": "✅ What to do:\nComplete 1 exercise using Substitution method\n\n📚 Exercises you can choose:\n• Exercise #2 (Efficiency)\n• Exercise #9 (Matching)\n• Exercise #5 (Sutaiblity)",
+  
+  "Understand how elimination works": "✅ What to do:\nComplete 1 exercise using Elimination method\n\n📚 Exercises you can choose:\n• Exercise #6 (Efficiency)\n• Exercise #7 (Matching)\n• Exercise #3 (Suitability)",
+
+  "Understand how equalization works": "✅ What to do:\nComplete 1 exercise using Equalization method\n\n📚 Exercises you can choose:\n• Exercise #1 (Suitability)\n• Exercise #2 (Matching)\n• Exercise #4 (Matching)",
+
+  // Method Mastery (5 goals)
+  "Master substitution/equalization/elimination method": "✅ What to do:\nComplete 2 exercises using Substitution, Equalization, OR Elimination method\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise  in the Training Flexibility module \n•Pick two exercises that use the same method twice",
+  
+  "Practice with different methods": "✅ What to do:\nComplete 2 exercises using 2 DIFFERENT methods\n\nExample: 1 Substitution + 1 Elimination\n\n📚 Exercises you can choose:\n• Pick two exercises that use different methods",
+  
+  "Switch methods strategically": "✅ What to do:\nComplete 3 exercises using a DIFFERENT method each time\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• Use all 3 methods (Substitution, Elimination, Equalization) in any of the exercises",
+  
+  "Choose optimal methods consistently": "✅ What to do:\nComplete 3 Efficiency Exercises\n\n📚 Exercises you can choose:\n• Any Efficiency Exercise",
+
+  "Master all three methods fluently": "✅ What to do:\nComplete atleast 2 exercises using EACH method\n\nMeans: 2 Substitution + 2 Elimination + 2 Equalization = 6 exercises total\n\n📚 Exercises you can choose:\n• Substitution: Exercise #2, #9\n• Elimination: Exercise #6, #7\n• Equalization: Exercise #1, #13",
+
+  // Problem Solving (5 goals)
+  "Complete exercises without hints": "✅ What to do:\nComplete 1 exercise using 0 hints\n\n📚 Exercises you can choose:\n• Any Exercise",
+  
+  "Solve problems with minimal errors": "✅ What to do:\nComplete 1 exercise with 1 or fewer errors\n\n📚 Exercises you can choose:\n• Any Exercise",
+  
+  "Handle complex problems confidently": "✅ What to do:\nComplete 5 exercises total\n\n📚 Exercises you can choose:\n• Any Exercise\n• Any method",
+  
+  "Show exceptional problem-solving": "✅ What to do:\nComplete 1 exercise with 0 errors AND 0 hints\n\n📚 Exercises you can choose:\n• Any Exercise",
+
+  "Maintain accuracy under pressure": "✅ What to do:\nComplete 5+ exercises with average of 1 error or less\n\nExample: If you do 5 exercises, you can make max 5 total errors\n\n📚 Exercises you can choose:\n• Any Exercise",
+
+  // Learning & Growth (5 goals)  
+  "Build confidence through success": "✅ What to do:\nComplete 1 exercise using 2 or fewer hints\n\n📚 Exercises you can choose:\n• Any  Exercise",
+  
+  "Develop problem-solving resilience": "✅ What to do:\nComplete 1 exercise even if you make errors\n\nMake at least 1 error, then finish the exercise\n\n📚 Exercises you can choose:\n• Any  Exercise",
+
+  "Learn from mistakes effectively": "✅ What to do:\nThe system automatically tracks your improvement\nTry to make fewer errors in recent exercises than earlier ones\n\n📚 Exercises you can choose:\n• Any Exercise",
+
+  "Set personal learning challenges": "✅ What to do:\nComplete 10 exercises in total\n\n📚 Exercises you can choose:\n• Any Exercise\n• Any method",
+
+  "Reflect on method effectiveness": "✅ What to do:\nComplete 1 exercise with self-explanation\n\n📚 Exercises you can choose:\n•Any Matching Exercise\n• Any Efficiency Exercise",
+
+  "Explain reasoning clearly": "✅ What to do:\nComplete 3 exercises with self-explanation\n\n📚 Exercises you can choose:\n• Any Matching Exercise\n• Any Efficiency Exercise",
+
+  "Show consistent improvement": "✅ What to do:\n The system automatically tracks your improvement\nTry to complete 4 exercises with fewer errors each time\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• System tracks improvement automatically",
+
+  "Work independently": "✅ What to do:\nComplete 3 exercises without using hints\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise"
 };
 
 export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange }: GoalListOverlayProps) {
