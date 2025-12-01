@@ -125,7 +125,10 @@
     "keep-going": "Keep going!",
     "almost-there": "Almost there!",
     "great-job": "Great job!",
-    "excellent-work": "Excellent work!"
+    "excellent-work": "Excellent work!",
+    "reason-prompt-delete": "Why did you delete this goal?",
+    "reason-prompt-edit": "Why did you edit this goal?",
+    "reason-placeholder": "Explain your reason..."
   },
   
   "pre-goal-assessment": {

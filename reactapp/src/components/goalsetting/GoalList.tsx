@@ -12,7 +12,8 @@ import {
   categorizedGoalsKeys,
   getGoalTitleKey,
   getCategoryKey,
-  getDifficultyKey 
+  getDifficultyKey,
+  hasGoalTranslation
 } from "@/utils/goalTranslations";
 
 import {
@@ -175,6 +176,15 @@ const [showAppraisalModal, setShowAppraisalModal] = useState<{ goalId: number } 
       "very-hard": "⚫"
     };
     return `${difficultyEmojis[difficultyKey] || "🟡"} ${t(`difficulty.${difficultyKey}`)}`;
+  };
+
+  // Helper function to get translated goal title with fallback for old goals
+  const getTranslatedTitle = (title: string): string => {
+    if (hasGoalTranslation(title)) {
+      return t(`goal-titles.${getGoalTitleKey(title)}`);
+    }
+    // Fallback: return original title for old goals without translations
+    return title;
   };
 
   const totalGoals = goals.length;
@@ -503,7 +513,7 @@ async function handleAppraisalSubmit(
     const messages: Array<{ text: string; duration?: number }> = [];
     
     // Add basic goal completion feedback with translated title
-    const translatedTitle = t(`goal-titles.${getGoalTitleKey(currentGoal.title)}`);
+    const translatedTitle = getTranslatedTitle(currentGoal.title);
     messages.push({ text: t('ui.goal-completed-message', { title: translatedTitle }), duration: 4000 });
 
     // Add progression feedback if suggestions were updated
@@ -1019,7 +1029,7 @@ async function removeGoal(id: number) {
                   whiteSpace: "normal",
                   wordWrap: "break-word",
                 }}>
-                  🎯 {t(`goal-titles.${getGoalTitleKey(goal.title)}`)}
+                  🎯 {getTranslatedTitle(goal.title)}
                 </div>
                   
                 {/* Category and Difficulty */}
@@ -1079,7 +1089,7 @@ async function removeGoal(id: number) {
                     onMouseLeave={(e) => (e.currentTarget.style.background = "#ffc107")}
                     aria-label={`Edit goal ${goal.title}`}
                   >
-                    ✏️ Edit
+                    ✏️ {t('ui.edit')}
                   </button>
 
                   <button
@@ -1099,7 +1109,7 @@ async function removeGoal(id: number) {
                     onMouseLeave={(e) => (e.currentTarget.style.background = "#dc3545")}
                     aria-label={`Delete goal ${goal.title}`}
                   >
-                    🗑️ Delete
+                    🗑️ {t('ui.delete')}
                   </button>
 
                   <button
@@ -1617,8 +1627,8 @@ async function removeGoal(id: number) {
       {/* Move modals outside the goals container */}
       {reasonPrompt && (
         <ReasonPrompt
-          title={`Why did you ${reasonPrompt.action.toLowerCase()} this goal?`}
-          placeholder="Explain your reason..."
+          title={reasonPrompt.action === "Delete" ? t('ui.reason-prompt-delete') : t('ui.reason-prompt-edit')}
+          placeholder={t('ui.reason-placeholder')}
           onCancel={() => setReasonPrompt(null)}
           onSubmit={async (reason) => {
             try {
@@ -1801,7 +1811,7 @@ async function removeGoal(id: number) {
                 fontSize: "1rem",
                 fontWeight: "bold"
               }}>
-                "{t(`goal-titles.${getGoalTitleKey(showGuidanceModal)}`)}"
+                "{getTranslatedTitle(showGuidanceModal)}"
               </h4>
             </div>
 

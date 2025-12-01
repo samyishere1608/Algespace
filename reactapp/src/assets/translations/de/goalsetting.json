@@ -125,7 +125,10 @@
     "keep-going": "Weiter so!",
     "almost-there": "Fast geschafft!",
     "great-job": "Großartige Arbeit!",
-    "excellent-work": "Ausgezeichnete Arbeit!"
+    "excellent-work": "Ausgezeichnete Arbeit!",
+    "reason-prompt-delete": "Warum hast du dieses Ziel gelöscht?",
+    "reason-prompt-edit": "Warum hast du dieses Ziel bearbeitet?",
+    "reason-placeholder": "Erkläre deinen Grund..."
   },
 
   "pre-goal-assessment": {

@@ -98,7 +98,9 @@ export default function AgentPopup({ message, image, onClose, duration = 4000 }:
             padding: "0",
             margin: "0",
             userSelect: "none",
-            WebkitUserSelect: "none"
+            WebkitUserSelect: "none",
+            wordBreak: "break-word",
+            overflowWrap: "break-word"
           }}>
             {message}
           </p>

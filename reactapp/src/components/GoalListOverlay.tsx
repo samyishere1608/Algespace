@@ -974,8 +974,8 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
       {/* Reason Prompt Modal */}
       {reasonPrompt && (
         <ReasonPrompt
-          title={`Why did you ${reasonPrompt.action.toLowerCase()} this goal?`}
-          placeholder="Explain your reason..."
+          title={reasonPrompt.action === "Delete" ? t('ui.reason-prompt-delete') : t('ui.reason-prompt-edit')}
+          placeholder={t('ui.reason-placeholder')}
           onSubmit={handleReasonSubmit}
           onCancel={() => setReasonPrompt(null)}
         />

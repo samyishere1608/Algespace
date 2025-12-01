@@ -59,6 +59,13 @@ export function getGoalTitleKey(title: string): string {
 }
 
 /**
+ * Check if a goal title has a valid translation key
+ */
+export function hasGoalTranslation(title: string): boolean {
+  return title in goalTitleToKey;
+}
+
+/**
  * Get translation key for goal description
  */
 export function getGoalDescriptionKey(title: string): string {
