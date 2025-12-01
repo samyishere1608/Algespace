@@ -6,6 +6,7 @@
 // - AdaptiveFeedback (Frontend) = Focus on motivational messaging only
 // - No duplicate goal suggestion logic = Consistent recommendations across system
 
+import i18n from '@/i18n';
 import { getExerciseProgress, ExerciseSession } from './progressiveGoalTracking';
 
 export interface AdaptiveFeedbackData {
@@ -37,6 +38,11 @@ export interface FeedbackPattern {
    pattern: 'not_using_hints' | 'hint_dependent' | 'perfectionist' | 'overconfident' | 'impostor_syndrome' | 'burnout_fatigue' | 'flow_state' | 'frustrated_learner' | 'anxious_high_achiever' | 'high_performance' | 'struggling' | 'consistent_improvement' | 'mixed_performance' | 'building_confidence' | 'generic';
   confidence: number; // 0-1 how confident we are in this pattern
 }
+
+// Helper function to get translation function  
+const t = (key: string, options?: any): string => {
+  return i18n.t(key, { ns: 'goalsetting', ...options }) as string;
+};
 
 // ✅ Removed hardcoded goal lists - GoalsController is now the single source of truth
 // The backend GoalsController handles all goal recommendation logic
@@ -270,22 +276,22 @@ function getGoalAwarePrefix(data: AdaptiveFeedbackData): string | null {
   // Handle hint-free goal achievements
   if (data.hints === 0) {
     if (data.activeGoalTitles.includes("Complete exercises without hints")) {
-      return "🎯 Perfect! You achieved your goal of completing without hints! ";
+      return t('adaptive-feedback.goal-aware.hints-free-goal');
     }
     if (data.activeGoalTitles.includes("Work independently")) {
-      return "💪 Great independence! You're working without hints as your goal requires! ";
+      return t('adaptive-feedback.goal-aware.work-independently');
     }
     if (data.activeGoalTitles.includes("Show exceptional problem-solving") && data.errors === 0) {
-      return "✨ Flawless! You achieved exceptional problem-solving with 0 hints AND 0 errors! ";
+      return t('adaptive-feedback.goal-aware.exceptional-flawless');
     }
     if (data.activeGoalTitles.includes("Show exceptional problem-solving")) {
-      return "🏆 Excellent hint-free completion! You're halfway to exceptional problem-solving! ";
+      return t('adaptive-feedback.goal-aware.exceptional-halfway');
     }
   }
 
   // Handle accuracy goal achievements  
   if (data.errors <= 1 && data.activeGoalTitles.includes("Solve problems with minimal errors")) {
-    return "⭐ Excellent accuracy! You kept errors minimal as your goal was targeted! ";
+    return t('adaptive-feedback.goal-aware.minimal-errors');
   }
 
   return null; // Use normal feedback
@@ -299,7 +305,7 @@ export function generateAdaptiveFeedback(data: AdaptiveFeedbackData): string {
   const goalPrefix = getGoalAwarePrefix(data);
   if (goalPrefix) {
     console.log(`🎯 Goal-aware feedback triggered: ${goalPrefix}`);
-    return goalPrefix + "Keep up the excellent work toward your learning objectives! 🌟";
+    return goalPrefix + t('adaptive-feedback.goal-aware.keep-up');
   }
 
   const pattern = detectPerformancePattern(data);
@@ -369,17 +375,17 @@ function generateHighPerformanceFeedback(data: AdaptiveFeedbackData): string {
   const perfectScore = data.hints === 0 && data.errors === 0;
   
   if (perfectScore) {
-    return `🚀 Outstanding! Perfect execution with 0 hints and 0 errors! Your confidence is clearly high - you're ready for bigger challenges. I've updated your recommended goals to match your excellent progress!`;
+    return t('adaptive-feedback.high-performance.perfect');
   } else {
-    return `🌟 Excellent work! Only ${data.hints} hints and ${data.errors} errors shows real mastery. With your high confidence level, you're ready for more advanced goals. I've updated your recommended goals to push you further!`;
+    return t('adaptive-feedback.high-performance.excellent', { hints: data.hints, errors: data.errors });
   }
 }
 
 function generateStrugglingFeedback(data: AdaptiveFeedbackData): string {
   if (data.postAnxiety && data.postAnxiety >= 4) {
-    return `💪 I see you’re feeling anxious, but you pushed through ${data.errors} errors and ${data.hints} hints- that takes real courage! I’ve adjusted your goal recommendations to give you more support and build confidence step by step. You’ve got this!🤗`;
+    return t('adaptive-feedback.struggling.with-anxiety', { errors: data.errors, hints: data.hints });
   } else {
-    return `🎯 Working through ${data.errors} errors and using ${data.hints} hints shows determination! Everyone learns at their own pace. I've updated your goals to better support your learning journey. You’ve got this!🤗`;
+    return t('adaptive-feedback.struggling.default', { errors: data.errors, hints: data.hints });
   }
 }
 
@@ -390,61 +396,64 @@ function generateImprovementFeedback(_data: AdaptiveFeedbackData, progress: any)
   const olderAvg = olderErrors.reduce((sum: number, err: number) => sum + err, 0) / olderErrors.length;
   const improvementPercent = Math.round(((olderAvg - recentAvg) / olderAvg) * 100);
   
-  return `📈 Amazing progress! Your error rate improved by ${improvementPercent}% from ${olderAvg.toFixed(1)} to ${recentAvg.toFixed(1)} - you're clearly learning and growing! I've updated your goals to celebrate and continue your improvement streak!`;
+  return t('adaptive-feedback.consistent-improvement.message', { 
+    improvementPercent, 
+    olderAvg: olderAvg.toFixed(1), 
+    recentAvg: recentAvg.toFixed(1) 
+  });
 }
 
 function generateMixedPerformanceFeedback(data: AdaptiveFeedbackData): string {
   if (data.postSatisfaction && data.postSatisfaction <= 2) {
-    return `🎯 You're doing well (${data.hints} hints, ${data.errors} errors), but I sense some frustration. That's completely normal! I've adjusted your goals to help you feel more successful. Remember, progress isn't always linear! 💙`;
+    return t('adaptive-feedback.mixed-performance.frustrated', { hints: data.hints, errors: data.errors });
   } else {
-    return `🌱 Good performance (${data.hints} hints, ${data.errors} errors) but I want you to feel more confident too! I've updated your goals to support both achievement and confidence.`;
+    return t('adaptive-feedback.mixed-performance.default', { hints: data.hints, errors: data.errors });
   }
 }
 
 function generateConfidenceBuildingFeedback(data: AdaptiveFeedbackData): string {
-  return `🌟 Great work! ${data.hints} hints and ${data.errors} errors shows you're building solid skills. Your confidence is growing nicely - that's the foundation of all great learning! I've updated your goals to keep building on this positive momentum! Keep going!💙`;
+  return t('adaptive-feedback.building-confidence.message', { hints: data.hints, errors: data.errors });
 }
 
 function generatePerfectionistFeedback(data: AdaptiveFeedbackData): string {
-  return `🌟 Great job! You used no hints and made no errors! I notice you might still feel a bit stressed. Remember, learning doesn’t have to be perfect every time. Let’s set goals that celebrate your progress and keep things light. You’re doing awesome!💙`;
+  return t('adaptive-feedback.perfectionist.message');
 }
 
 function generateOverconfidentFeedback(data: AdaptiveFeedbackData): string {
-  return `💪 I love your confidence! You used ${data.hints} hints and made ${data.errors} errors, which just means more chances to learn and grow. I’ve set goals that will challenge you while building on your positive mindset. Your enthusiasm is your superpower! 🚀`;
+  return t('adaptive-feedback.overconfident.message', { hints: data.hints, errors: data.errors });
 }
 
 function generateImpostorSyndromeFeedback(data: AdaptiveFeedbackData): string {
-  return `🏆 Look at the data : only ${data.hints} hints and ${data.errors} errors - that’s truly impressive! Your skills are real,even if you sometimes doubt them. It’s normal to feel that way when you’re growing. I’ve selected goals to help you recognize and trust your abilities and see your progress.You’re more capable than you think!✨
-`;
+  return t('adaptive-feedback.impostor-syndrome.message', { hints: data.hints, errors: data.errors });
 }
 
 function generateBurnoutFatigueFeedback(_data: AdaptiveFeedbackData): string {
-  return `🌿 I can sense you're putting in serious effort but feeling drained. That takes courage to keep going! Learning fatigue is real, and it's okay to adjust your pace. I've suggested lighter goals that will help you rebuild your enthusiasm while still making progress. Your wellbeing matters as much as your achievement! 💚`;
+  return t('adaptive-feedback.burnout-fatigue.message');
 }
 
 function generateFlowStateFeedback(data: AdaptiveFeedbackData): string {
-  return `✨ You're in the learning zone! Great performance (${data.hints} hints, ${data.errors} errors) plus you're clearly enjoying the process. This is what optimal learning looks like! I've chosen goals that will help you maintain this wonderful momentum and positive experience. This is the magic of engaged learning! 🌟`;
+  return t('adaptive-feedback.flow-state.message', { hints: data.hints, errors: data.errors });
 }
 
 function generateFrustratedLearnerFeedback(data: AdaptiveFeedbackData): string {
-  return `🤝 I see you’re putting in real effort (${data.hints} hints, ${data.errors} errors) but feeling frustrated with the results. That’s completely normal. Your hard work isn’t wasted- sometimes learning often happens beneath the surface. I’ve adjusted your goals to help you see your progress more clearly. Your persistence will pay off!🌱`;
+  return t('adaptive-feedback.frustrated-learner.message', { hints: data.hints, errors: data.errors });
 }
 
 function generateAnxiousHighAchieverFeedback(data: AdaptiveFeedbackData): string {
-  return `🧘‍♀️ Strong performance (${data.hints} hints, ${data.errors} errors) but I want you to feel as good as your results look! High achievement shouldn't come with high anxiety. You're clearly capable - now let's work on making it feel sustainable and enjoyable. I've selected goals that maintain your high standards while supporting your emotional wellbeing. Excellence and peace can coexist! 🌺`;
+  return t('adaptive-feedback.anxious-high-achiever.message', { hints: data.hints, errors: data.errors });
 }
 
 function generateGenericFeedback(data: AdaptiveFeedbackData): string {
-  return `🎯 Nice work! You used ${data.hints} hints and made ${data.errors} errors - every attempt helps you learn! I've updated your recommended goals based on your progress.`;
+  return t('adaptive-feedback.generic.message', { hints: data.hints, errors: data.errors });
 }
 
 
 function generateNotUsingHintsFeedback(data: AdaptiveFeedbackData): string {
-  return `💡 I notice you made ${data.errors} errors without using any hints. That shows determination, but remember - hints are here to help you learn, not to make things easier! Using hints strategically can help you build understanding and confidence faster. I've updated your goals, and I encourage you to try using the hint system - it's a powerful learning tool! 🎓`;
+  return t('adaptive-feedback.not-using-hints.message', { errors: data.errors });
 }
 
 function generateHintDependentFeedback(data: AdaptiveFeedbackData): string {
-  return `🎯 Great job getting a perfect score, but I noticed you used ${data.hints} hints to get there. Hints are helpful for learning, but try challenging yourself to use fewer hints next time - it will help you build independent problem-solving skills and confidence! I've updated your goals to help you gradually reduce hint dependency while maintaining your success. You're capable of more than you think! 💪`;
+  return t('adaptive-feedback.hint-dependent.message', { hints: data.hints });
 }
 
 /**

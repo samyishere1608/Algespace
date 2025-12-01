@@ -1,0 +1,494 @@
+{
+  "_comment": "Goal Setting System - German Translations (FOR PROOFREADING)",
+  "_note": "This file contains German translations that need to be reviewed and corrected by a native speaker",
+
+  "categories": {
+    "basic-understanding": "Grundverständnis",
+    "method-mastery": "Lösungsverfahren kennenlernen",
+    "problem-solving": "Problemlösung",
+    "learning-growth": "Lernen & Wachstum"
+  },
+
+  "difficulty": {
+    "very-easy": "Sehr Einfach",
+    "easy": "Einfach",
+    "medium": "Mittel",
+    "hard": "Schwer",
+    "very-hard": "Sehr Schwer"
+  },
+
+  "goal-titles": {
+    "learn-linear-equations": "Lerne, was lineare Gleichungen sind",
+    "understand-substitution": "Verstehe, wie das Einsetzungsverfahren funktioniert",
+    "understand-elimination": "Verstehe, wie das Additionsverfahren funktioniert",
+    "understand-equalization": "Verstehe, wie das Gleichsetzungsverfahren funktioniert",
+    "master-single-method": "Beherrsche Einsetzungs-/Gleichsetzungs-/Additionsverfahren",
+    "practice-different-methods": "Übe mit verschiedenen Lösungsverfahren",
+    "switch-methods-strategically": "Wechsle strategisch zwischen Lösungsverfahren",
+    "choose-optimal-methods": "Wähle konsequent optimale Lösungsverfahren",
+    "master-all-methods": "Beherrsche alle drei Lösungsverfahren",
+    "complete-without-hints": "Erledige Aufgaben ohne Hinweise",
+    "solve-minimal-errors": "Löse Probleme mit minimaler Anzahl von Fehlern",
+    "handle-complex-problems": "Bewältige komplexe Probleme",
+    "exceptional-problem-solving": "Zeige außergewöhnliche Problemlösungsfähigkeiten",
+    "maintain-accuracy": "Behalte Genauigkeit unter Druck bei",
+    "reflect-effectiveness": "Reflektiere über die Effektivität von Lösungsverfahren",
+    "build-confidence": "Baue Selbstvertrauen durch Erfolg auf",
+    "learn-from-mistakes": "Lerne effektiv aus Fehlern",
+    "develop-resilience": "Entwickle Problemlösungsfähigkeiten",
+    "explain-reasoning": "Erkläre deine Argumentation klar",
+    "show-improvement": "Zeige kontinuierlich Verbesserung",
+    "work-independently": "Arbeite selbstständig",
+    "set-learning-challenges": "Setze dir persönliche Herausforderungen beim Lernen"
+  },
+
+  "goal-descriptions": {
+    "learn-linear-equations": "✅ Wie erreicht man das Ziel?\nErledige 1 Aufgabe\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe",
+    "understand-substitution": "✅ Wie erreicht man das Ziel?\nErledige 1 Aufgabe mit dem Einsetzungsverfahren\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe, die das Einsetzungsverfahren verwendet\n• Beispiele: Aufgabe #2, #3, #4, #5, #9, #14",
+    "understand-elimination": "✅ Wie erreicht man das Ziel?\nErledige 1 Aufgabe mit dem Additionsverfahren\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe, die das Additionsverfahren verwendet\n• Beispiele: Aufgabe #6, #7, #8, #10, #12",
+    "understand-equalization": "✅ Wie erreicht man das Ziel?\nErledige 1 Aufgabe mit dem Gleichsetzungsverfahren\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe, die das Gleichsetzungsverfahren verwendet\n• Beispiele: Aufgabe #1, #11, #13, #15",
+    "master-single-method": "✅ Wie erreicht man das Ziel?\nErledige 2 Aufgaben mit Einsetzungs-, Gleichsetzungs- ODER Additionsverfahren\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Wähle zwei Aufgaben und verwende in beiden das gleiche Lösungsverfahren",
+    "practice-different-methods": "✅ Wie erreicht man das Ziel?\nErledige 2 Aufgaben mit VERSCHIEDENEN Lösungsverfahren\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Verwende 2 verschiedene Lösungsverfahren (z.B. Einsetzungs- und Additionsverfahren)",
+    "switch-methods-strategically": "✅ Wie erreicht man das Ziel?\nErledige 3 Aufgaben mit jeweils einem ANDEREN Lösungsverfahren\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Verwende alle 3 Lösungsverfahren in beliebigen Aufgaben",
+    "choose-optimal-methods": "✅ Wie erreicht man das Ziel?\nErledige 3 Aufgaben zum Erkennen von effizienten Verfahren\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgaben zum Erkennen von effizienten Verfahren",
+    "master-all-methods": "✅ Wie erreicht man das Ziel?\nErledige mindestens 2 Aufgaben mit JEDEM Lösungsverfahren\n\nBedeutet: 2 Einsetzungsverfahren + 2 Additionsverfahren + 2 Gleichsetzungsverfahren = 6 Aufgaben insgesamt\n\n📚 Aufgaben, die du wählen kannst:\n• Einsetzungsverfahren: Aufgabe #2, #9\n• Additionsverfahren: Aufgabe #6, #7\n• Gleichsetzungsverfahren: Aufgabe #1, #13",
+    "complete-without-hints": "✅ Wie erreicht man das Ziel?\nErledige 1 Aufgabe ohne Hinweise zu verwenden\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Klicke nicht auf die Hinweis-Schaltfläche (?-Button)",
+    "solve-minimal-errors": "✅ Wie erreicht man das Ziel?\nErledige Aufgaben mit 1 oder weniger Fehlern\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgaben\n• Das System speichert deine Fehleranzahl automatisch",
+    "handle-complex-problems": "✅ Wie erreicht man das Ziel?\nErledige 5 Aufgaben insgesamt\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgaben\n• Beliebiges Lösungsverfahren",
+    "exceptional-problem-solving": "✅ Wie erreicht man das Ziel?\nErledige Aufgaben mit 0 Hinweisen UND 0 Fehlern\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Perfekte Ausführung ohne Fehler",
+    "maintain-accuracy": "✅ Wie erreicht man das Ziel?\nErledige 5 Aufgaben mit durchschnittlich 1 oder weniger Fehlern\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Das System berechnet deine durchschnittliche Fehleranzahl automatisch",
+    "reflect-effectiveness": "✅ Wie erreicht man das Ziel?\nErledige 1 Aufgabe mit Selbsterklärung\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe zum Zuordnen von Verfahren oder Erkennen von effizienten Verfahren\n• Beliebige Aufgabe zum Zuordnen von Verfahren oder Erkennen von effizienten Verfahren",
+    "build-confidence": "✅ Wie erreicht man das Ziel?\nErledige 1 Aufgabe mit 2 oder weniger Hinweisen\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Versuche, möglichst wenige Hinweise zu verwenden",
+    "learn-from-mistakes": "✅ Wie erreicht man das Ziel?\nDas System verfolgt deine Verbesserung automatisch\nVersuche, Fehler im Laufe der Zeit die Anzahl der Fehler zu reduzieren\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Das System verfolgt deine Verbesserung automatisch",
+    "develop-resilience": "✅ Wie erreicht man das Ziel?\nErledige Aufgaben auch wenn du Fehler machst\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Das System speichert deine Fehleranzahl automatisch",
+    "explain-reasoning": "✅ Wie erreicht man das Ziel?\nErledige 3 Aufgaben mit Selbsterklärung\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgaben zum Zuordnen von Verfahren\n• Beliebige Aufgabe zum Zuordnen von Verfahren",
+    "show-improvement": "✅ Wie erreicht man das Ziel?\nDas System verfolgt deine Verbesserung automatisch\nVersuche, vier Aufgaben zu vervollständigen und dabei weniger Fehler zu machen.\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgabe\n• Das System verfolgt deine Verbesserung automatisch",
+    "work-independently": "✅ Wie erreicht man das Ziel?\nErledige 3 Aufgaben ohne Hinweise zu verwenden\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgaben",
+    "set-learning-challenges": "✅ Wie erreicht man das Ziel?\nErledige 10 Aufgaben insgesamt\n\n📚 Aufgaben, die du wählen kannst:\n• Beliebige Aufgaben\n• Beliebiges Lösungsverfahren"
+  },
+
+  "ui": {
+    "set-goal": "Ziele Setzen",
+    "view-goals": "Ziele Ansehen",
+    "my-goals": "Meine Ziele",
+    "active-goals": "Aktive Ziele",
+    "your-active-goals": "Deine Aktiven Ziele",
+    "completed-goals": "Abgeschlossene Ziele",
+    "goal": "Ziel",
+    "all-goals": "Alle Ziele",
+    "browse-goals": "Ziele Durchsuchen",
+    "goal-completion": "Zielabschluss",
+    "goal-progress": "Zielfortschritt",
+    "select-category": "Kategorie auswählen",
+    "select-goal": "Ziel Auswählen",
+    "goal-details": "Zieldetails",
+    "difficulty-level": "Schwerkeitsgrad",
+    "category": "Kategorie",
+    "status": "Status",
+    "page-header": "🎯 Lege deine Lernziele fest",
+    "set-goals-tooltip": "🌟 Lege hier deine Lernziele fest! 🚀",
+    "set-goals-button-title": "Lege deine Lernziele fest!",
+    "goal-completed-message": "🎉 Ziel abgeschlossen! Tolle Arbeit bei \"{{title}}\".",
+    "all-goals-completed-message": "🎉 Fantastisch! Du hast alle deine Ziele abgeschlossen!",
+    "active": "Aktiv",
+    "completed": "Abgeschlossen",
+    "easy": "Einfach",
+    "medium": "Mittel",
+    "hard": "Schwer",
+    "in-progress": "In Bearbeitung",
+    "not-started": "Noch Nicht Begonnen",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "close": "Schließen",
+    "continue": "Weiter",
+    "back": "Zurück",
+    "next": "Weiter",
+    "submit": "Absenden",
+    "skip": "Überspringen",
+    "add-goal": "Ziel Erstellen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "guide": "Anleitung",
+    "why": "Warum?",
+    "no-active-goals": "Keine aktiven Ziele. Setze Dir Ziele, um zu beginnen!",
+    "progressive-goal": "📈 Ziel mit Teilzielen",
+    "progressive-goal-tooltip": "Dies ist ein Ziel mit Teilzielen, welches über mehrere Aufgaben verfolgt wird. Bewege den Mauszeiger über deine Punktzahl unten, um eine Übersicht zu sehen.",
+    "score-breakdown": "Punkteübersicht",
+    "average-score": "Durchschnittliche Punktzahl",
+    "contributing-exercises": "Beitragende Aufgaben",
+    "exercise-count": "{{count}} Aufgaben",
+    "no-goals": "Noch keine Ziele",
+    "create-first-goal": "Erstelle dein erstes Ziel, um deinen Fortschritt zu verfolgen!",
+    "goal-created": "Ziel erfolgreich erstellt!",
+    "goal-completed": "Ziel abgeschlossen!",
+    "congratulations": "Herzlichen Glückwunsch!",
+    "keep-going": "Weiter so!",
+    "almost-there": "Fast geschafft!",
+    "great-job": "Großartige Arbeit!",
+    "excellent-work": "Ausgezeichnete Arbeit!"
+  },
+
+  "pre-goal-assessment": {
+    "title": "Bevor es losgeht",
+    "confidence-question": "Wie zuversichtlich bist du, dass du dieses Ziel erreichen kannst?",
+    "confidence-scale": {
+      "1": "Nicht zuversichtlich",
+      "2": "Wenig zuversichtlich",
+      "3": "Etwas zuversichtlich",
+      "4": "Sehr zuversichtlich",
+      "5": "Äußerst zuversichtlich"
+    },
+    "mistakes-question": "Wie viele Fehler erwartest du zu machen?",
+    "mistakes-placeholder": "Gib eine Zahl ein (z.B. 0, 1, 2, 3...)",
+    "motivation-question": "Wie motiviert bist du, dieses Ziel zu erreichen?",
+    "motivation-scale": {
+      "1": "Nicht motiviert",
+      "2": "Wenig motiviert",
+      "3": "Etwas motiviert",
+      "4": "Sehr motiviert",
+      "5": "Äußerst motiviert"
+    }
+  },
+
+  "post-task-appraisal": {
+    "title": "Zielreflexion",
+    "satisfaction-question": "Wie zufrieden bist du mit deiner Leistung?",
+    "satisfaction-scale": {
+      "1": "😔 Nicht zufrieden",
+      "2": "🙁 Wenig zufrieden",
+      "3": "😊 Zufrieden",
+      "4": "😃 Sehr zufrieden",
+      "5": "🤩 Äußerst zufrieden"
+    },
+    "confidence-question": "Wie zuversichtlich fühlst du dich jetzt in Bezug auf dieses Thema?",
+    "confidence-scale": {
+      "1": "🌱 Ich stehe am Anfang",
+      "2": "🌿 Ich baue Vertrauen auf",
+      "3": "🌳 Ich bin einigermaßen sicher",
+      "4": "🚀 Ich fühle mich sehr sicher",
+      "5": "⭐ Ich beherrsche es wirklich gut"
+    },
+  "anxiety-question": "Wie stark hast du dich während der Aufgabe nervös oder angespannt gefühlt?",
+    "anxiety-scale": {
+    "1": "😊 Nicht angespannt",
+    "2": "😐 Leicht angespannt",
+    "3": "😟 Spürbar angespannt",
+    "4": "😰 Stark angespannt",
+    "5": "😱 Äußerst angespannt"
+    },
+ "effort-question": "Wie viel Mühe hast du in diese Aufgabe gesteckt?",
+  "effort-scale": {
+    "1": "😴 Kaum Mühe",
+    "2": "😐 Etwas Mühe",
+    "3": "😌 Mäßige Mühe",
+    "4": "💪 Große Mühe",
+    "5": "🏆 Vollen Einsatz gezeigt"
+    },
+  "enjoyment-question": "Wie viel Freude hat dir diese Aufgabe bereitet?",
+  "enjoyment-scale": {
+    "1": "😔 Gar keine Freude",
+    "2": "🙁 Wenig Freude",
+    "3": "😊 Mäßige Freude",
+    "4": "😃 Große Freude",
+    "5": "🤩 Total begeistert"
+  },
+    "difficulty-question": "Wie schwierig war diese Aufgabe für dich?",
+    "difficulty-scale": {
+      "1": "Sehr einfach",
+      "2": "Einfach",
+      "3": "Mittel",
+      "4": "Schwer",
+      "5": "Sehr schwer"
+    }
+  },
+  "retrospective": {
+    "title": "Lass uns Reflektieren",
+    "performance-question": "Wie viele Fehler denkst du, hast du gemacht?",
+    "performance-placeholder": "Gib eine Zahl ein",
+    "expected": "Erwartet",
+    "actual": "Tatsächlich",
+    "mistakes": "Fehler",
+    "actual-mistakes": "Tatsächliche Fehler: {{count}}",
+    "expected-mistakes": "Du hast erwartet: {{count}}",
+    "better-than-expected": "Du hast besser abgeschnitten als erwartet!",
+    "as-expected": "Du hast wie erwartet abgeschnitten!",
+    "room-for-improvement": "Es gibt Verbesserungspotenzial!",
+    "contributing-exercises-info": "Dieses Ziel umfasst deine Leistung in {{count}} Aufgabe(n)",
+    "great-job": "Großartige Arbeit! 👏",
+    "excellent": "Ausgezeichnet! 🌟",
+    "outstanding": "Hervorragend! 🎉",
+    "perfect-prediction": "Perfekte Vorhersage! 🎯",
+    "keep-trying": "Versuche es weiter! 💪",
+    "dont-give-up": "Gib nicht auf! 🚀",
+    "learning": "In Arbeit! 📚",
+    "score-calculation": "Punkteberechnung",
+    "sum-of-exercises": "Summe aus {{count}} Aufgaben:",
+    "based-on-errors": "Basierend auf deinen Fehlern (gemachte Fehler)",
+    "complete-button": "Fertig ✓"
+  },
+
+  "adaptive-feedback": {
+    "goal-aware": {
+      "hints-free-goal": "🎯 Perfekt! Du hast dein Ziel erreicht, ohne Hinweise zu nutzen!",
+      "work-independently": "💪 Großartig! Du arbeitest sehr selbstständig und ohne Hinweise zu nutzen, wie in deinem Lernziel angegeben!",
+      "exceptional-flawless": "✨ Makellos! Du hast außergewöhnliche Problemlösungsfähigkeiten mit 0 Hinweisen UND 0 Fehlern gezeigt!",
+      "exceptional-halfway": "🏆 Ausgezeichnete Leistung ohne Hinweise! Du bist auf halbem Weg zu außergewöhnlichen Problemlösungsfähigkeiten!",
+      "minimal-errors": "⭐ Ausgezeichnete Genauigkeit! Du hast die Fehler minimal gehalten, wie in deinem Lernziel angegeben!",
+      "keep-up": "Mach weiter so bei deinen Lernzielen! 🌟"
+    },
+    "high-performance": {
+      "perfect": "🚀 Hervorragend! Perfekte Lösung der Aufgabe mit 0 Hinweisen und 0 Fehlern! Dein Selbstvertrauen ist hoch - du bist bereit für größere Herausforderungen. Ich habe deine empfohlenen Ziele aktualisiert, damit sie deinem Fortschritt entsprechen!",
+      "excellent": "🌟 Ausgezeichnete Arbeit! Nur {{hints}} Hinweise und {{errors}} Fehler. Das ist wirklich super! Mit deinem hohen Selbstvertrauen bist du bereit die nächste Stufe! Ich habe deine empfohlenen Ziele aktualisiert, um dich weiter herauszufordern!"
+    },
+    "struggling": {
+      "with-anxiety": "💪 Ich sehe, du fühlst dich angespannt, aber du hast dich durch {{errors}} Fehler und {{hints}} Hinweise durchgekämpft, das erfordert Durchsetzungskraft! Ich habe deine empfohlenen Ziele angepasst, um dir mehr Unterstützung zu geben und Schritt für Schritt Selbstvertrauen aufzubauen. Du schaffst das! 🤗",
+      "default": "🎯 Durch {{errors}} Fehler zu arbeiten und {{hints}} Hinweise zu verwenden zeigt Entschlossenheit! Jeder lernt in seinem eigenen Tempo. Ich habe deine Ziele aktualisiert, um deine Lernreise besser zu unterstützen. Du schaffst das!🤗"
+    },
+    "consistent-improvement": {
+      "message": "📈 Erstaunlicher Fortschritt! Deine Fehlerrate hat sich um {{improvementPercent}}% von {{olderAvg}} auf {{recentAvg}} verbessert. Du lernst und wächst eindeutig! Ich habe deine Ziele aktualisiert, um deinen Fortschritt zu feiern und fortzusetzen!"
+    },
+    "mixed-performance": {
+      "frustrated": "🎯 Du machst das gut ({{hints}} Hinweise, {{errors}} Fehler), aber ich spüre etwas Frustration. Das ist völlig normal! Ich habe deine Ziele angepasst, um dir zu helfen, wieder in den Erfolgsmodus zu kommen. Denk daran, beim Lernen kann es immer mal schneller oder langsamer vorangehen! 💙",
+      "default": "🌱 Gute Leistung ({{hints}} Hinweise, {{errors}} Fehler), aber ich möchte, dass du dich auch selbstbewusster fühlst! Ich habe deine Ziele aktualisiert, um sowohl Leistung als auch Selbstvertrauen zu unterstützen."
+    },
+    "building-confidence": {
+      "message": "🌟 Tolle Arbeit! {{hints}} Hinweise und {{errors}} Fehler zeigen, dass du solide Fähigkeiten aufbaust. Dein Selbstvertrauen wächst. Das ist die Grundlage für erfolgreiches Lernen! Ich habe deine Ziele aktualisiert, um auf diese positive Entwicklung aufzubauen! Weiter so! 💙"
+    },
+    "perfectionist": {
+      "message": "🌟 Tolle Arbeit! Du hast keine Hinweise benutzt und keine Fehler gemacht! Ich merke, dass du dich vielleicht noch etwas angespannt fühlst. Denk daran, Lernen muss nicht jedes Mal perfekt sein. Lass uns Ziele setzen, die deinen Fortschritt feiern und die Dinge leicht halten. Du machst das großartig! 💙"
+    },
+    "overconfident": {
+      "message": "💪 Ich finde dein Selbstvertrauen super! Du hast {{hints}} Hinweise benutzt und {{errors}} Fehler gemacht, was auf mehr Chancen zum Lernen und Wachsen hinweist. Ich habe Ziele gesetzt, die dich herausfordern und gleichzeitig auf deiner positiven Einstellung aufbauen. Dein Enthusiasmus ist dein entscheidender Vorteil. 🚀"
+    },
+    "impostor-syndrome": {
+      "message": "🏆 Schau dir die Ergebnisse an: nur {{hints}} Hinweise und {{errors}} Fehler. Das ist beeindruckend! Du machst das super, auch wenn du manchmal an deinen Fähigkeiten zweifelst. Es ist normal sich so zu fühlen, wenn du wächst. Ich habe Ziele ausgewählt, die dir helfen, deine Fähigkeiten zu erkennen, ihnen zu vertrauen und deinen Fortschritt zu sehen. Du kannst mehr als du denkst!✨"
+    },
+    "burnout-fatigue": {
+      "message": "🌿 Ich sehe, dass du dir Mühe gibst, dich aber erschöpft fühlst. Es erfordert Mut, um weiterzumachen! Es ist okay, dein Tempo anzupassen. Ich habe leichtere Ziele vorgeschlagen, um dir zu helfen, deinen Enthusiasmus schrittweise wieder aufzubauen und gleichzeitig entspannte Fortschritte zu machen. Denn Lernen soll auch Spaß machen! 💚"
+    },
+    "flow-state": {
+      "message": "✨ Du machst große Lernfortschritte! Tolle Leistung ({{hints}} Hinweise, {{errors}} Fehler) und du genießt das Lernen eindeutig. So sieht optimales Lernen aus! Ich habe Ziele gewählt, die dir helfen, diesen wunderbaren Schwung und diese positive Erfahrung beizubehalten. Das ist genau das, was engagiertes Lernen bewirken kann! 🌟"
+    },
+    "frustrated-learner": {
+      "message": "🤝 Ich sehe, du gibst dir Mühe ({{hints}} Hinweise, {{errors}} Fehler), fühlst dich aber frustriert über die Ergebnisse. Das ist völlig normal. Schwierigkeiten oder Fehler gehören zum Lernen dazu. Ich habe deine Ziele angepasst, um dir zu helfen, deinen Fortschritt klarer zu sehen. Deine Ausdauer wird sich auszahlen!🌱"
+    },
+    "anxious-high-achiever": {
+      "message": "🧘‍♀️ Starke Leistung ({{hints}} Hinweise, {{errors}} Fehler), aber ich möchte, dass du dich so gut fühlst wie deine Ergebnisse aussehen! Hohe Leistung sollte nicht mit hoher Angst einhergehen. Du machst deine Aufgaben gut. Lass uns daran arbeiten, das Lernen für dich angenehmer zu machen. Ich habe Ziele ausgewählt, die deine hohen Standards beibehalten und gleichzeitig dein emotionales Wohlbefinden unterstützen. Top-Leistung und Gelassenheit können perfekt zusammenpassen! 🌺"
+    },
+    "not-using-hints": {
+      "message": "💡 Ich bemerke, dass du {{errors}} Fehler gemacht hast, ohne Hinweise zu verwenden. Das zeigt Entschlossenheit, aber denk daran. Hinweise sind hier, um dir beim Lernen zu helfen, nicht um es einfacher zu machen! Strategisches Verwenden von Hinweisen kann dir helfen, Verständnis und Selbstvertrauen schneller aufzubauen. Ich habe deine Ziele aktualisiert, und ich ermutige dich, das Hinweissystem auszuprobieren! 🎓"
+    },
+    "hint-dependent": {
+      "message": "🎯 Tolle Arbeit, eine perfekte Punktzahl zu erzielen, aber ich habe bemerkt, dass du {{hints}} Hinweise dafür verwendet hast. Hinweise sind hilfreich zum Lernen, aber versuche dich beim nächsten Mal herauszufordern, weniger Hinweise zu verwenden. Es wird dir helfen, unabhängige Problemlösungsfähigkeiten und Selbstvertrauen aufzubauen! Ich habe deine Ziele aktualisiert, um dir zu helfen, die Anzahl der Hinweise schrittweise zu reduzieren und gleichzeitig deinen Erfolg beizubehalten. Glaub an dich! 💪"
+    },
+    "generic": {
+      "message": "🎯 Gute Arbeit! Du hast {{hints}} Hinweise verwendet und {{errors}} Fehler gemacht. Jeder Versuch hilft dir beim Lernen! Ich habe deine empfohlenen Ziele basierend auf deinem Fortschritt aktualisiert."
+    }
+  },
+
+  "recommendations": {
+    "title": "🎯 Deine Adaptiven Empfehlungen",
+    "personalized-message": "Diese Ziele sind personalisiert basierend auf deinen {{count}} abgeschlossenen Zielen.",
+    "why-instruction": "Klicke auf \"💡 Warum empfohlen?\", um detaillierte Begründungen zu sehen.",
+    "based-on-performance": "Basierend auf deiner Leistung empfehlen wir:",
+    "category-label": "Kategorie",
+    "difficulty-label": "Schwierigkeit",
+    "goal-label": "Ziel",
+    "why-button": "Warum?",
+    "add-goal-button": "Ziel Hinzufügen",
+    "goal-added-button": "Hinzugefügt",
+    "condition-fulfilled": "Ziel Bedingung erfüllt",
+    "goal-exists-tooltip": "Ziel bereits zu deiner Liste hinzugefügt",
+    "add-goal-tooltip": "Dieses Ziel zu deiner Liste hinzufügen",
+    "why-recommended-tooltip": "Warum wird dieses Ziel empfohlen?",
+    "why-recommended": "Warum dieses Ziel?",
+    "modal": {
+      "title": "🗺️ Deine Lernreise",
+      "subtitle": "Sieh, wo du bist und wohin du gehst!",
+      "pattern-matched": "MUSTER ERKANNT",
+      "what-indicates": "WAS DIES BEDEUTET",
+      "how-helps": "WIE DIESES ZIEL HILFT",
+      "loading": "Details deiner Empfehlung werden geladen...",
+      "close-button": "Verstanden! Los geht's! 🚀"
+    },
+    "reasons": {
+      "build-foundation": "Ein starkes Verständnis der Grundlagen aufzubauen wird bei komplexeren Zielen helfen.",
+      "natural-progression": "Dies ist der nächste natürliche Schritt auf deiner Lernreise.",
+      "address-struggles": "Dieses Ziel adressiert Bereiche ab, in denen du dich verbessern kannst.",
+      "leverage-strengths": "Dieses Ziel baut auf deinen bestehenden Stärken auf.",
+      "variety": "Verschiedene Ansätze auszuprobieren hilft, das Verständnis zu vertiefen.",
+      "consolidate": "Es ist wichtig, deine Fähigkeiten über Lösungsverfahren hinweg zu üben.",
+      "challenge": "Du bist bereit für eine größere Herausforderung!",
+      "consistency": "Übung und wiederholte Erfolge  werden dein Selbstvertrauen stärken.",
+      "independence": "Selbstständig zu arbeiten baut Problemlösefähigkeiten auf.",
+      "reflection": "Reflexion hilft, dein Verständnis zu festigen."
+    },
+    "accept-recommendation": "Dieses Ziel Setzen",
+    "browse-other-goals": "Andere Ziele Durchsuchen",
+    "no-recommendation": "Toller Fortschritt! Du kannst frei wählen, welches Ziel dich als nächstes interessiert."
+  },
+
+  "claim-modal": {
+    "title": "Wozza! Du hast es geschafft!",
+    "subtitle": "Du hast die Bedingungen für dieses Ziel bereits erfüllt!",
+    "what-accomplished": "✨ Was Du erreicht hast:",
+    "explanation": "Du hast die Bedingungen für dieses Ziel bereits erfüllt! Wenn du es zu deinen abgeschlossenen Zielen hinzufügen  möchtest, kannst du es zu deinen Zielen hinzufügen und beim nächsten Abschluss des Ziels wird es als abgeschlossen markiert.",
+    "close-button": "Verstanden!"
+  },
+
+  "goal-completion-guide": {
+    "title": "Wie man dieses Ziel abschließt",
+    "steps": "Schritte",
+    "tips": "Tipps",
+    "exercises-needed": "Benötigte Aufgaben: {{count}}",
+    "method-requirement": "Lösungsverfahren: {{method}}",
+    "any-method": "Beliebiges Lösungsverfahren",
+    "specific-method": "Nur {{method}}",
+    "multiple-methods": "Verwende verschiedene Lösungsverfahren",
+    "tip-take-time": "Nimm dir Zeit und konzentriere dich auf Verständnis, nicht nur auf Geschwindigkeit.",
+    "tip-use-hints": "Zögere nicht, Hinweise zu verwenden, wenn du nicht weiter weißt.",
+    "tip-review": "Überprüfe das Konzept vor dem Start, wenn du unsicher bist.",
+    "tip-practice": "Übung macht den Meister. Mach dir keine Sorgen über Fehler!",
+    "tip-reflect": "Reflektiere nach jeder Aufgabe, was du gelernt hast.",
+    "tip-strategy": "Denk darüber nach, welches Lösungsverfahren am effizientesten ist.",
+    "tip-accuracy": "Konzentriere dich auf Genauigkeit, anstatt dich zu beeilen.",
+    "tip-independence": "Fordere dich heraus, wenn möglich ohne Hinweise zu arbeiten."
+  },
+
+  "errors-and-validation": {
+    "goal-title-required": "Bitte gib einen Titel für das Ziel ein",
+    "goal-title-too-short": "Der Titel für das Ziel muss mindestens 3 Zeichen lang sein",
+    "goal-title-too-long": "Der Titel für das Ziel muss weniger als 200 Zeichen lang sein",
+    "category-required": "Bitte wähle eine Kategorie",
+    "difficulty-required": "Bitte wähle einen Schwierigkeitsgrad",
+    "confidence-required": "Bitte bewerte dein Selbstvertrauen",
+    "mistakes-required": "Bitte gib erwartete Fehler ein",
+    "mistakes-invalid": "Bitte gib eine gültige Zahl ein",
+    "motivation-required": "Bitte bewerte deine Motivation",
+    "rating-required": "Bitte gib eine Bewertung ab",
+    "duplicate-goal": "Du hast dieses Ziel bereits",
+    "max-active-goals": "Du kannst nur {{max}} aktive Ziele gleichzeitig haben",
+    "goal-not-found": "Ziel nicht gefunden",
+    "error-creating-goal": "Fehler beim Erstellen des Ziels. Bitte versuche es erneut.",
+    "error-completing-goal": "Fehler beim Abschließen des Ziels. Bitte versuche es erneut.",
+    "error-loading-goals": "Fehler beim Laden der Ziele. Bitte versuche es erneut."
+  },
+
+  "placeholders": {
+    "search-goals": "Ziele suchen...",
+    "goal-title": "Titel für das Ziel eingeben...",
+    "notes": "Notizen hinzufügen (optional)...",
+    "reflection": "Was hast du gelernt?",
+    "select-category": "Kategorie auswählen...",
+    "select-difficulty": "Schwierigkeit auswählen...",
+    "select-goal": "Ziel auswählen..."
+  },
+
+  "pretest": {
+    "header-title": "📚 Vortest",
+    "header-subtitle": "Hilf uns, die besten Ziele für deine Lernreise vorzuschlagen!",
+    "question-progress": "Frage {{current}} von {{total}}",
+    "next-button": "Nächste Frage",
+    "complete-button": "Vortest Abschließen",
+    "results-title": "🎯 Vortest Abgeschlossen!",
+    "recommended-title": "🎯 Empfohlene Ziele für Dich:",
+    "category-label": "Kategorie",
+    "difficulty-label": "Schwierigkeit",
+    "why-button": "Warum Empfohlen?",
+    "why-button-tooltip": "Warum wird dieses Ziel für dich empfohlen?",
+    "no-goals-message": "Keine spezifischen Ziele basierend auf deinen Antworten vorgeschlagen.",
+    "no-goals-explore": "Du kannst alle verfügbaren Ziele auf der Zielsetzung-Seite erkunden!",
+    "continue-button": "Weiter zur Zielsetzung",
+    "questions": {
+      "q1": "Wie selbstbewusst bist du beim Lösen von Mathematikaufgaben?",
+      "q2": "Welche Art von Zielen bevorzugst du?"
+    },
+    "options": {
+      "not-confident": "Überhaupt nicht selbstbewusst",
+      "somewhat-confident": "Etwas selbstbewusst",
+      "very-confident": "Sehr selbstbewusst",
+      "expert-level": "Expertenniveau",
+      "quick-practice": "Schnelles Üben",
+      "deep-understanding": "Fokus auf tiefes Verständnis",
+      "problem-variety": "Verschiedene Lösungswege nutzen",
+      "skill-building": "Fähigkeiten aufbauen"
+    },
+    "why-modal": {
+      "title": "💡 Warum Dir Dieses Ziel Empfohlen Wurde",
+      "subtitle": "Basierend auf deinen Vortest-Antworten",
+      "close-button": "Verstanden! 👍",
+      "reasons": {
+        "not-confident": "Du bist noch nicht sehr selbstbewusst beim Lösen von Gleichungssystemen, daher bietet dieses Ziel einen guten Startpunkt.",
+        "somewhat-confident": "Du bist etwas selbstbewusst beim Lösen von Gleichungssystemen, dieses Ziel stärkt deine Grundlage.",
+        "very-confident": "Mit deinem hohen Selbstbewusstsein beim Lösen von Gleichungssystemen bietet dieses Ziel das richtige Maß an Herausforderung.",
+        "expert": "Als Experte beim Lösen von Gleichungssystemen zielt dieses Ziel auf fortgeschrittene Fähigkeiten ab.",
+        "quick-practice": "Du arbeitest lieber an Übungseinheiten, die schnell abgeschlossen werden können. Dieses Ziel passt zu kurzen, fokussierten Aufgaben.",
+        "deep-understanding": "Du schätzt tiefes Verständnis. Dieses Ziel fördert gründliches Begreifen.",
+        "problem-variety": "Du magst Abwechslung. Mit diesem Ziel lernst du verschiedene Lösungsansätze kennen.",
+        "skill-building": "Du konzentrierst dich auf den Aufbau deiner Fähigkeiten. Dieses Ziel entwickelt spezifische Kompetenzen."
+      }
+    }
+  },
+  "agent-messages": {
+    "goal-updated": "👍 Super! Ziele zu ändern ist in Ordnung, denke nur daran, warum du dich dafür entschieden hast!",
+    "goal-deleted": "🗑️ Es ist okay, Ziele zu entfernen, wenn sie zu viel sind. Behalte einfach im Blick, warum du dieses Ziel entfernt hast.",
+    "goal-prefilled": "✨ Formular vorgefüllt: \"{{title}}\". Fülle die Fragen aus und klicke auf  \"Ziel Erstellen\"!"
+  },
+  "menu": {
+    "public-training-mode": "👤 Dies ist die öffentliche Version der Plattform - Anonymisierte Daten aller Teilnehmenden werden gespeichert ",
+    "join-research-study": "🔬 An Studie teilnehmen"
+  },
+  "prefilled-form": {
+    "title": "📌 Ausgefüllt basierend auf einer Empfehlung:",
+    "instruction": "Beantworte die Fragen zu deinem aktuellen Selbstbewusstsein beim Lösen von Gleichungssystemen unten und klicke auf \"Ziel Erstellen\"!"
+  },
+  "add-goal-help": {
+    "text": "💡 Du kannst die \"Ziel Hinzufügen\"-Schaltfläche verwenden, um ein vorausgefülltes Ziel-Formular zu erstellen oder erstelle ein beliebiges Ziel deiner Wahl mithilfe des untenstehenden Ziel-Formulars."
+  },
+  "study-login": {
+    "title": "Anmeldung zur Forschungsstudie",
+    "subtitle": "Nimm an unserer Studie teil, übe das Lösen von Gleichungssystemen und unterstütze dadurch unsere Forschung. Deine Daten werden vertraulich behandelt",
+    "participant-id-label": "Teilnehmer-ID:",
+    "participant-id-placeholder": "Gib deine Teilnehmer-ID ein (z.B. PART001)",
+    "participant-id-help": "3-20 Zeichen: Buchstaben, Zahlen, Unterstrich, Bindestrich nur",
+    "start-button": "🚀  Mit dem Lernen beginnen",
+    "cancel-button": "Abbrechen",
+    "what-happens-title": "📋 Was passiert, wenn du teilnimmst:",
+    "benefit-1": "Deine Ziele und Fortschritte werden individuell verfolgt",
+    "benefit-2": "Alle deine Daten helfen dabei, deine Lernerfahrungen zu verbessern",
+    "benefit-3": "Du kannst deine Sitzung jederzeit beenden"
+  },
+  "satisfaction-reasons": {
+    "completed-exercises": "Du hast {{count}} Aufgabe abgeschlossen!",
+    "completed-exercises_plural": "Du hast {{count}} Aufgaben abgeschlossen!",
+    "completed-substitution": "Du hast {{count}} Einsetzungsaufgabe abgeschlossen!",
+    "completed-substitution_plural": "Du hast {{count}} Einsetzungsaufgaben abgeschlossen!",
+    "completed-elimination": "Du hast {{count}} Additionsaufgabe abgeschlossen!",
+    "completed-elimination_plural": "Du hast {{count}} Additionsaufgaben abgeschlossen!",
+    "completed-equalization": "Du hast {{count}} Gleichsetzungsaufgabe abgeschlossen!",
+    "completed-equalization_plural": "Du hast {{count}} Gleichsetzungsaufgaben abgeschlossen!",
+    "mastered-substitution": "Du hast das Einsetzungsverfahren mit {{count}} Aufgaben gemeistert!",
+    "mastered-elimination": "Du hast das Additionsverfahren mit {{count}} Aufgaben gemeistert!",
+    "mastered-equalization": "Du hast das Gleichsetzungsverfahren mit {{count}} Aufgaben gemeistert!",
+    "used-methods": "Du hast {{count}} verschiedene Verfahren verwendet: {{methods}}!",
+    "completed-all-methods": "Du hast {{count}} Aufgaben mit allen 3 Verfahren abgeschlossen!",
+    "completed-efficiency": "Du hast {{count}} Effizienzaufgaben abgeschlossen!",
+    "mastered-all-methods": "Du hast alle Verfahren gemeistert: {{substitution}} Einsetzung, {{elimination}} Addition, {{equalization}} Gleichsetzung!",
+    "completed-without-hints": "Du hast {{count}} Aufgabe ohne Hinweise abgeschlossen!",
+    "completed-without-hints_plural": "Du hast {{count}} Aufgaben ohne Hinweise abgeschlossen!",
+    "completed-low-errors": "Du hast {{count}} Aufgabe mit ≤1 Fehler abgeschlossen!",
+    "completed-low-errors_plural": "Du hast {{count}} Aufgaben mit ≤1 Fehler abgeschlossen!",
+    "completed-perfect": "Du hast {{count}} perfekte Aufgabe abgeschlossen!",
+    "completed-perfect_plural": "Du hast {{count}} perfekte Aufgaben abgeschlossen!",
+    "average-errors": "Deine durchschnittlichen Fehler über {{count}} Aufgaben: {{average}}!",
+    "self-explanations": "Du hast {{count}} Selbsterklärung gegeben!",
+    "self-explanations_plural": "Du hast {{count}} Selbsterklärungen gegeben!",
+    "completed-low-hints": "Du hast {{count}} Aufgabe mit ≤2 Hinweisen abgeschlossen!",
+    "completed-low-hints_plural": "Du hast {{count}} Aufgaben mit ≤2 Hinweisen abgeschlossen!",
+    "persevered-errors": "Du hast in {{count}} Aufgabe trotz Fehlern durchgehalten!",
+    "persevered-errors_plural": "Du hast in {{count}} Aufgaben trotz Fehlern durchgehalten!",
+    "errors-improved": "Deine Fehler haben sich von {{older}} auf {{recent}} verbessert!",
+    "errors-decreased": "Deine Fehler sind stetig gesunken: {{sequence}}!",
+    "conditions-satisfied": "Bedingungen erfüllt!"
+  }
+}

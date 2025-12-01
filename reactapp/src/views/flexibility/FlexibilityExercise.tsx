@@ -1,6 +1,8 @@
 import useAxios from "axios-hooks";
 import { plainToClass } from "class-transformer";
 import { ReactElement, useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { TranslationNamespaces } from "@/i18n";
 import { ErrorTranslations } from "@/types/shared/errorTranslations.ts";
 import { GeneralTranslations } from "@/types/shared/generalTranslations.ts";
 import ErrorScreen from "@components/shared/ErrorScreen.tsx";
@@ -21,11 +23,12 @@ import { EfficiencyExercise } from "@components/flexibility/exercises/Efficiency
 import { Goal } from "@/types/goal";
 import { fetchGoals } from "@/utils/api.ts";
 import GoalListOverlay from "@/components/GoalListOverlay.tsx";
-import { GoalList } from "@/components/goalsetting/GoalList.tsx";
+import GoalList from "@/components/goalsetting/GoalList.tsx";
 import { GoalCompletionProvider } from "@/contexts/GoalCompletionContext.tsx";
 import RetrospectiveModal from "@/components/RetrospectivePrompt.tsx";
 import PostTaskAppraisal from "@/components/PostTaskAppraisal.tsx";
 import { generateAdaptiveFeedback } from "@/utils/adaptiveFeedback";
+import { getGoalTitleKey } from "@/utils/goalTranslations";
 import AgentPopup from "@/components/PedologicalAgent";
 import FemaleAfricanSmiling from "@images/flexibility/Agent 3.png";
 import confetti from "canvas-confetti";
@@ -41,6 +44,7 @@ import { PlainExercise } from "@components/flexibility/exercises/PlainExercise.t
 import { getStudySession } from "@/utils/studySession";
 
 export default function FlexibilityExercise({ isStudyExample }: { isStudyExample: boolean }): ReactElement {
+    const { t } = useTranslation(TranslationNamespaces.GoalSetting);
     const [exitOverlay, setExitOverlay] = useState<[boolean, boolean]>([false, false]);
     const location = useLocation();
     const { exerciseId } = useParams();
@@ -68,6 +72,32 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
     // Agent message state for adaptive feedback
     const [showCheckIn, setShowCheckIn] = useState(false);
     const [agentMessage, setAgentMessage] = useState<{ text: string; duration?: number } | null>(null);
+    
+    // Queue for pending goal completions
+    const [isShowingFeedback, setIsShowingFeedback] = useState(false);
+    const [pendingGoalQueue, setPendingGoalQueue] = useState<Array<{ goalId: number; autoScore?: number; exercises?: any[] }>>([]);
+    
+    // Function to handle multiple goal completions
+    const handleMultipleGoalCompletions = (goalTitles: string[], completeGoalByTitle: (title: string) => void) => {
+        console.log(`🎯 handleMultipleGoalCompletions called with ${goalTitles.length} goals:`, goalTitles);
+        
+        if (goalTitles.length === 0) return;
+        
+        // Trigger only the first goal immediately
+        console.log(`🎯 Triggering first goal immediately: "${goalTitles[0]}"`);
+        completeGoalByTitle(goalTitles[0]);
+        
+        // Queue the rest with a small delay to ensure first modal is open
+        if (goalTitles.length > 1) {
+            setTimeout(() => {
+                console.log(`🎯 Now queuing remaining ${goalTitles.length - 1} goals`);
+                goalTitles.slice(1).forEach(goalTitle => {
+                    console.log(`🎯 Queuing: "${goalTitle}"`);
+                    completeGoalByTitle(goalTitle);
+                });
+            }, 300); // Wait for first modal to definitely be open
+        }
+    };
 
     // Study session detection - check for study mode on component mount and periodically
     useEffect(() => {
@@ -125,7 +155,24 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
 
     // Callback to handle modal triggering at FlexibilityExercise level (visible)
     const handleModalTrigger = (goalId: number, autoScore?: number, exercises?: any[]) => {
+        console.log(`🎯 ========== HANDLE MODAL TRIGGER CALLED ==========`);
         console.log(`🎯 FlexibilityExercise: Modal trigger received for goal ${goalId}`);
+        console.log(`🎯 Current state - selectedGoalId: ${selectedGoalId}, showAppraisalModal: ${showAppraisalModal}, isShowingFeedback: ${isShowingFeedback}`);
+        
+        // If currently showing feedback OR a retrospective modal is already open, queue this goal
+        // Note: We don't check showAppraisalModal here because it might not have updated yet after setState
+        if (isShowingFeedback || selectedGoalId !== null) {
+            console.log(`🎯 ========== ADDING TO QUEUE ==========`);
+            console.log(`🎯 Currently busy (feedback: ${isShowingFeedback}, modal: ${selectedGoalId !== null}) - adding goal ${goalId} to queue`);
+            setPendingGoalQueue(prev => {
+                const newQueue = [...prev, { goalId, autoScore, exercises }];
+                console.log(`🎯 Queue updated - new length: ${newQueue.length}`, newQueue);
+                return newQueue;
+            });
+            return;
+        }
+        
+        console.log(`🎯 ========== SHOWING MODAL IMMEDIATELY ==========`);
         console.log(`🎯 Setting modal state at FlexibilityExercise level (should be visible)`);
         
         // Dispatch event to notify exercises that goal completion flow has started
@@ -166,6 +213,15 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
     ) => {
         if (!completingGoalId || !tempScores) return;
         
+        console.log(`🎯 ========== APPRAISAL SUBMIT START ==========`);
+        console.log(`🎯 Completing goal ID: ${completingGoalId}`);
+        console.log(`🎯 Goal title: ${goals.find(g => g.id === completingGoalId)?.title}`);
+        console.log(`🎯 Current queue length: ${pendingGoalQueue.length}`);
+        console.log(`🎯 Pending goals in queue:`, pendingGoalQueue.map(g => g.goalId));
+        
+        // Mark that we're showing feedback now
+        setIsShowingFeedback(true);
+        
         try {
             console.log(`🎯 FlexibilityExercise: PostTaskAppraisal submitted for goal ID: ${completingGoalId}`);
             
@@ -183,12 +239,24 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     const contributingExercises = getContributingExercises(currentGoal.title, allExerciseScores);
                     
                     if (contributingExercises.length > 0) {
-                        // For multi-exercise goals, use averaged data
+                        // ✅ FIXED: For multi-exercise goals, use TOTAL SUM not average
                         const totalHints = contributingExercises.reduce((sum, ex) => sum + ex.hints, 0);
                         const totalErrors = contributingExercises.reduce((sum, ex) => sum + ex.errors, 0);
-                        calculatedHints = Math.round(totalHints / contributingExercises.length);
-                        calculatedErrors = Math.round(totalErrors / contributingExercises.length);
-                        console.log(`🎯 Using averaged performance for multi-exercise goal: ${calculatedHints} hints, ${calculatedErrors} errors`);
+                        
+                        // Use total sum for hints
+                        calculatedHints = totalHints;
+                        
+                        // ✅ CRITICAL: Use autoCalculatedScore for errors (same source as retrospective!)
+                        if (autoCalculatedScore !== null && autoCalculatedScore !== undefined) {
+                            calculatedErrors = autoCalculatedScore;
+                            console.log(`🎯 ✅ Using autoCalculatedScore for errors: ${calculatedErrors} (same as retrospective)`);
+                        } else {
+                            // Fallback: use total sum
+                            calculatedErrors = totalErrors;
+                            console.warn(`⚠️ Fallback: Using calculated total errors: ${calculatedErrors}`);
+                        }
+                        
+                        console.log(`🎯 Using TOTAL performance for multi-exercise goal: ${calculatedHints} hints, ${calculatedErrors} errors (sum, not average)`);
                     } else {
                         // For single-exercise goals, get from most recent session
                         const allSessionKeys = Object.keys(sessionStorage).filter(key => 
@@ -259,6 +327,12 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
 
             console.log(`🎯 Goal ${completingGoalId} completed successfully with performance: hints=${calculatedHints}, errors=${calculatedErrors}`);
 
+            // Close the appraisal modal BEFORE generating feedback
+            console.log(`🎯 Closing appraisal modal before feedback generation starts`);
+            setShowAppraisalModal(false);
+            setTempScores(null);
+            setCompletingGoalId(null);
+
             // Generate adaptive feedback message
             await generateAdaptiveFeedbackForGoal(
                 completingGoalId, 
@@ -270,12 +344,11 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                 updatedGoals  // Pass updated goals to check if all completed
             );        } catch (error) {
             console.error("Failed to complete goal:", error);
+            // Make sure modal is closed even if there's an error
+            setShowAppraisalModal(false);
+            setTempScores(null);
+            setCompletingGoalId(null);
         }
-        
-        // Close the appraisal modal
-        setShowAppraisalModal(false);
-        setTempScores(null);
-        setCompletingGoalId(null);
     };
 
     const generateAdaptiveFeedbackForGoal = async (
@@ -298,8 +371,9 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                 return;
             }
 
-            // Add completion celebration message first
-            messages.push({ text: `🎉 Goal completed! Great work on "${currentGoal.title}".`, duration: 4000 });
+            // Add completion celebration message first - use translated title
+            const translatedTitle = t(`goal-titles.${getGoalTitleKey(currentGoal.title)}`);
+            messages.push({ text: t('ui.goal-completed-message', { title: translatedTitle }), duration: 4000 });
 
             // Update dynamic goal suggestions based on new progress
             let updatedSuggestions: string[] = [];
@@ -328,9 +402,9 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
 
             console.log('🎯 Goal suggestions updated - generating adaptive feedback');
 
-            // Generate adaptive feedback using the same logic as GoalList
-            let averagedHints: number | undefined = undefined;
-            let averagedErrors: number | undefined = undefined;
+            // ✅ Generate adaptive feedback using TOTAL performance data (not average)
+            let totalHints: number | undefined = undefined;
+            let totalErrors: number | undefined = undefined;
 
             // Import auto-scoring utilities
             const { getExerciseScores, getContributingExercises } = await import('@/utils/autoScoring');
@@ -340,18 +414,27 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
             if (contributingExercises.length > 0) {
                 console.log('🎯 Found', contributingExercises.length, 'contributing exercises for adaptive feedback');
 
-                // Calculate average hints and errors across all contributing exercises
-                const totalHints = contributingExercises.reduce((sum, ex) => sum + ex.hints, 0);
-                const totalErrors = contributingExercises.reduce((sum, ex) => sum + ex.errors, 0);
-                averagedHints = Math.round(totalHints / contributingExercises.length);
-                averagedErrors = Math.round(totalErrors / contributingExercises.length);
+                // ✅ FIXED: Calculate TOTAL (sum) not average
+                const sumHints = contributingExercises.reduce((sum, ex) => sum + ex.hints, 0);
+                const sumErrors = contributingExercises.reduce((sum, ex) => sum + ex.errors, 0);
+                
+                // Use total sum for hints
+                totalHints = sumHints;
+                
+                // ✅ CRITICAL: Use autoCalculatedScore for errors (same source as retrospective!)
+                if (autoCalculatedScore !== null && autoCalculatedScore !== undefined) {
+                    totalErrors = autoCalculatedScore;
+                    console.log(`🎯 ✅ Using autoCalculatedScore for errors: ${totalErrors} (same as retrospective)`);
+                } else {
+                    // Fallback: use total sum
+                    totalErrors = sumErrors;
+                    console.warn(`⚠️ Fallback: Using calculated total errors: ${totalErrors}`);
+                }
 
-                console.log('🎯 Averaged performance data:', {
+                console.log('🎯 TOTAL performance data (sum, not average):', {
                     contributingCount: contributingExercises.length,
                     totalHints,
-                    totalErrors,
-                    averagedHints,
-                    averagedErrors
+                    totalErrors
                 });
             }
 
@@ -419,8 +502,8 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                         postAnxiety
                     };
 
-                    const finalHints = averagedHints !== undefined ? averagedHints : sessionData.hints;
-                    const finalErrors = averagedErrors !== undefined ? averagedErrors : sessionData.errors;
+                    const finalHints = totalHints !== undefined ? totalHints : sessionData.hints;
+                    const finalErrors = totalErrors !== undefined ? totalErrors : sessionData.errors;
 
                     const feedbackData = {
                         hints: finalHints,
@@ -429,7 +512,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                         exerciseType: sessionData.exerciseType,
                         completedWithSelfExplanation: sessionData.completedWithSelfExplanation,
                         userId: userId,
-                        activeGoalTitles: goals.filter(g => !g.completed).map(g => g.title),
+                        activeGoalTitles: [currentGoal.title], // Only the goal being completed, not all active goals
                         ...emotionalData
                     };
 
@@ -462,7 +545,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     exerciseType: 'efficiency',
                     completedWithSelfExplanation: false,
                     userId: userId,
-                    activeGoalTitles: goals.filter(g => !g.completed).map(g => g.title),
+                    activeGoalTitles: [currentGoal.title], // Only the goal being completed
                     ...emotionalData
                 };
 
@@ -474,23 +557,32 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
             messages.push({ text: "📈 Your goal recommendations have been updated based on your progress!", duration: 4000 });
         }
 
-        // Check if all goals completed
+        // 🎉 Confetti for every goal completion!
+        setTimeout(() => {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }, 500);
+
+        // Check if all goals completed - extra celebration!
         const completedGoals = updatedGoals.filter(g => g.completed).length;
         const totalGoals = updatedGoals.length;
         const isAllCompleted = completedGoals === totalGoals && totalGoals > 0;
         
         if (isAllCompleted) {
             console.log('🎉 All goals completed! Adding celebration message');
-            messages.push({ text: "🎉 Awesome! You've completed all your goals!", duration: 4000 });
+            messages.push({ text: t('ui.all-goals-completed-message'), duration: 4000 });
             
-            // Add confetti celebration
+            // Extra confetti burst for all goals done
             setTimeout(() => {
                 confetti({
                     particleCount: 200,
                     spread: 90,
                     origin: { y: 0.6 }
                 });
-            }, 1000); // Small delay for dramatic effect
+            }, 1200); // Additional celebration
         }
 
         // Show messages sequentially
@@ -503,19 +595,45 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
             delay += (message.duration || 4000) + 200; // 200ms buffer between messages
         });
 
-        // Dispatch event when all goal feedback is complete (for auto-close in exercises)
-        if (delay > 0) { // Only if we have messages to show
-            setTimeout(() => {
-                console.log('🎯 All goal feedback complete, dispatching event for auto-close');
-                window.dispatchEvent(new CustomEvent('goalFeedbackComplete'));
-            }, delay + 1000); // Additional delay after last message finishes
-        } else {
-            // If no messages to show, dispatch immediately
-            console.log('🎯 No feedback messages to show, dispatching goalFeedbackComplete immediately');
-            setTimeout(() => {
-                window.dispatchEvent(new CustomEvent('goalFeedbackComplete'));
-            }, 500); // Small delay
-        }
+        // After all feedback is shown, trigger next goal from queue
+        // Use Math.max to ensure minimum delay even if no messages
+        const minDelay = 2000; // Minimum 2 seconds to ensure feedback phase completes
+        const totalDelay = Math.max(delay, minDelay);
+        
+        console.log(`🎯 Setting timeout to check queue after ${totalDelay + 1000}ms`);
+        
+        setTimeout(() => {
+            console.log('🎯 ========== FEEDBACK COMPLETE - CHECKING QUEUE ==========');
+            console.log('🎯 All goal feedback complete');
+            console.log(`🎯 isShowingFeedback: ${isShowingFeedback} -> setting to false`);
+            setIsShowingFeedback(false);
+            
+            // Check if there's a pending goal in the queue
+            setPendingGoalQueue(prev => {
+                console.log(`🎯 Checking queue - current length: ${prev.length}`);
+                console.log(`🎯 Queue contents:`, prev);
+                
+                if (prev.length > 0) {
+                    const nextGoal = prev[0];
+                    console.log(`🎯 ========== TRIGGERING NEXT GOAL FROM QUEUE ==========`);
+                    console.log(`🎯 Queue has ${prev.length} pending goals. Triggering next: ${nextGoal.goalId}`);
+                    
+                    // Trigger next modal immediately
+                    setTimeout(() => {
+                        console.log(`🎯 NOW calling handleModalTrigger for goal ${nextGoal.goalId}`);
+                        handleModalTrigger(nextGoal.goalId, nextGoal.autoScore, nextGoal.exercises);
+                    }, 100); // Very short delay just to ensure state updates have propagated
+                    
+                    return prev.slice(1); // Remove the goal we're about to trigger
+                } else {
+                    // No more goals in queue - NOW we can close the exercise
+                    console.log('🎯 ========== NO MORE GOALS - EXERCISE CAN CLOSE ==========');
+                    console.log('🎯 No more goals in queue - dispatching goalFeedbackComplete for exercise auto-close');
+                    window.dispatchEvent(new CustomEvent('goalFeedbackComplete'));
+                }
+                return prev;
+            });
+        }, totalDelay + 1000); // Wait for all messages + 1 second
     };
 
     // Completion function for exercises - trigger the RetrospectiveModal via auto-scoring

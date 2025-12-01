@@ -1,5 +1,10 @@
 // components/RetrospectiveModal.tsx
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { TranslationNamespaces } from "@/i18n";
+import { GoalSettingTranslations } from "@/types/shared/goalsettingTranslations.ts";
+import { getGoalTitleKey } from "@/utils/goalTranslations.ts";
+
 
 interface ExerciseScore {
   exerciseId: number;
@@ -56,6 +61,7 @@ const buttonStylePrimary: React.CSSProperties = {
 
 
 const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose, onSubmit, goalTitle, autoCalculatedScore, expectedMistakes, contributingExercises }) => {
+  const { t } = useTranslation(TranslationNamespaces.GoalSetting);
   const [actualScore, setActualScore] = useState<number>(0);
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
 
@@ -65,16 +71,16 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
   const getFeedbackMessage = (actual: number, expected: number) => {
     if (actual < expected) {
       const difference = expected - actual;
-      if (difference === 1) return "Great job! 👏";
-      if (difference <= 2) return "Excellent! 🌟";
-      return "Outstanding! 🎉";
+      if (difference === 1) return t(GoalSettingTranslations.RETRO_GREAT_JOB);
+      if (difference <= 2) return t(GoalSettingTranslations.RETRO_EXCELLENT);
+      return t(GoalSettingTranslations.RETRO_OUTSTANDING);
     } else if (actual === expected) {
-      return "Perfect prediction! 🎯";
+      return t(GoalSettingTranslations.RETRO_PERFECT_PREDICTION);
     } else {
       const difference = actual - expected;
-      if (difference === 1) return "Keep trying! 💪";
-      if (difference <= 2) return "Don't give up! 🚀";
-      return "Learning! 📚";
+      if (difference === 1) return t(GoalSettingTranslations.RETRO_KEEP_TRYING);
+      if (difference <= 2) return t(GoalSettingTranslations.RETRO_DONT_GIVE_UP);
+      return t(GoalSettingTranslations.RETRO_LEARNING);
     }
   };
 
@@ -146,7 +152,7 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
     <div style={overlayStyle} data-modal="retrospective" onClick={(e) => e.stopPropagation()}>
       <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
         <h3 style={{ marginTop: 0, marginBottom: "0.5rem", textAlign: "center", color: "black" }}>
-          � Performance Result
+          🎯 {t("retrospective.title")}
         </h3>
         {goalTitle && (
           <div style={{ 
@@ -159,7 +165,7 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
             position: "relative"
           }}>
             <strong style={{ color: "#2c5aa0", fontSize: "0.9rem" }}>
-              🎯 Goal: "{goalTitle}"
+              🎯 {t("ui.goal")}: "{t(`goal-titles.${getGoalTitleKey(goalTitle)}`)}"
             </strong>
             
             {/* Progressive Goal Indicator */}
@@ -178,9 +184,9 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
                   cursor: "help",
                   verticalAlign: "middle"
                 }}
-                title="This is a progressive goal tracked across multiple exercises. Hover over your score below to see the breakdown."
+                title={t("ui.progressive-goal-tooltip")}
               >
-                📈 Progressive Goal
+                {t("ui.progressive-goal")}
               </div>
             )}
           </div>
@@ -195,17 +201,17 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
             textAlign: "center"
           }}>
             <div style={{ fontSize: "1.5rem", fontWeight: "bold", color: "#28a745", marginBottom: "0.5rem" }}>
-              🎯 Mistakes Comparison
+              🎯 {t("retrospective.title")}
             </div>
             <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", gap: "1rem" }}>
               <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#6c757d" }}>Expected</div>
+                <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#6c757d" }}>{t("retrospective.expected")}</div>
                 <div style={{ fontSize: "2rem", fontWeight: "bold", color: "#6c757d" }}>{expectedMistakes || 0}</div>
-                <div style={{ fontSize: "0.8rem", color: "#6c757d" }}>mistakes</div>
+                <div style={{ fontSize: "0.8rem", color: "#6c757d" }}>{t("retrospective.mistakes")}</div>
               </div>
               <div style={{ fontSize: "2rem", color: "#6c757d" }}>vs</div>
               <div style={{ textAlign: "center", position: "relative" }}>
-                <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#28a745" }}>Actual</div>
+                <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#28a745" }}>{t("retrospective.actual")}</div>
                 <div 
                   style={{ fontSize: "2rem", fontWeight: "bold", color: "#28a745", cursor: contributingExercises && contributingExercises.length > 1 ? "help" : "default" }}
                   onMouseEnter={() => setShowTooltip(true)}
@@ -237,10 +243,10 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
                     color: "#333"
                   }}>
                     <div style={{ fontWeight: "bold", marginBottom: "0.5rem", color: "#28a745", textAlign: "center" }}>
-                      📊 Score Calculation
+                      📊 {t("retrospective.score-calculation")}
                     </div>
                     <div style={{ marginBottom: "0.5rem", fontSize: "0.75rem", color: "#666", textAlign: "center" }}>
-                      Sum of {contributingExercises.length} exercises:
+                      {t("retrospective.sum-of-exercises", { count: contributingExercises.length })}
                     </div>
                     {contributingExercises.map((ex, idx) => (
                       <div key={idx} style={{ 
@@ -287,14 +293,14 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
               </div>
             </div>
             <div style={{ fontSize: "0.9rem", color: "#666", marginTop: "0.5rem" }}>
-              Based on your exercise errors (mistakes made)
+              {t("retrospective.based-on-errors")}
             </div>
           </div>
         </div>
         
         <div style={{ display: "flex", justifyContent: "center" }}>
           <button style={buttonStylePrimary} onClick={handleSubmit}>
-            Complete ✓
+            {t("retrospective.complete-button")}
           </button>
         </div>
       </div>

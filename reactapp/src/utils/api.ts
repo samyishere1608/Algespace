@@ -302,32 +302,33 @@ export async function getUserPerformanceStats(userId: number): Promise<{
 // Get detailed recommendation reasons for suggested goals
 export async function getRecommendationReasons(
   userId: number, 
-  recommendedGoals: string[]
+  recommendedGoals: string[],
+  lang: string = "en"
 ): Promise<Record<string, string>> {
-  console.log(`� Calling recommendation reasons API for userId: ${userId}`);
-  console.log(`� Recommended goals:`, recommendedGoals);
+  console.log(`📡 Calling recommendation reasons API for userId: ${userId}, lang: ${lang}`);
+  console.log(`📡 Recommended goals:`, recommendedGoals);
   
   try {
-    const res = await fetch(`${API_BASE_URL}/goals/recommendation-reasons/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/goals/recommendation-reasons/${userId}?lang=${lang}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(recommendedGoals),
     });
     
-    console.log(`� API Response status: ${res.status} ${res.statusText}`);
+    console.log(`📡 API Response status: ${res.status} ${res.statusText}`);
     
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`� API Error response: ${errorText}`);
+      console.error(`❌ API Error response: ${errorText}`);
       throw new Error(`Failed to get recommendation reasons: ${res.status}`);
     }
     
     const result = await res.json();
-    console.log(`� API Response data:`, result);
+    console.log(`📡 API Response data:`, result);
     
     return result.Reasons || result.reasons || {};
   } catch (error) {
-    console.error(`� Recommendation reasons API call failed:`, error);
+    console.error(`❌ Recommendation reasons API call failed:`, error);
     return {}; // Return empty object on failure
   }
 }

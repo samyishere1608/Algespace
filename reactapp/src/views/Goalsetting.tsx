@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { TranslationNamespaces } from "@/i18n";
 import { fetchGoals, createGoal, checkPretestStatus as checkPretestStatusAPI, getUserPerformanceStats, getRecommendationReasons, completeGoalWithScore } from "@/utils/api";
 import { Goal, GoalInput } from "@/types/goal";
 import { GoalForm } from "@/components/goalsetting/GoalForm";
-import { GoalList } from "@/components/goalsetting/GoalList";
+import GoalList from "@/components/goalsetting/GoalList";
 import AgentPopup from "@/components/PedologicalAgent";
 import { PretestModal } from "@/components/pretest/PretestModal";
 import { getStudySession } from "@/utils/studySession";
 import { checkGoalConditionsSatisfied, getGoalSatisfactionReason } from "@/utils/implicitGoalChecker";
+import { getGoalTitleKey, getCategoryKey, getDifficultyKey } from "@/utils/goalTranslations";
 
 import FemaleAfricanSmiling from "@images/flexibility/AfroAmerican_F_Smiling.png";
 
@@ -62,6 +65,7 @@ const goalCompletionGuide: Record<string, string> = {
 };
 
 export default function GoalSettingView({ userId: propUserId }: { userId?: number }) {
+  const { t, i18n } = useTranslation(TranslationNamespaces.GoalSetting);
   const [goals, setGoals] = useState<Goal[]>([]);
 
   
@@ -143,7 +147,7 @@ export default function GoalSettingView({ userId: propUserId }: { userId?: numbe
           
           // Fetch recommendation reasons for initial suggested goals
           if (suggestions.length > 0) {
-            getRecommendationReasons(userId, suggestions).then(reasons => {
+            getRecommendationReasons(userId, suggestions, i18n.language).then(reasons => {
               console.log('💡 Initial recommendation reasons loaded:', reasons);
               setRecommendationReasons(reasons);
             }).catch(err => {
@@ -182,7 +186,7 @@ export default function GoalSettingView({ userId: propUserId }: { userId?: numbe
       
       // Fetch detailed reasons for each recommended goal
       if (event.detail.suggestions && event.detail.suggestions.length > 0) {
-        const reasons = await getRecommendationReasons(userId, event.detail.suggestions);
+        const reasons = await getRecommendationReasons(userId, event.detail.suggestions, i18n.language);
         console.log('💡 Fetched recommendation reasons:', reasons);
         setRecommendationReasons(reasons);
       }
@@ -275,7 +279,7 @@ useEffect(() => {
     
     if (matchingSuggestion) {
       console.log('💡 Found matching suggestion:', matchingSuggestion);
-      const reasons = await getRecommendationReasons(userId, [matchingSuggestion]);
+      const reasons = await getRecommendationReasons(userId, [matchingSuggestion], i18n.language);
       console.log('💡 Fetched reason:', reasons);
       
       if (reasons && reasons[goalTitle]) {
@@ -334,7 +338,7 @@ useEffect(() => {
         goalFormElement.scrollIntoView({ behavior: 'smooth' });
       }
       
-      setAgentMessage(`✨ Goal form pre-filled with: "${title}". Just set your self-efficacy questions and click create!`);
+      setAgentMessage(t('agent-messages.goal-prefilled', { title: t(`goal-titles.${getGoalTitleKey(title)}`) }));
       setShowCheckIn(true);
     } else {
       console.warn('Invalid goal format for quick-add:', goal);
@@ -348,13 +352,13 @@ useEffect(() => {
       width: "100%",
       maxWidth: "1400px",
       margin: "0 auto",
-      fontFamily: "'Comic Sans MS', cursive, sans-serif",
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       color: "white",
       minHeight: "100vh",
       boxSizing: "border-box",
     }}
   >
-    {/* USER SWITCHER - made more compact for mobile */}
+    {/* USER SWITCHER - made more compact for mobile
     <form
       onSubmit={handleSubmit}
       style={{ 
@@ -391,13 +395,13 @@ useEffect(() => {
       >
         Load User
       </button>
-    </form>
+    </form> */}
 
     <h1 style={{ 
       fontSize: "clamp(1.2rem, 4vw, 1.8rem)", 
       marginBottom: "1rem" 
     }}>
-      🎯 Set Your Learning Goals
+      {t('ui.page-header')}
     </h1>
 
     {/* Learning Profile panel removed - focus is on "Why recommended?" explanations in goal cards */}
@@ -419,7 +423,7 @@ useEffect(() => {
           fontWeight: 'bold',
           textAlign: 'center'
         }}>
-          🎯 Your Adaptive Recommendations
+          {t('recommendations.title')}
         </h3>
         
         {performanceStats && performanceStats.totalGoalsCompleted > 0 && (
@@ -433,8 +437,9 @@ useEffect(() => {
             textAlign: 'center',
             fontStyle: 'italic'
           }}>
-            These goals are personalized based on your {performanceStats.totalGoalsCompleted} completed goals.
-            Click "💡 Why recommended?" to see detailed reasoning.
+            {t('recommendations.personalized-message', { count: performanceStats.totalGoalsCompleted })}
+            {' '}
+            {t('recommendations.why-instruction')}
           </div>
         )}
 
@@ -463,12 +468,36 @@ useEffect(() => {
               // Get difficulty color and emoji - matching GoalForm style
               const getDifficultyStyle = (diff: string) => {
                 const diffLower = diff.toLowerCase();
-                if (diffLower.includes('very easy')) return { color: '#007bff', emoji: '🟦', label: 'Very Easy' };
-                if (diffLower.includes('easy')) return { color: '#28a745', emoji: '🟢', label: 'Easy' };
-                if (diffLower.includes('medium')) return { color: '#ffc107', emoji: '🟡', label: 'Medium' };
-                if (diffLower.includes('hard') && !diffLower.includes('very')) return { color: '#dc3545', emoji: '🔴', label: 'Hard' };
-                if (diffLower.includes('very hard')) return { color: '#343a40', emoji: '⚫', label: 'Very Hard' };
-                return { color: '#6c757d', emoji: '⚪', label: difficulty };
+                if (diffLower.includes('very easy')) return { 
+                  color: '#007bff', 
+                  emoji: '🟦', 
+                  label: t(`difficulty.${getDifficultyKey('Very Easy')}`)
+                };
+                if (diffLower.includes('easy')) return { 
+                  color: '#28a745', 
+                  emoji: '🟢', 
+                  label: t(`difficulty.${getDifficultyKey('Easy')}`)
+                };
+                if (diffLower.includes('medium')) return { 
+                  color: '#ffc107', 
+                  emoji: '🟡', 
+                  label: t(`difficulty.${getDifficultyKey('Medium')}`)
+                };
+                if (diffLower.includes('hard') && !diffLower.includes('very')) return { 
+                  color: '#dc3545', 
+                  emoji: '🔴', 
+                  label: t(`difficulty.${getDifficultyKey('Hard')}`)
+                };
+                if (diffLower.includes('very hard')) return { 
+                  color: '#343a40', 
+                  emoji: '⚫', 
+                  label: t(`difficulty.${getDifficultyKey('Very Hard')}`)
+                };
+                return { 
+                  color: '#6c757d', 
+                  emoji: '⚪', 
+                  label: t(`difficulty.${getDifficultyKey(difficulty)}`)
+                };
               };
               
               const diffStyle = getDifficultyStyle(difficulty);
@@ -492,46 +521,51 @@ useEffect(() => {
                     paddingBottom: '8px',
                     borderBottom: '1px solid #e3f2fd'
                   }}>
-                    Goal : {title}
+                    {t('recommendations.goal-label')} : {t(`goal-titles.${getGoalTitleKey(title)}`)}
                   </div>
 
                   {/* Category and Difficulty Below Title */}
                   <div style={{ 
                     display: 'flex', 
+                    flexWrap: 'wrap',
                     justifyContent: 'space-between', 
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     marginBottom: '10px',
-              
-                    gap: '5px'
+                    gap: '8px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: '0', flex: '1 1 auto' }}>
                       <span style={{ 
                         fontSize: '0.65rem',
                         fontWeight: '600',
                         color: '#64748b',
-                        textTransform: 'uppercase'
+                        textTransform: 'uppercase',
+                        flexShrink: 0
                       }}>
-                        Category:
+                        {t('recommendations.category-label')}:
                       </span>
                       <span style={{ 
-                        fontSize: '0.6rem',
+                        fontSize: '0.55rem',
                         fontWeight: '600',
                         color: '#1976d2',
-                        padding: '3px 8px',
+                        padding: '3px 6px',
                         backgroundColor: '#e3f2fd',
                         borderRadius: '4px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        width: 'fit-content',
+                        display: 'inline-block',
+                        maxWidth: '120px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap'
-                      }}>
-                        {category}
+                      }}
+                      title={t(`categories.${getCategoryKey(category)}`)}
+                      >
+                        {t(`categories.${getCategoryKey(category)}`)}
                       </span>
                     </div>
                     <div style={{ 
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '3px'
+                      gap: '3px',
+                      flexShrink: 0
                     }}>
                       <span style={{ 
                         fontSize: '0.65rem',
@@ -539,7 +573,7 @@ useEffect(() => {
                         color: '#64748b',
                         textTransform: 'uppercase'
                       }}>
-                        Difficulty:
+                        {t('recommendations.difficulty-label')}:
                       </span>
                       <div style={{ 
                         display: 'inline-flex',
@@ -548,14 +582,13 @@ useEffect(() => {
                         fontSize: '0.5rem',
                         fontWeight: '600',
                         color: diffStyle.color,
-                        padding: '3px 8px',
+                        padding: '3px 6px',
                         backgroundColor: 'rgba(255,255,255,0.8)',
                         borderRadius: '4px',
                         border: `1.5px solid ${diffStyle.color}40`,
-                        width: 'fit-content',
                         whiteSpace: 'nowrap'
                       }}>
-                        <span style={{ fontSize: '0.75rem' }}>{diffStyle.emoji}</span>
+                        <span style={{ fontSize: '0.7rem' }}>{diffStyle.emoji}</span>
                         <span>{diffStyle.label}</span>
                       </div>
                     </div>
@@ -587,10 +620,10 @@ useEffect(() => {
                           fontWeight: "600",
                           transition: "all 0.2s"
                         }}
-                        title="Why is this goal recommended?"
+                        title={t('recommendations.why-recommended-tooltip')}
                       >
                         <span>💡</span>
-                        <span>Why?</span>
+                        <span>{t('recommendations.why-button')}</span>
                       </button>
                     </div>
                     
@@ -635,7 +668,7 @@ useEffect(() => {
                           }}
                         >
                           <span style={{ fontSize: '0.8rem' }}>✓</span>
-                          <span style={{fontSize: '0.70rem',fontFamily:"Comic Sans MS",fontWeight:"bold"}}>Condition fullfilled</span>
+                          <span style={{fontSize: '0.70rem', fontWeight:"bold"}}>{t('recommendations.condition-fulfilled')}</span>
                         </button>
                       )}
                       
@@ -665,7 +698,7 @@ useEffect(() => {
                           transition: "all 0.2s",
                           opacity: goalExists ? 0.6 : 1
                         }}
-                        title={goalExists ? "Goal already added to your list" : "Add this goal to your list"}
+                        title={goalExists ? t('recommendations.goal-exists-tooltip') : t('recommendations.add-goal-tooltip')}
                         onMouseEnter={(e) => {
                           if (!goalExists) {
                             e.currentTarget.style.transform = "scale(1.05)";
@@ -680,7 +713,7 @@ useEffect(() => {
                         }}
                       >
                         <span style={{ fontSize: '1rem' }}>{goalExists ? '✓' : '+'}</span>
-                        <span>{goalExists ? 'Added' : 'Add Goal'}</span>
+                        <span>{goalExists ? t('recommendations.goal-added-button') : t('recommendations.add-goal-button')}</span>
                       </button>
                     </div>
                   </div>
@@ -755,7 +788,7 @@ useEffect(() => {
             fontStyle: 'italic',
             fontSize: '0.75rem'
           }}>
-            💡 You can use the add goal button to prefill the goal form or add a goal of your choice from the goal form below.
+            {t('add-goal-help.text')}
           </small>
         </div>
       </div>
@@ -909,8 +942,7 @@ useEffect(() => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 1000,
-          fontFamily: "'Comic Sans MS', cursive, sans-serif"
+          zIndex: 1000
         }}
         onClick={() => setShowGuidance(null)}
         >
@@ -1004,8 +1036,7 @@ useEffect(() => {
                   borderRadius: "6px",
                   cursor: "pointer",
                   fontWeight: "bold",
-                  fontSize: "0.9rem",
-                  fontFamily: "'Comic Sans MS', cursive, sans-serif"
+                  fontSize: "0.9rem"
                 }}
               >
                 Got it! 👍
@@ -1038,7 +1069,6 @@ useEffect(() => {
             width: "95%",
             maxHeight: "85vh",
             boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
-            fontFamily: "'Comic Sans MS', cursive, sans-serif",
             overflow: "hidden"
           }}>
             {/* Header */}
@@ -1057,14 +1087,14 @@ useEffect(() => {
                 justifyContent: "center",
                 gap: "0.5rem"
               }}>
-                🗺️ Your Learning Journey
+                {t('recommendations.modal.title')}
               </h2>
               <p style={{
                 margin: "0.5rem 0 0 0",
                 fontSize: "0.9rem",
                 opacity: 0.95
               }}>
-                See where you are and where you're headed!
+                {t('recommendations.modal.subtitle')}
               </p>
             </div>
             
@@ -1110,12 +1140,13 @@ useEffect(() => {
                     
                     bulletPoints.forEach(line => {
                       const content = line.substring(line.indexOf('•') + 1).trim();
-                      if (content.startsWith('Condition Matched:')) {
-                        conditionMatched = content.replace('Condition Matched:', '').trim();
-                      } else if (content.startsWith('What This Indicates:')) {
-                        whatThisMeans = content.replace('What This Indicates:', '').trim();
-                      } else if (content.startsWith('How This Goal Helps:')) {
-                        howItHelps = content.replace('How This Goal Helps:', '').trim();
+                      // Support both English and German markers
+                      if (content.startsWith('Condition Matched:') || content.startsWith('Bedingung erfüllt:')) {
+                        conditionMatched = content.replace('Condition Matched:', '').replace('Bedingung erfüllt:', '').trim();
+                      } else if (content.startsWith('What This Indicates:') || content.startsWith('Was dies bedeutet:')) {
+                        whatThisMeans = content.replace('What This Indicates:', '').replace('Was dies bedeutet:', '').trim();
+                      } else if (content.startsWith('How This Goal Helps:') || content.startsWith('Wie dieses Ziel hilft:')) {
+                        howItHelps = content.replace('How This Goal Helps:', '').replace('Wie dieses Ziel hilft:', '').trim();
                       }
                     });
                     
@@ -1147,7 +1178,7 @@ useEffect(() => {
                               fontSize: "1.1rem",
                               fontWeight: "bold"
                             }}>
-                              PATTERN MATCHED
+                              {t('recommendations.modal.pattern-matched')}
                             </h4>
                             <div style={{
                               backgroundColor: "#e8eaf6",
@@ -1187,7 +1218,7 @@ useEffect(() => {
                               fontSize: "1.1rem",
                               fontWeight: "bold"
                             }}>
-                              WHAT THIS INDICATES
+                              {t('recommendations.modal.what-indicates')}
                             </h4>
                             <div style={{
                               backgroundColor: "#fff3e0",
@@ -1227,7 +1258,7 @@ useEffect(() => {
                               fontSize: "1.1rem",
                               fontWeight: "bold"
                             }}>
-                              HOW THIS GOAL HELPS
+                              {t('recommendations.modal.how-helps')}
                             </h4>
                             <div style={{
                               backgroundColor: "#e8f5e9",
@@ -1250,7 +1281,7 @@ useEffect(() => {
                             color: "#666"
                           }}>
                             <p style={{ margin: 0, fontSize: "0.9rem" }}>
-                              {reasonText || "Loading recommendation details..."}
+                              {reasonText || t('recommendations.modal.loading')}
                             </p>
                           </div>
                         )}
@@ -1279,7 +1310,6 @@ useEffect(() => {
                   cursor: "pointer",
                   fontWeight: "bold",
                   fontSize: "1rem",
-                  fontFamily: "'Comic Sans MS', cursive, sans-serif",
                   boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
                   transition: "all 0.3s ease"
                 }}
@@ -1292,7 +1322,7 @@ useEffect(() => {
                   e.currentTarget.style.boxShadow = "0 4px 12px rgba(102, 126, 234, 0.3)";
                 }}
               >
-                Got it! Let's do this! 🚀
+                {t('recommendations.modal.close-button')}
               </button>
             </div>
           </div>
@@ -1321,7 +1351,6 @@ useEffect(() => {
             maxWidth: "600px",
             width: "90%",
             boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
-            fontFamily: "'Comic Sans MS', cursive, sans-serif",
             overflow: "hidden"
           }}>
             {/* Header */}
@@ -1337,14 +1366,14 @@ useEffect(() => {
                 fontWeight: "bold",
                 color: "#d84315"
               }}>
-                Wozza! You Did It!
+                {t('claim-modal.title')}
               </h2>
               <p style={{
                 margin: "0.5rem 0 0 0",
                 fontSize: "1rem",
                 color: "#f57c00"
               }}>
-                You've already satisfied the conditions for this goal!
+                {t('claim-modal.subtitle')}
               </p>
             </div>
             
@@ -1366,7 +1395,7 @@ useEffect(() => {
                   fontSize: "1.3rem",
                   fontWeight: "bold"
                 }}>
-                  {claimingGoal.title}
+                  {t(`goal-titles.${getGoalTitleKey(claimingGoal.title)}`)}
                 </h3>
                 <div style={{ 
                   display: "flex",
@@ -1381,7 +1410,7 @@ useEffect(() => {
                     fontWeight: "600",
                     color: "#1976d2"
                   }}>
-                    📂 {claimingGoal.category}
+                    📂 {t(`categories.${getCategoryKey(claimingGoal.category)}`)}
                   </div>
                   <div style={{
                     padding: "0.5rem 1rem",
@@ -1390,7 +1419,7 @@ useEffect(() => {
                     fontWeight: "600",
                     color: "#7b1fa2"
                   }}>
-                    ⚡ {claimingGoal.difficulty}
+                    ⚡ {t(`difficulty.${getDifficultyKey(claimingGoal.difficulty)}`)}
                   </div>
                 </div>
               </div>
@@ -1409,7 +1438,7 @@ useEffect(() => {
                   fontSize: "1.1rem",
                   fontWeight: "bold"
                 }}>
-                  ✨ What You Accomplished:
+                  {t('claim-modal.what-accomplished')}
                 </h4>
                 <p style={{ 
                   margin: 0,
@@ -1436,8 +1465,7 @@ useEffect(() => {
                   lineHeight: "1.7",
                   textAlign: "center"
                 }}>
-                  You've already fulfilled the conditions for this goal! 
-                  If you'd like to track it, you can add it to your goal list and on your next excerise completion it will be marked as completed.
+                  {t('claim-modal.explanation')}
                 </p>
               </div>
 
@@ -1460,7 +1488,6 @@ useEffect(() => {
                     cursor: "pointer",
                     fontWeight: "600",
                     fontSize: "0.95rem",
-                    fontFamily: "'Comic Sans MS', cursive, sans-serif",
                     transition: "all 0.2s",
                     boxShadow: "0 2px 8px rgba(76, 175, 80, 0.3)"
                   }}
@@ -1473,7 +1500,7 @@ useEffect(() => {
                     e.currentTarget.style.transform = "scale(1)";
                   }}
                 >
-                  Got It!
+                  {t('claim-modal.close-button')}
                 </button>
               </div>
             </div>

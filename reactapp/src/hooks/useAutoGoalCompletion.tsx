@@ -38,18 +38,35 @@ export function useAutoGoalCompletion(
           // Get all stored exercise scores for this user
           const allExerciseScores = getExerciseScores(userId);
           console.log(`📚 Found ${allExerciseScores.length} exercise scores for user ${userId}`);
+          console.warn(`🔍 [AUTOSCORING DEBUG] All exercise scores:`, allExerciseScores.map(ex => ({
+            exerciseId: ex.exerciseId,
+            exerciseType: ex.exerciseType,
+            method: ex.method,
+            hints: ex.hints,
+            errors: ex.errors,
+            timestamp: ex.timestamp
+          })));
           
           // Get exercises that contributed to this specific goal
           const contributingExercises = getContributingExercises(title, allExerciseScores);
           console.log(`🎯 Found ${contributingExercises.length} contributing exercises for goal "${title}"`);
+          console.warn(`🔍 [AUTOSCORING DEBUG] Contributing exercises for "${title}":`, contributingExercises.map(ex => ({
+            exerciseId: ex.exerciseId,
+            exerciseType: ex.exerciseType,
+            method: ex.method,
+            hints: ex.hints,
+            errors: ex.errors
+          })));
           
           let autoCalculatedScore: number | undefined = undefined;
           if (contributingExercises.length > 0) {
             const goalScoreData = calculateGoalScore(title, userId, contributingExercises);
             autoCalculatedScore = goalScoreData.finalScore;
-            console.log(`✅ Auto-calculated score for "${title}": ${autoCalculatedScore}%`);
+            console.warn(`✅ [AUTOSCORING DEBUG] Auto-calculated score for "${title}": ${autoCalculatedScore} (total errors)`);
+            console.warn(`🎯 [AUTOSCORING DEBUG] Goal score data:`, goalScoreData);
           } else {
-            console.warn(`⚠️ No contributing exercises found for "${title}" - will use manual scoring`);
+            console.warn(`⚠️ [AUTOSCORING DEBUG] No contributing exercises found for "${title}" - will use manual scoring`);
+            console.warn(`⚠️ [AUTOSCORING DEBUG] This means autoCalculatedScore will be UNDEFINED!`);
           }
           
           // Trigger retrospective flow for automatic goal completion

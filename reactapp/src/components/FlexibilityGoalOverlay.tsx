@@ -1,7 +1,7 @@
 // Custom GoalListOverlay for Flexibility exercises that exposes completion function
 import { useEffect } from "react";
 import { Goal } from "@/types/goal";
-import { GoalList } from "@/components/goalsetting/GoalList";
+import GoalList from "@/components/goalsetting/GoalList";
 
 interface FlexibilityGoalOverlayProps {
   goals: Goal[];

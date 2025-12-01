@@ -26,6 +26,7 @@ export function FirstSolution(
         additionalMessage,
         trackAction,
         trackError,
+        trackHints,
         trackChoice,
         trackType,
         trackInterventionChoice,
@@ -43,6 +44,7 @@ export function FirstSolution(
         additionalMessage?: string;
         trackAction: (action: string) => void;
         trackError: () => void;
+        trackHints: () => void;
         trackChoice: (choice: string) => void;
         trackType: (type: number) => void;
         trackInterventionChoice: (choice: string) => void;
@@ -74,7 +76,7 @@ export function FirstSolution(
                 </div>
             )}
             <VariableComputation variable={variable} loadNextStep={loadNextStep} additionalMessage={additionalMessage} agentType={agentType}
-                                 trackAction={trackAction} trackError={trackError} trackChoice={trackChoice} trackType={trackType} trackInterventionChoice={trackInterventionChoice} condition={condition} decideCalculationIntervention={decideCalculationIntervention}/>
+                                 trackAction={trackAction} trackError={trackError} trackHints={trackHints} trackChoice={trackChoice} trackType={trackType} trackInterventionChoice={trackInterventionChoice} condition={condition} decideCalculationIntervention={decideCalculationIntervention}/>
         </React.Fragment>
     );
 }

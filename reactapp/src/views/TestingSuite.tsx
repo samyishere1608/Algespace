@@ -3,9 +3,10 @@ import { GoalSystemTestComponent } from '../components/testing/GoalSystemTestCom
 import { AdaptiveFeedbackTestComponent } from '../components/testing/AdaptiveFeedbackTestComponent';
 import { RecommendationSystemTest } from '../components/testing/RecommendationSystemTest';
 import { SQLiteLoadTestComponent } from '../components/testing/SQLiteLoadTestComponent';
+import { ComprehensiveGoalSystemTest } from '../components/testing/ComprehensiveGoalSystemTest';
 
 export default function TestingSuite() {
-  const [activeTab, setActiveTab] = useState<'goals' | 'feedback' | 'recommendations' | 'loadtest'>('goals');
+  const [activeTab, setActiveTab] = useState<'comprehensive' | 'goals' | 'feedback' | 'recommendations' | 'loadtest'>('comprehensive');
 
   const tabStyle = (isActive: boolean) => ({
     padding: '12px 24px',
@@ -81,8 +82,15 @@ export default function TestingSuite() {
           maxWidth: '1200px', 
           margin: '0 auto',
           display: 'flex',
-          paddingTop: '20px'
+          paddingTop: '20px',
+          flexWrap: 'wrap'
         }}>
+          <button
+            onClick={() => setActiveTab('comprehensive')}
+            style={tabStyle(activeTab === 'comprehensive')}
+          >
+            🌟 E2E Comprehensive Test
+          </button>
           <button
             onClick={() => setActiveTab('goals')}
             style={tabStyle(activeTab === 'goals')}
@@ -112,7 +120,9 @@ export default function TestingSuite() {
 
       {/* Tab Content */}
       <div style={{ backgroundColor: 'white', minHeight: 'calc(100vh - 200px)' }}>
-        {activeTab === 'goals' ? (
+        {activeTab === 'comprehensive' ? (
+          <ComprehensiveGoalSystemTest />
+        ) : activeTab === 'goals' ? (
           <div>
             {/* Goals Tab Description */}
             <div style={{

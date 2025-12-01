@@ -24,7 +24,7 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import "@styles/flexibility/flexibility.scss";
 
 export function FlexibilityStudyView(): ReactElement {
-    const { t } = useTranslation(TranslationNamespaces.Study);
+    const { t } = useTranslation([TranslationNamespaces.Study, TranslationNamespaces.GoalSetting]);
     const navigate = useNavigate();
     const { logout } = useAuth();
     const { studyId } = useParams();
@@ -83,7 +83,6 @@ export function FlexibilityStudyView(): ReactElement {
                         padding: "0.75rem 1rem",
                         borderRadius: "15px",
                         fontSize: "0.9rem",
-                        fontFamily: "'Comic Sans MS', cursive, sans-serif",
                         fontWeight: "bold",
                         boxShadow: "0 8px 20px rgba(255, 107, 107, 0.4)",
                         whiteSpace: "nowrap",
@@ -91,7 +90,7 @@ export function FlexibilityStudyView(): ReactElement {
                         border: "2px solid rgba(255, 255, 255, 0.3)",
                         animation: "tooltipBounce 0.3s ease-out"
                     }}>
-                        🌟 Set your learning goals here! 🚀
+                        {t('ui.set-goals-tooltip', { ns: TranslationNamespaces.GoalSetting })}
                         {/* Arrow pointing down */}
                         <div style={{
                             position: "absolute",
@@ -127,10 +126,9 @@ export function FlexibilityStudyView(): ReactElement {
                         fontSize: "1.2rem",
                         cursor: "pointer",
                         boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-                        transition: "all 0.3s ease",
-                        fontFamily: "'Comic Sans MS', cursive, sans-serif"
+                        transition: "all 0.3s ease"
                     }}
-                    title="Set your learning goals!"
+                    title={t('ui.set-goals-button-title', { ns: TranslationNamespaces.GoalSetting })}
                 >
                     🎯
                 </button>

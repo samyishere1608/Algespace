@@ -236,6 +236,7 @@ export function PlainExercise({ flexibilityExerciseId, exercise, condition, hand
                     }}
                     trackAction={(action: string) => trackActionInPhase(action, FlexibilityExerciseActionPhase.FirstSolutionActions)}
                     trackError={trackErrorInPhase}
+                    trackHints={trackHintsInPhase}
                     trackChoice={(choice: string) => trackChoice(choice, FlexibilityExerciseChoicePhase.FirstSolutionChoice)}
                     trackInterventionChoice={(choice: string) => trackChoice(choice, FlexibilityExerciseChoicePhase.FirstSolutionInterventionChoice)}
                     trackType={(type: number) => trackType(type, FlexibilityExerciseChoicePhase.StudentTypeFirstSolution)}
@@ -292,6 +293,7 @@ export function PlainExercise({ flexibilityExerciseId, exercise, condition, hand
                     }}
                     trackAction={(action: string) => trackActionInPhase(action, FlexibilityExerciseActionPhase.SecondSolutionActions)}
                     trackError={trackErrorInPhase}
+                    trackHints={trackHintsInPhase}
                     trackChoice={(choice: string) => trackChoice(choice, FlexibilityExerciseChoicePhase.SecondSolutionChoice)}
                     trackInterventionChoice={(choice: string) => trackChoice(choice, FlexibilityExerciseChoicePhase.SecondSolutionInterventionChoice)}
                     trackType={(type: number) => trackType(type, FlexibilityExerciseChoicePhase.StudentTypeSecondSolution)}

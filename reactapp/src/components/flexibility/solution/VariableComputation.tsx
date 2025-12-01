@@ -11,13 +11,14 @@ import {SolutionInputField} from "@components/flexibility/solution/SolutionInput
 import {VariableSolution} from "@components/flexibility/solution/VariableSolution.tsx";
 import {StepNextIntervention} from "@components/flexibility/interventions/StepIntervention.tsx";
 
-export function VariableComputation({ variable, loadNextStep, agentType, additionalMessage, trackAction, trackError, trackChoice, trackType, trackInterventionChoice, isSecondSolution = false, condition, decideCalculationIntervention}: {
+export function VariableComputation({ variable, loadNextStep, agentType, additionalMessage, trackAction, trackError, trackHints, trackChoice, trackType, trackInterventionChoice, isSecondSolution = false, condition, decideCalculationIntervention}: {
     variable: Variable;
     loadNextStep: () => void;
     agentType?: AgentType;
     additionalMessage?: string;
     trackAction: (action: string) => void;
     trackError: () => void;
+    trackHints: () => void;
     trackChoice: (choice: string) => void;
     trackType: (type: number) => void;
     trackInterventionChoice: (choice: string) => void;
@@ -148,7 +149,7 @@ export function VariableComputation({ variable, loadNextStep, agentType, additio
         case FirstSolutionState.ManualComputation: {
             content = <SolutionInputField variable={variable} handleSolution={() => setExerciseState(FirstSolutionState.ResultManual)}
                                           showSolution={() => setExerciseState(FirstSolutionState.ResultAuto)} agentType={agentType}
-                                          trackAction={trackAction} trackError={trackError}
+                                          trackAction={trackAction} trackError={trackError} trackHints={trackHints}
             />;
             break;
         }

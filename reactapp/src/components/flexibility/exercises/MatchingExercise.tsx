@@ -339,6 +339,7 @@ export function MatchingExercise({ flexibilityExerciseId, exercise, condition, h
                     }}
                     trackAction={(action: string) => trackActionInPhase(action, FlexibilityExerciseActionPhase.FirstSolutionActions)}
                     trackError={trackErrorsWithCounter}
+                    trackHints={trackHintsWithCounter}
                     trackChoice={(choice: string) => trackChoice(choice, FlexibilityExerciseChoicePhase.FirstSolutionChoice)}
                     trackInterventionChoice={(choice: string) => trackChoice(choice, FlexibilityExerciseChoicePhase.FirstSolutionInterventionChoice)}
                     trackType={(type: number) => trackType(type, FlexibilityExerciseChoicePhase.StudentTypeFirstSolution)}
@@ -395,6 +396,7 @@ export function MatchingExercise({ flexibilityExerciseId, exercise, condition, h
                     }}
                     trackAction={(action: string) => trackActionInPhase(action, FlexibilityExerciseActionPhase.SecondSolutionActions)}
                     trackError={trackErrorsWithCounter}
+                    trackHints={trackHintsWithCounter}
                     trackChoice={(choice: string) => trackChoice(choice, FlexibilityExerciseChoicePhase.SecondSolutionChoice)}
                     trackInterventionChoice={(choice: string) => trackChoice(choice, FlexibilityExerciseChoicePhase.SecondSolutionInterventionChoice)}
                     trackType={(type: number) => trackType(type, FlexibilityExerciseChoicePhase.StudentTypeSecondSolution)}
@@ -510,12 +512,41 @@ export function MatchingExercise({ flexibilityExerciseId, exercise, condition, h
             );
             console.log(`✅ Exercise score saved:`, exerciseScore);
             
-            // ✅ CRITICAL: Force save session to sessionStorage BEFORE triggering goal completion
-            forceSaveSession();
-            console.log(`💾 Session force-saved before goal completion check`);
+            // ✅ CRITICAL: Manually save session to sessionStorage BEFORE triggering goal completion
+            // forceSaveSession() doesn't work - it saves hook's internal state which may be outdated
+            const sessionKey = `exerciseSession_${effectiveUserId}_matching_${exercise.id}`;
+            const sessionData = {
+                hints: totalHints,
+                errors: totalErrors,
+                method: selectedMethod.toString(),
+                exerciseType: 'matching',
+                completedWithSelfExplanation: hasProvidedExplanation,
+                timestamp: Date.now(),
+                completedAt: new Date().toISOString()
+            };
+            sessionStorage.setItem(sessionKey, JSON.stringify(sessionData));
+            console.log(`💾 Session manually saved to sessionStorage BEFORE goal completion:`, sessionKey, sessionData);
             
             console.log(`🏁 About to call checkProgressiveGoals with session:`, session);
-            checkProgressiveGoals(effectiveUserId, session, completeGoalByTitle, exercise.id);
+            const completedGoals = checkProgressiveGoals(effectiveUserId, session, completeGoalByTitle, exercise.id);
+            console.log(`🎯 checkProgressiveGoals returned ${completedGoals.length} goals:`, completedGoals);
+            
+            // Trigger only the FIRST goal - the rest will be queued automatically
+            if (completedGoals.length > 0) {
+                console.log(`🎯 Triggering first goal: "${completedGoals[0]}"`);
+                completeGoalByTitle(completedGoals[0]);
+                
+                // Queue the remaining goals
+                if (completedGoals.length > 1) {
+                    console.log(`🎯 Pre-queuing ${completedGoals.length - 1} additional goals:`, completedGoals.slice(1));
+                    completedGoals.slice(1).forEach(goalTitle => {
+                        setTimeout(() => {
+                            console.log(`🎯 Queuing goal: "${goalTitle}"`);
+                            completeGoalByTitle(goalTitle);
+                        }, 500);
+                    });
+                }
+            }
             
             // Display current progressive tracking stats
             displayProgressiveStats(effectiveUserId);

@@ -1,6 +1,7 @@
 // Implicit Goal Completion Checker
 // Checks which goals a user has already satisfied conditions for (without explicitly adding them)
 
+import i18n from 'i18next';
 import { getExerciseProgress } from './progressiveGoalTracking';
 import { getExerciseScores } from './autoScoring';
 
@@ -10,6 +11,11 @@ export interface ImplicitGoalStatus {
   difficulty: string;
   isSatisfied: boolean;
   reason: string; // Why it's satisfied
+}
+
+// Helper function to get translated satisfaction reasons
+function t(key: string, options?: Record<string, unknown>): string {
+  return i18n.t(`satisfaction-reasons.${key}`, { ns: 'goalsetting', ...options });
 }
 
 /**
@@ -161,21 +167,21 @@ export function getGoalSatisfactionReason(userId: number, goalTitle: string): st
   
   switch (goalTitle) {
     case "Learn what linear equations are":
-      return `You've completed ${progress.total} exercise${progress.total !== 1 ? 's' : ''}!`;
+      return t(progress.total !== 1 ? 'completed-exercises_plural' : 'completed-exercises', { count: progress.total });
       
     case "Understand how substitution works":
-      return `You've completed ${progress.substitution} substitution exercise${progress.substitution !== 1 ? 's' : ''}!`;
+      return t(progress.substitution !== 1 ? 'completed-substitution_plural' : 'completed-substitution', { count: progress.substitution });
       
     case "Understand how elimination works":
-      return `You've completed ${progress.elimination} elimination exercise${progress.elimination !== 1 ? 's' : ''}!`;
+      return t(progress.elimination !== 1 ? 'completed-elimination_plural' : 'completed-elimination', { count: progress.elimination });
       
     case "Understand how equalization works":
-      return `You've completed ${progress.equalization} equalization exercise${progress.equalization !== 1 ? 's' : ''}!`;
+      return t(progress.equalization !== 1 ? 'completed-equalization_plural' : 'completed-equalization', { count: progress.equalization });
       
     case "Master substitution/equalization/elimination method": {
-      if (progress.substitution >= 2) return `You've mastered substitution with ${progress.substitution} exercises!`;
-      if (progress.elimination >= 2) return `You've mastered elimination with ${progress.elimination} exercises!`;
-      return `You've mastered equalization with ${progress.equalization} exercises!`;
+      if (progress.substitution >= 2) return t('mastered-substitution', { count: progress.substitution });
+      if (progress.elimination >= 2) return t('mastered-elimination', { count: progress.elimination });
+      return t('mastered-equalization', { count: progress.equalization });
     }
       
     case "Practice with different methods": {
@@ -183,53 +189,57 @@ export function getGoalSatisfactionReason(userId: number, goalTitle: string): st
       if (progress.substitution > 0) methods.push('substitution');
       if (progress.elimination > 0) methods.push('elimination');
       if (progress.equalization > 0) methods.push('equalization');
-      return `You've used ${methods.length} different methods: ${methods.join(', ')}!`;
+      return t('used-methods', { count: methods.length, methods: methods.join(', ') });
     }
       
     case "Switch methods strategically":
-      return `You've completed ${progress.total} exercises using all 3 methods!`;
+      return t('completed-all-methods', { count: progress.total });
       
     case "Choose optimal methods consistently":
-      return `You've completed ${progress.efficiency} efficiency exercises!`;
+      return t('completed-efficiency', { count: progress.efficiency });
       
     case "Master all three methods fluently":
-      return `You've mastered all methods: ${progress.substitution} substitution, ${progress.elimination} elimination, ${progress.equalization} equalization!`;
+      return t('mastered-all-methods', { 
+        substitution: progress.substitution, 
+        elimination: progress.elimination, 
+        equalization: progress.equalization 
+      });
       
     case "Complete exercises without hints": {
       const noHintExercises = sortedScores.filter(ex => ex.hints === 0);
-      return `You've completed ${noHintExercises.length} exercise${noHintExercises.length !== 1 ? 's' : ''} without hints!`;
+      return t(noHintExercises.length !== 1 ? 'completed-without-hints_plural' : 'completed-without-hints', { count: noHintExercises.length });
     }
       
     case "Solve problems with minimal errors": {
       const lowErrorExercises = sortedScores.filter(ex => ex.errors <= 1);
-      return `You've completed ${lowErrorExercises.length} exercise${lowErrorExercises.length !== 1 ? 's' : ''} with ≤1 error!`;
+      return t(lowErrorExercises.length !== 1 ? 'completed-low-errors_plural' : 'completed-low-errors', { count: lowErrorExercises.length });
     }
       
     case "Handle complex problems confidently":
-      return `You've completed ${progress.total} exercises!`;
+      return t(progress.total !== 1 ? 'completed-exercises_plural' : 'completed-exercises', { count: progress.total });
       
     case "Show exceptional problem-solving": {
       const perfectExercises = sortedScores.filter(ex => ex.hints === 0 && ex.errors === 0);
-      return `You've completed ${perfectExercises.length} perfect exercise${perfectExercises.length !== 1 ? 's' : ''}!`;
+      return t(perfectExercises.length !== 1 ? 'completed-perfect_plural' : 'completed-perfect', { count: perfectExercises.length });
     }
       
     case "Maintain accuracy under pressure": {
       const recentFive = sortedScores.slice(0, 5);
       const avgErrors = recentFive.reduce((sum, ex) => sum + ex.errors, 0) / recentFive.length;
-      return `Your average errors over ${recentFive.length} exercises: ${avgErrors.toFixed(1)}!`;
+      return t('average-errors', { count: recentFive.length, average: avgErrors.toFixed(1) });
     }
       
     case "Reflect on method effectiveness":
-      return `You've provided ${progress.selfExplanations} self-explanation${progress.selfExplanations !== 1 ? 's' : ''}!`;
+      return t(progress.selfExplanations !== 1 ? 'self-explanations_plural' : 'self-explanations', { count: progress.selfExplanations });
       
     case "Build confidence through success": {
       const lowHintExercises = sortedScores.filter(ex => ex.hints <= 2);
-      return `You've completed ${lowHintExercises.length} exercise${lowHintExercises.length !== 1 ? 's' : ''} with ≤2 hints!`;
+      return t(lowHintExercises.length !== 1 ? 'completed-low-hints_plural' : 'completed-low-hints', { count: lowHintExercises.length });
     }
       
     case "Develop problem-solving resilience": {
       const withErrors = sortedScores.filter(ex => ex.errors >= 1);
-      return `You've persevered through errors in ${withErrors.length} exercise${withErrors.length !== 1 ? 's' : ''}!`;
+      return t(withErrors.length !== 1 ? 'persevered-errors_plural' : 'persevered-errors', { count: withErrors.length });
     }
       
     case "Learn from mistakes effectively": {
@@ -237,26 +247,26 @@ export function getGoalSatisfactionReason(userId: number, goalTitle: string): st
       const older = progress.errorHistory.slice(-6, -3);
       const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
       const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
-      return `Your errors improved from ${olderAvg.toFixed(1)} to ${recentAvg.toFixed(1)}!`;
+      return t('errors-improved', { older: olderAvg.toFixed(1), recent: recentAvg.toFixed(1) });
     }
       
     case "Explain reasoning clearly":
-      return `You've provided ${progress.selfExplanations} self-explanations!`;
+      return t(progress.selfExplanations !== 1 ? 'self-explanations_plural' : 'self-explanations', { count: progress.selfExplanations });
       
     case "Show consistent improvement": {
       const lastFour = progress.errorHistory.slice(-4);
-      return `Your errors decreased consistently: ${lastFour.join(' → ')}!`;
+      return t('errors-decreased', { sequence: lastFour.join(' → ') });
     }
       
     case "Set personal learning challenges":
-      return `You've completed ${progress.total} exercises!`;
+      return t(progress.total !== 1 ? 'completed-exercises_plural' : 'completed-exercises', { count: progress.total });
       
     case "Work independently": {
       const noHintExercises = sortedScores.filter(ex => ex.hints === 0);
-      return `You've completed ${noHintExercises.length} exercises without hints!`;
+      return t(noHintExercises.length !== 1 ? 'completed-without-hints_plural' : 'completed-without-hints', { count: noHintExercises.length });
     }
       
     default:
-      return "Conditions satisfied!";
+      return t('conditions-satisfied');
   }
 }

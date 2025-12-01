@@ -30,6 +30,7 @@ export function SecondSolution(
         additionalMessage,
         trackAction,
         trackError,
+        trackHints,
         trackChoice,
         trackType,
         trackInterventionChoice,
@@ -50,6 +51,7 @@ export function SecondSolution(
         additionalMessage?: string;
         trackAction: (action: string) => void;
         trackError: () => void;
+        trackHints: () => void;
         trackChoice: (choice: string) => void;
         trackType: (type: number) => void;
         trackInterventionChoice: (choice: string) => void;
@@ -92,7 +94,7 @@ export function SecondSolution(
                 <BackSubstitutionEquation initialEquation={selectedEquation} variable={firstSolutionVariable} />
             </div>
             <VariableComputation variable={otherVariable} loadNextStep={loadNextStep} additionalMessage={additionalMessage} agentType={agentType}
-                                 trackAction={trackAction} trackError={trackError} trackChoice={trackChoice} trackType={trackType}  trackInterventionChoice={trackInterventionChoice} isSecondSolution={true} condition={condition} decideCalculationIntervention = {decideCalculationIntervention}/>
+                                 trackAction={trackAction} trackError={trackError} trackHints={trackHints} trackChoice={trackChoice} trackType={trackType}  trackInterventionChoice={trackInterventionChoice} isSecondSolution={true} condition={condition} decideCalculationIntervention = {decideCalculationIntervention}/>
         </React.Fragment>
     );
 }

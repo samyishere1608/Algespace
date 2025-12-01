@@ -275,11 +275,11 @@ public IActionResult GetPerformanceStats(int userId)
 }
 
 [HttpPost("recommendation-reasons/{userId}")]
-public IActionResult GetRecommendationReasons(int userId, [FromBody] List<string> recommendedGoals)
+public IActionResult GetRecommendationReasons(int userId, [FromBody] List<string> recommendedGoals, [FromQuery] string lang = "en")
 {
     try
     {
-        Console.WriteLine($"💡 [REASONS API] Called for userId: {userId}");
+        Console.WriteLine($"💡 [REASONS API] Called for userId: {userId}, lang: {lang}");
         Console.WriteLine($"💡 [REASONS API] Received {recommendedGoals?.Count ?? 0} goals");
         
         if (recommendedGoals != null)
@@ -315,7 +315,7 @@ public IActionResult GetRecommendationReasons(int userId, [FromBody] List<string
                 var category = parts[0];
                 var title = parts[1];
                 Console.WriteLine($"💡 [REASONS API] Generating reason for: Category='{category}', Title='{title}'");
-                var reason = GenerateRecommendationReason(title, category, stats, completedGoals);
+                var reason = GenerateRecommendationReason(title, category, stats, completedGoals, lang);
                 Console.WriteLine($"💡 [REASONS API] Generated reason length: {reason.Length} chars");
                 reasons[title] = reason;
             }
@@ -905,7 +905,7 @@ public IActionResult LogAction([FromBody] LogActionRequest request)
             return Math.Abs(hash) % 900000 + 100000; // Range: 100000-999999
         }
 
-        private string GenerateRecommendationReason(string goalTitle, string category, PerformanceStats stats, List<Goal> completedGoals)
+        private string GenerateRecommendationReason(string goalTitle, string category, PerformanceStats stats, List<Goal> completedGoals, string lang = "en")
         {
             // Performance indicators - using same thresholds as recommendation logic
             bool hasHighErrors = stats.AverageActualScore >= 3; // ActualScore stores error count
@@ -916,69 +916,72 @@ public IActionResult LogAction([FromBody] LogActionRequest request)
             bool hasHighAnxiety = stats.AverageAnxiety > 3 && stats.AverageAnxiety >= 0;
             bool isNewUser = stats.TotalGoalsCompleted == 0;
             
+            // Translation helper
+            string T(string en, string de) => lang == "de" ? de : en;
+            
             // Build simple 3-line reason
             var reason = new System.Text.StringBuilder();
             
             // Simple 3-line explanation
             if (hasHighAnxiety && hasLowConfidence)
             {
-                reason.AppendLine($"• Condition Matched: High anxiety ({stats.AverageAnxiety:F1}/5) and low confidence ({stats.AverageConfidence:F1}/5)");
-                reason.AppendLine($"• What This Indicates: You're feeling stressed and unsure about your abilities");
-                reason.AppendLine($"• How This Goal Helps: Building confidence through achievable successes will reduce anxiety and improve your learning experience");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T($"High anxiety ({stats.AverageAnxiety:F1}/5) and low confidence ({stats.AverageConfidence:F1}/5)", $"Hohe Angst ({stats.AverageAnxiety:F1}/5) und geringes Selbstvertrauen ({stats.AverageConfidence:F1}/5)")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("You're feeling stressed and unsure about your abilities", "Du fühlst dich gestresst und bist dir deiner Fähigkeiten unsicher")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("Building confidence through achievable successes will reduce anxiety and improve your learning experience", "Selbstvertrauen durch erreichbare Erfolge aufzubauen wird Angst reduzieren und deine Lernerfahrung verbessern")}");
             }
             else if (hasHighAnxiety && !hasHighErrors && stats.AverageActualScore < 2)
             {
-                reason.AppendLine($"• Condition Matched: High anxiety ({stats.AverageAnxiety:F1}/5) despite good performance");
-                reason.AppendLine($"• What This Indicates: You're worried even though you're doing well");
-                reason.AppendLine($"• How This Goal Helps: Reflection will help you recognize your actual capabilities and feel more confident");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T($"High anxiety ({stats.AverageAnxiety:F1}/5) despite good performance", $"Hohe Angst ({stats.AverageAnxiety:F1}/5) trotz guter Leistung")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("You're worried even though you're doing well", "Du machst dir Sorgen, obwohl du gut abschneidest")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("Reflection will help you recognize your actual capabilities and feel more confident", "Reflexion wird dir helfen, deine tatsächlichen Fähigkeiten zu erkennen und dich selbstbewusster zu fühlen")}");
             }
             else if (hasHighErrors && hasHighHints)
             {
-                reason.AppendLine($"• Condition Matched: High errors ({stats.AverageActualScore:F1}/goal) and high hints usage ({stats.AverageHintsPerGoal:F1}/goal)");
-                reason.AppendLine($"• What This Indicates: You're making mistakes and needing help to complete exercises");
-                reason.AppendLine($"• How This Goal Helps: Focusing on accuracy will strengthen your fundamentals and reduce dependence on hints");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T($"High errors ({stats.AverageActualScore:F1}/goal) and high hints usage ({stats.AverageHintsPerGoal:F1}/goal)", $"Hohe Fehlerrate ({stats.AverageActualScore:F1}/Ziel) und hohe Hinweisnutzung ({stats.AverageHintsPerGoal:F1}/Ziel)")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("You're making mistakes and needing help to complete exercises", "Du machst Fehler und brauchst Hilfe, um Übungen abzuschließen")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("Focusing on accuracy will strengthen your fundamentals and reduce dependence on hints", "Der Fokus auf Genauigkeit wird deine Grundlagen stärken und die Abhängigkeit von Hinweisen reduzieren")}");
             }
             else if (hasHighErrors && hasLowSatisfaction)
             {
-                reason.AppendLine($"• Condition Matched: High errors ({stats.AverageActualScore:F1}/goal) and low satisfaction ({stats.AverageSatisfaction:F1}/5)");
-                reason.AppendLine($"• What This Indicates: Making mistakes is affecting your motivation");
-                reason.AppendLine($"• How This Goal Helps: Improving accuracy will lead to success experiences that boost satisfaction");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T($"High errors ({stats.AverageActualScore:F1}/goal) and low satisfaction ({stats.AverageSatisfaction:F1}/5)", $"Hohe Fehlerrate ({stats.AverageActualScore:F1}/Ziel) und geringe Zufriedenheit ({stats.AverageSatisfaction:F1}/5)")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("Making mistakes is affecting your motivation", "Fehler machen beeinträchtigt deine Motivation")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("Improving accuracy will lead to success experiences that boost satisfaction", "Die Verbesserung der Genauigkeit führt zu Erfolgserlebnissen, die die Zufriedenheit steigern")}");
             }
             else if (hasHighErrors)
             {
-                reason.AppendLine($"• Condition Matched: High error rate ({stats.AverageActualScore:F1}/goal)");
-                reason.AppendLine($"• What This Indicates: There are gaps in your understanding of the basics");
-                reason.AppendLine($"• How This Goal Helps: Strengthening fundamentals will reduce errors and build a solid foundation");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T($"High error rate ({stats.AverageActualScore:F1}/goal)", $"Hohe Fehlerrate ({stats.AverageActualScore:F1}/Ziel)")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("There are gaps in your understanding of the basics", "Es gibt Lücken in deinem Verständnis der Grundlagen")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("Strengthening fundamentals will reduce errors and build a solid foundation", "Die Stärkung der Grundlagen wird Fehler reduzieren und eine solide Basis schaffen")}");
             }
             else if (hasHighHints)
             {
-                reason.AppendLine($"• Condition Matched: High hints usage ({stats.AverageHintsPerGoal:F1}/goal)");
-                reason.AppendLine($"• What This Indicates: You're relying heavily on help to complete exercises");
-                reason.AppendLine($"• How This Goal Helps: Building independence will make you a more confident problem solver");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T($"High hints usage ({stats.AverageHintsPerGoal:F1}/goal)", $"Hohe Hinweisnutzung ({stats.AverageHintsPerGoal:F1}/Ziel)")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("You're relying heavily on help to complete exercises", "Du verlässt dich stark auf Hilfe, um Übungen abzuschließen")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("Building independence will make you a more confident problem solver", "Unabhängigkeit aufzubauen wird dich zu einem selbstbewussteren Problemlöser machen")}");
             }
             else if (hasLowSatisfaction)
             {
-                reason.AppendLine($"• Condition Matched: Low satisfaction ({stats.AverageSatisfaction:F1}/5)");
-                reason.AppendLine($"• What This Indicates: Your motivation and engagement need a boost");
-                reason.AppendLine($"• How This Goal Helps: Success experiences will improve your satisfaction and keep you motivated");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T($"Low satisfaction ({stats.AverageSatisfaction:F1}/5)", $"Geringe Zufriedenheit ({stats.AverageSatisfaction:F1}/5)")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("Your motivation and engagement need a boost", "Deine Motivation und dein Engagement brauchen einen Schub")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("Success experiences will improve your satisfaction and keep you motivated", "Erfolgserlebnisse werden deine Zufriedenheit verbessern und dich motiviert halten")}");
             }
             else if (stats.AverageEffort < 3 && stats.AverageEffort >= 0 && stats.AverageActualScore < 2)
             {
-                reason.AppendLine($"• Condition Matched: Low effort ({stats.AverageEffort:F1}/5) with good performance");
-                reason.AppendLine($"• What This Indicates: Current exercises are too easy for you");
-                reason.AppendLine($"• How This Goal Helps: More challenging goals will keep you engaged and accelerate your growth");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T($"Low effort ({stats.AverageEffort:F1}/5) with good performance", $"Geringer Aufwand ({stats.AverageEffort:F1}/5) bei guter Leistung")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("Current exercises are too easy for you", "Die aktuellen Übungen sind zu einfach für dich")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("More challenging goals will keep you engaged and accelerate your growth", "Anspruchsvollere Ziele werden dich bei der Stange halten und dein Wachstum beschleunigen")}");
             }
             else if (isNewUser)
             {
-                reason.AppendLine($"• Condition Matched: You're just starting (0 goals completed)");
-                reason.AppendLine($"• What This Indicates: You need a solid foundation to build upon");
-                reason.AppendLine($"• How This Goal Helps: This beginner-friendly goal provides the essential skills for success");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T("You're just starting (0 goals completed)", "Du fängst gerade an (0 Ziele abgeschlossen)")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("You need a solid foundation to build upon", "Du brauchst eine solide Grundlage, auf der du aufbauen kannst")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("This beginner-friendly goal provides the essential skills for success", "Dieses anfängerfreundliche Ziel vermittelt die wesentlichen Fähigkeiten für den Erfolg")}");
             }
             else
             {
-                reason.AppendLine($"• Condition Matched: All performance metrics are healthy");
-                reason.AppendLine($"• What This Indicates: You're ready for the next natural step in your learning");
-                reason.AppendLine($"• How This Goal Helps: This continues your strong progress and builds on your solid foundation");
+                reason.AppendLine($"• {T("Condition Matched", "Bedingung erfüllt")}: {T("All performance metrics are healthy", "Alle Leistungskennzahlen sind gesund")}");
+                reason.AppendLine($"• {T("What This Indicates", "Was dies bedeutet")}: {T("You're ready for the next natural step in your learning", "Du bist bereit für den nächsten natürlichen Schritt in deinem Lernprozess")}");
+                reason.AppendLine($"• {T("How This Goal Helps", "Wie dieses Ziel hilft")}: {T("This continues your strong progress and builds on your solid foundation", "Dies setzt deinen starken Fortschritt fort und baut auf deiner soliden Grundlage auf")}");
             }
             
             return reason.ToString();

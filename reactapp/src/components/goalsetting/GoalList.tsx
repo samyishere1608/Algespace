@@ -3,6 +3,17 @@
 import { useState, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { Goal, GoalInput } from "@/types/goal";
+import { useTranslation } from "react-i18next";
+import { TranslationNamespaces } from "@/i18n";
+import { 
+  goalTitleToKey, 
+  categoryToKey, 
+  difficultyToKey,
+  categorizedGoalsKeys,
+  getGoalTitleKey,
+  getCategoryKey,
+  getDifficultyKey 
+} from "@/utils/goalTranslations";
 
 import {
   updateGoal,
@@ -24,6 +35,7 @@ import { GoalCompletionProvider } from "@/contexts/GoalCompletionContext";
 
 import RetrospectiveModal from "../RetrospectivePrompt";
 import DiscrepancyFeedbackModal from "../DiscrepencyFeedbackModel";
+import PostTaskAppraisal from "../PostTaskAppraisal";
 
 interface Props {
   goals: Goal[];
@@ -34,9 +46,8 @@ interface Props {
   compact?: boolean; // For overlay/compact display mode
   onModalTrigger?: (goalId: number, autoScore?: number, exercises?: any[]) => void; // Callback for external modal rendering
 }
-import PostTaskAppraisal from "../PostTaskAppraisal";
 
-// Goal completion guidance mapping
+// Goal completion guidance mapping (DEPRECATED - now using translations)
 const goalCompletionGuide: Record<string, string> = {
   // Basic Understanding (5 goals)
   "Learn what linear equations are": "✅ What to do:\nStart any Flexibility Exercise\n\n📚 Exercises you can choose:\n• Suitability Exercise\n• Efficiency Exercise\n• Matching Exercise\n\n✓ Completes automatically on first exercise",
@@ -124,7 +135,8 @@ const categorizedGoals: Record<string, { title: string; difficulty: string }[]> 
 };
 
 
-export function GoalList({ goals, onGoalsChange, userId, showOnlyActive, showOnlyCompleted, compact = false, onModalTrigger }: Props) {
+export default function GoalList({ goals, onGoalsChange, userId, showOnlyActive, showOnlyCompleted, compact = false, onModalTrigger }: Props) {
+  const { t } = useTranslation(TranslationNamespaces.GoalSetting);
   const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDifficulty, setEditDifficulty] = useState("");
@@ -152,16 +164,17 @@ const [showAppraisalModal, setShowAppraisalModal] = useState<{ goalId: number } 
   } | null>(null);
   const [showGuidanceModal, setShowGuidanceModal] = useState<string | null>(null);
 
-  // Helper function to get difficulty display text
+  // Helper function to get difficulty display text with translations
   const getDifficultyDisplay = (difficulty: string) => {
-    const difficultyMap: Record<string, string> = {
-      "very easy": "🟦 Very Easy",
-      "easy": "😊 Easy", 
-      "medium": "🙂 Medium",
-      "hard": "😅 Hard",
-      "very hard": "⚫ Very Hard"
+    const difficultyKey = getDifficultyKey(difficulty);
+    const difficultyEmojis: Record<string, string> = {
+      "very-easy": "🟦",
+      "easy": "🟢",
+      "medium": "🟡",
+      "hard": "🔴",
+      "very-hard": "⚫"
     };
-    return difficultyMap[difficulty] || "🙂 Medium";
+    return `${difficultyEmojis[difficultyKey] || "🟡"} ${t(`difficulty.${difficultyKey}`)}`;
   };
 
   const totalGoals = goals.length;
@@ -221,6 +234,12 @@ const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   // Listen for custom goal completion events from exercises
   useEffect(() => {
     const handleGoalCompletion = (event: CustomEvent) => {
+      // Check if event.detail exists before destructuring
+      if (!event.detail) {
+        console.log(`🎯 GoalList received triggerGoalCompletion event (no detail - just a notification)`);
+        return; // This is just a notification event, not a goal completion
+      }
+      
       const { goalId, goalTitle } = event.detail;
       console.log(`🎯 GoalList received completion event for goal: "${goalTitle}" (ID: ${goalId})`);
       console.log(`🎯 Current completeGoalByTitle function:`, completeGoalByTitle);
@@ -311,7 +330,7 @@ const [showFeedbackModal, setShowFeedbackModal] = useState(false);
       setShowEditModal(false);
       setReasonPrompt({ goalId: editingGoalId, action: "Update" });
       setAgentMessage({
-        text: "👍 Great! Changing goals is okay — just remember why you made the switch!",
+        text: t('agent-messages.goal-updated'),
         duration: 4000
       });
       setShowCheckIn(true);
@@ -483,8 +502,9 @@ async function handleAppraisalSubmit(
     // Prepare messages array
     const messages: Array<{ text: string; duration?: number }> = [];
     
-    // Add basic goal completion feedback
-    messages.push({ text: `🎉 Goal completed! Great work on "${currentGoal.title}".`, duration: 4000 });
+    // Add basic goal completion feedback with translated title
+    const translatedTitle = t(`goal-titles.${getGoalTitleKey(currentGoal.title)}`);
+    messages.push({ text: t('ui.goal-completed-message', { title: translatedTitle }), duration: 4000 });
 
     // Add progression feedback if suggestions were updated
     if (updatedSuggestions && updatedSuggestions.length > 0) {
@@ -495,9 +515,12 @@ async function handleAppraisalSubmit(
         // Use the userId that's already in scope (from earlier in the function)
         console.log('🎯 Using userId for adaptive feedback:', userId);
         
-        // ✅ For multi-exercise goals, get averaged data from contributing exercises
-        let averagedHints: number | undefined = undefined;
-        let averagedErrors: number | undefined = undefined;
+        // ✅ For multi-exercise goals, get TOTAL data from contributing exercises (sum, not average)
+        let totalHints: number | undefined = undefined;
+        let totalErrors: number | undefined = undefined;
+        
+        // 🎯 CRITICAL FIX: Use autoCalculatedScore for errors if available (same source as retrospective)
+        console.warn(`🎯 [FIX v3] Checking autoCalculatedScore availability: ${autoCalculatedScore}`);
         
         // Import auto-scoring utilities
         const { getExerciseScores, getContributingExercises } = await import('@/utils/autoScoring');
@@ -506,20 +529,38 @@ async function handleAppraisalSubmit(
         
         if (contributingExercises.length > 0) {
           console.log('🎯 Found', contributingExercises.length, 'contributing exercises for adaptive feedback');
+          console.log('🎯 Contributing exercises details:', contributingExercises.map(ex => ({
+            exerciseId: ex.exerciseId,
+            method: ex.method,
+            hints: ex.hints,
+            errors: ex.errors,
+            timestamp: ex.timestamp
+          })));
           
-          // Calculate average hints and errors across all contributing exercises
-          const totalHints = contributingExercises.reduce((sum, ex) => sum + ex.hints, 0);
-          const totalErrors = contributingExercises.reduce((sum, ex) => sum + ex.errors, 0);
-          averagedHints = Math.round(totalHints / contributingExercises.length);
-          averagedErrors = Math.round(totalErrors / contributingExercises.length);
+          // ✅ Calculate TOTAL hints (autoscoring doesn't track hints separately)
+          const sumHints = contributingExercises.reduce((sum, ex) => sum + ex.hints, 0);
+          totalHints = sumHints;
           
-          console.log('🎯 Averaged performance data:', {
+          // ✅ CRITICAL: Use autoCalculatedScore for errors (same source as retrospective!)
+          if (autoCalculatedScore !== null && autoCalculatedScore !== undefined) {
+            totalErrors = autoCalculatedScore;
+            console.warn(`🎯 [FIX v3] ✅ Using autoCalculatedScore for errors: ${totalErrors} (same as retrospective)`);
+          } else {
+            // Fallback: Calculate sum manually
+            const sumErrors = contributingExercises.reduce((sum, ex) => sum + ex.errors, 0);
+            totalErrors = sumErrors;
+            console.warn(`⚠️ [FIX v3] Fallback: Calculated errors manually: ${totalErrors}`);
+          }
+          
+          console.warn('🎯 [FIX v3] Total performance data for progressive goal:', {
+            goalTitle: currentGoal.title,
             contributingCount: contributingExercises.length,
-            totalHints,
-            totalErrors,
-            averagedHints,
-            averagedErrors
+            'TOTAL hints (sum)': totalHints,
+            'TOTAL errors': totalErrors,
+            'errors source': autoCalculatedScore !== null ? 'autoCalculatedScore (✅ same as retrospective)' : 'manual calculation (fallback)'
           });
+        } else {
+          console.log('⚠️ No contributing exercises found for goal:', currentGoal.title);
         }
         
         // We'll use sessionStorage directly to find exercise session data
@@ -628,18 +669,33 @@ async function handleAppraisalSubmit(
           console.log('🎯 Session data for adaptive feedback:', sessionData);
           console.log('🎯 Emotional data for adaptive feedback:', emotionalData);
           
-          // ✅ Use averaged data for multi-exercise goals, or single session data for single-exercise goals
-          const finalHints = averagedHints !== undefined ? averagedHints : sessionData.hints;
-          const finalErrors = averagedErrors !== undefined ? averagedErrors : sessionData.errors;
+          // ✅ Use TOTAL data for multi-exercise goals, or single session data for single-exercise goals
+          const finalHints = totalHints !== undefined ? totalHints : sessionData.hints;
+          const finalErrors = totalErrors !== undefined ? totalErrors : sessionData.errors;
+          
+          // 🔍 SAFETY CHECK: Log exactly what we're using
+          if (totalHints !== undefined) {
+            console.log('✅ Using TOTAL hints:', totalHints, '(sum of', contributingExercises.length, 'exercises) instead of last session only:', sessionData.hints);
+          } else {
+            console.log('ℹ️ Using CURRENT SESSION hints:', sessionData.hints, '(single exercise goal)');
+          }
+          
+          if (totalErrors !== undefined) {
+            console.log('✅ Using TOTAL errors:', totalErrors, '(sum of', contributingExercises.length, 'exercises) instead of last session only:', sessionData.errors);
+          } else {
+            console.log('ℹ️ Using CURRENT SESSION errors:', sessionData.errors, '(single exercise goal)');
+          }
           
           console.log('🎯 Final performance data for adaptive feedback:', {
-            originalHints: sessionData.hints,
-            originalErrors: sessionData.errors,
-            averagedHints,
-            averagedErrors,
+            goalTitle: currentGoal.title,
+            lastSessionHints: sessionData.hints,
+            lastSessionErrors: sessionData.errors,
+            totalHintsAllExercises: totalHints,
+            totalErrorsAllExercises: totalErrors,
             finalHints,
             finalErrors,
-            isAveraged: averagedHints !== undefined
+            isMultiExerciseGoal: totalHints !== undefined,
+            contributingExercisesCount: contributingExercises?.length || 0
           });
           
           // Generate adaptive feedback message
@@ -652,15 +708,39 @@ async function handleAppraisalSubmit(
             userId: userId,
             ...emotionalData
           };
+          
+          console.log('🎯 Feedback data being sent to generateAdaptiveFeedback():', {
+            hints: feedbackData.hints,
+            errors: feedbackData.errors,
+            method: feedbackData.method,
+            exerciseType: feedbackData.exerciseType,
+            postSatisfaction: feedbackData.postSatisfaction,
+            postConfidence: feedbackData.postConfidence
+          });
+          
+          console.warn('🚨 FINAL CHECK - Data being used for feedback message:', {
+            'hints (will show in message)': feedbackData.hints,
+            'errors (will show in message)': feedbackData.errors
+          });
+          
           const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
           
           console.log('🎯 Generated adaptive feedback for goal completion');
           messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
           
-          // ✅ NOW clear the session data after using it for adaptive feedback
+          // ✅ FIXED: Don't clear session data immediately - multiple goals might need it
+          // Instead, mark it as used and clean it up after a delay to allow queued goals to use it
           if (mostRecentKey) {
-            sessionStorage.removeItem(mostRecentKey);
-            console.log('🧹 Cleared used session data after adaptive feedback:', mostRecentKey);
+            const usedKey = mostRecentKey + '_used';
+            sessionStorage.setItem(usedKey, Date.now().toString());
+            console.log('🏷️ Marked session as used (not cleared yet):', mostRecentKey);
+            
+            // Clean up after 3 seconds - enough time for queued goals to read the same session
+            setTimeout(() => {
+              sessionStorage.removeItem(mostRecentKey);
+              sessionStorage.removeItem(usedKey);
+              console.log('🧹 Cleaned up session data after delay:', mostRecentKey);
+            }, 3000);
           }
         } else {
           // ✅ FIX: Generate adaptive feedback even without exercise session data
@@ -719,18 +799,27 @@ async function handleAppraisalSubmit(
       // Note: Adaptive feedback system will handle confidence-related messaging
     }
 
-    // Check if all goals completed
+    // 🎉 Confetti for every goal completion!
+    setTimeout(() => {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }, 300);
+
+    // Check if all goals completed - extra celebration!
     const updatedCompletedGoals = newGoals.filter(g => g.completed).length;
     const isAllCompleted = updatedCompletedGoals === totalGoals;
     if (isAllCompleted) {
-      messages.push({ text: "🎉 Awesome! You've completed all your goals!", duration: 4000 });
+      messages.push({ text: t('ui.all-goals-completed-message'), duration: 4000 });
       setTimeout(() => {
         confetti({
           particleCount: 200,
           spread: 90,
           origin: { y: 0.6 }
         });
-      }, 300);
+      }, 800); // Extra confetti burst for all goals done
     }
 
     // Show messages sequentially
@@ -750,15 +839,6 @@ async function handleAppraisalSubmit(
         console.log('🎯 All goal feedback complete, dispatching event for auto-close');
         window.dispatchEvent(new CustomEvent('goalFeedbackComplete'));
       }, delay + 1000); // Additional delay after last message finishes
-    }
-
-    // Show celebration for high satisfaction
-    if (postSatisfaction >= 4) {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
     }
 
     setShowAppraisalModal(null);
@@ -825,7 +905,7 @@ async function removeGoal(id: number) {
             marginTop: "0.5rem",
           }}
         >
-          Progress: {completedGoals} completed • {activeGoals} active goals remaining
+          {t('ui.goal-progress')}: {completedGoals} {t('ui.completed').toLowerCase()} • {activeGoals} {t('ui.active').toLowerCase()} {t('ui.my-goals').toLowerCase()} {t('ui.in-progress').toLowerCase()}
         </div>
       </div>}
 
@@ -853,9 +933,9 @@ async function removeGoal(id: number) {
       <div
         style={{
           background: "white",
-          padding: compact ? "0.5rem" : "clamp(0.5rem, 2vw, 1rem)",
-          borderRadius: "clamp(4px, 1.5vw, 8px)",
-          marginBottom: compact ? "0" : "clamp(0.5rem, 1.5vw, 1rem)",
+          padding: compact ? "0.5rem" : "1rem",
+          borderRadius: "8px",
+          marginBottom: compact ? "0" : "1rem",
           border: showOnlyCompleted ? "2px solid #4caf50" : "2px solid #000000ff",
           flex: compact ? "1" : "initial",
           display: compact ? "flex" : "block",
@@ -865,16 +945,16 @@ async function removeGoal(id: number) {
       >
         <h3 style={{
           color: showOnlyCompleted ? "#4caf50" : "#1976d2",
-          marginBottom: "clamp(0.5rem, 1.5vw, 0.75rem)",
-          fontSize: compact ? "0.85rem" : "clamp(0.85rem, 2.2vw, 1.1rem)",
+          marginBottom: "0.75rem",
+          fontSize: compact ? "0.85rem" : "1.1rem",
           textAlign: "center",
           fontWeight: "600"
         }}>
           {showOnlyCompleted 
-            ? `✅ Completed Goals (${filteredGoals.length})` 
+            ? `✅ ${t('ui.completed-goals')} (${filteredGoals.length})` 
             : showOnlyActive 
-              ? `🎯 Your Active Goals (${filteredGoals.length})`
-              : `🎯 Your Goals (${filteredGoals.length})`
+              ? `🎯 ${t('ui.active-goals')} (${filteredGoals.length})`
+              : `🎯 ${t('ui.my-goals')} (${filteredGoals.length})`
           }
         </h3>
         
@@ -887,10 +967,10 @@ async function removeGoal(id: number) {
             fontSize: "clamp(0.75rem, 1.8vw, 0.9rem)"
           }}>
             {showOnlyCompleted 
-              ? "No completed goals yet. Keep working on your active goals!" 
+              ? t('ui.no-goals') + " " + t('ui.keep-going') 
               : showOnlyActive
-                ? "No active goals. Create some goals to get started!"
-                : "No goals yet. Create your first goal!"
+                ? t('ui.no-goals') + " " + t('ui.create-first-goal')
+                : t('ui.no-goals') + " " + t('ui.create-first-goal')
             }
           </div>
         ) : (
@@ -910,14 +990,13 @@ async function removeGoal(id: number) {
             <div
               key={goal.id}
               style={{
-                padding: compact ? "0.4rem" : "clamp(0.5rem, 1.5vw, 0.75rem)",
+                padding: compact ? "0.5rem" : "0.75rem",
                 border: "2px solid #e0e0e0",
-                borderRadius: "clamp(4px, 1vw, 6px)",
+                borderRadius: "8px",
                 background: "white",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                fontSize: compact ? "0.7rem" : "clamp(0.75rem, 1.8vw, 0.9rem)",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = "#2196f3";
@@ -929,82 +1008,47 @@ async function removeGoal(id: number) {
               }}
               aria-label={`Goal: ${goal.title}, difficulty: ${goal.difficulty}, category: ${goal.category}, status: ${goal.completed ? "completed" : "pending"}`}
             >
-              <div style={{ marginBottom: compact ? "0.3rem" : "clamp(0.5rem, 2vw, 1rem)" }}>
+              <div style={{ marginBottom: compact ? "0.3rem" : "0.5rem" }}>
+                {/* Goal Title */}
                 <div style={{
-                  display: "grid",
-                  gridTemplateColumns: "auto 1fr auto",
-                  gap: compact ? "0.3rem" : "clamp(0.3rem, 1vw, 0.5rem)",
-                  alignItems: "start",
-                  marginBottom: compact ? "0.2rem" : "clamp(0.3rem, 1vw, 0.5rem)"
+                  fontWeight: "600",
+                  fontSize: compact ? "0.8rem" : "0.95rem",
+                  color: "#333",
+                  lineHeight: "1.4",
+                  marginBottom: "0.4rem",
+                  whiteSpace: "normal",
+                  wordWrap: "break-word",
                 }}>
-                  <div>
-                    <div style={{ 
-                      fontSize: compact ? "0.5rem" : "clamp(0.5rem, 1.2vw, 0.65rem)", 
-                      fontWeight: "600", 
-                      color: "#666",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.3px",
-                      marginBottom: compact ? "0.1rem" : "clamp(0.1rem, 0.5vw, 0.2rem)"
-                    }}>
-                      Category
-                    </div>
-                    <div style={{ 
-                      color: "#2196f3", 
-                      fontWeight: "600",
-                      fontSize: compact ? "0.6rem" : "clamp(0.65rem, 1.4vw, 0.75rem)",
-                      padding: compact ? "0.1rem 0.3rem" : "clamp(0.1rem, 0.3vw, 0.15rem) clamp(0.2rem, 0.8vw, 0.4rem)",
-                      backgroundColor: "#e3f2fd",
-                      borderRadius: "3px",
-                      display: "inline-block"
-                    }}>
-                      {goal.category}
-                    </div>
-                  </div>
+                  🎯 {t(`goal-titles.${getGoalTitleKey(goal.title)}`)}
+                </div>
                   
-                  <div>
-                    <div style={{ 
-                      fontSize: compact ? "0.5rem" : "clamp(0.5rem, 1.2vw, 0.65rem)", 
-                      fontWeight: "600", 
-                      color: "#666",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.3px",
-                      marginBottom: compact ? "0.1rem" : "clamp(0.1rem, 0.5vw, 0.2rem)"
-                    }}>
-                      Goal
-                    </div>
-                    <div style={{
-                      fontWeight: "600",
-                      fontSize: compact ? "0.65rem" : "clamp(0.7rem, 1.6vw, 0.8rem)",
-                      color: "#333",
-                      lineHeight: "1.2"
-                    }}>
-                      {goal.title}
-                    </div>
-                  </div>
+                {/* Category and Difficulty */}
+                <div style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "0.5rem",
+                  alignItems: "center",
+                  fontSize: compact ? "0.7rem" : "0.8rem",
+                }}>
+                  <span style={{ 
+                    color: "#2196f3", 
+                    fontWeight: "500",
+                    padding: "0.2rem 0.5rem",
+                    backgroundColor: "#e3f2fd",
+                    borderRadius: "4px",
+                  }}>
+                    {t(`categories.${getCategoryKey(goal.category)}`)}
+                  </span>
                   
-                  <div>
-                    <div style={{ 
-                      fontSize: compact ? "0.5rem" : "clamp(0.5rem, 1.2vw, 0.65rem)", 
-                      fontWeight: "600", 
-                      color: "#666",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.3px",
-                      marginBottom: compact ? "0.1rem" : "clamp(0.1rem, 0.5vw, 0.2rem)"
-                    }}>
-                      Difficulty
-                    </div>
-                    <div style={{ 
-                      fontSize: compact ? "0.6rem" : "clamp(0.6rem, 1.3vw, 0.7rem)", 
-                      fontWeight: "600",
-                      color: "#555",
-                      padding: compact ? "0.1rem 0.3rem" : "clamp(0.1rem, 0.3vw, 0.15rem) clamp(0.2rem, 0.8vw, 0.4rem)",
-                      backgroundColor: "#f5f5f5",
-                      borderRadius: "3px",
-                      display: "inline-block"
-                    }}>
-                      {getDifficultyDisplay(goal.difficulty)}
-                    </div>
-                  </div>
+                  <span style={{ 
+                    fontWeight: "500",
+                    color: "#555",
+                    padding: "0.2rem 0.5rem",
+                    backgroundColor: "#f5f5f5",
+                    borderRadius: "4px",
+                  }}>
+                    {getDifficultyDisplay(goal.difficulty)}
+                  </span>
                 </div>
               </div>
 
@@ -1075,7 +1119,7 @@ async function removeGoal(id: number) {
                     onMouseLeave={(e) => (e.currentTarget.style.background = "#17a2b8")}
                     aria-label={`View completion guide for ${goal.title}`}
                   >
-                    💡 How to complete
+                    💡 {t('goal-completion-guide.title')}
                   </button>
 
                   {!goal.completed ? (
@@ -1100,13 +1144,7 @@ async function removeGoal(id: number) {
                       ✅ Mark as Done
                     </button>
                     */
-                    <div style={{
-                      color: "#666",
-                      fontSize: "clamp(0.65rem, 1.4vw, 0.8rem)",
-                      fontStyle: "italic"
-                    }}>
-                      Goals complete automatically through exercises
-                    </div>
+                    null
                   ) : (
                     <span
                       style={{
@@ -1117,7 +1155,7 @@ async function removeGoal(id: number) {
                       }}
                       aria-label="Goal completed"
                     >
-                      ✅ Done
+                      ✅ {t('ui.completed')}
                     </span>
                   )}
                 </div>
@@ -1138,7 +1176,7 @@ async function removeGoal(id: number) {
                     fontWeight: "600",
                     fontSize: "clamp(0.6rem, 1.3vw, 0.75rem)"
                   }}>
-                    ✅ Completed {goal.updatedAt ? new Date(goal.updatedAt).toLocaleDateString() : 'Recently'}
+                    ✅ {t('ui.completed')} {goal.updatedAt ? new Date(goal.updatedAt).toLocaleDateString() : t('ui.goal-completed')}
                   </span>
                 </div>
               )}
@@ -1161,8 +1199,7 @@ async function removeGoal(id: number) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 2000,
-          fontFamily: "'Comic Sans MS', cursive, sans-serif"
+          zIndex: 2000
         }}
         onClick={cancelEditing}
         >
@@ -1192,7 +1229,7 @@ async function removeGoal(id: number) {
                 fontSize: "1.2rem",
                 fontWeight: "bold"
               }}>
-                ✏️ Edit Your Goal
+                ✏️ {t('ui.edit')} {t('ui.goal')}
               </h3>
               <button
                 onClick={cancelEditing}
@@ -1231,7 +1268,7 @@ async function removeGoal(id: number) {
                   fontSize: "0.8rem",
                   fontWeight: "bold"
                 }}>
-                  <span style={{ color: editCategory ? "#28a745" : "#007bff" }}>1.</span> Category
+                  <span style={{ color: editCategory ? "#28a745" : "#007bff" }}>1.</span> {t('ui.category')}
                 </h5>
                 <select
                   value={editCategory}
@@ -1256,9 +1293,9 @@ async function removeGoal(id: number) {
                     backgroundColor: editCategory ? "#f8fff8" : "white"
                   }}
                 >
-                  <option value="">Select...</option>
+                  <option value="">{t('placeholders.select-category')}</option>
                   {Object.keys(categorizedGoals).map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat} value={cat}>{t(`categories.${getCategoryKey(cat)}`)}</option>
                   ))}
                 </select>
                 {editCategory && (
@@ -1268,7 +1305,7 @@ async function removeGoal(id: number) {
                     color: "#28a745",
                     fontWeight: "bold"
                   }}>
-                    ✓ Selected
+                    ✓ {t('ui.selected')}
                   </div>
                 )}
               </div>
@@ -1288,7 +1325,7 @@ async function removeGoal(id: number) {
                   fontSize: "0.8rem",
                   fontWeight: "bold"
                 }}>
-                  <span style={{ color: (editCategory && editDifficulty) ? "#28a745" : "#007bff" }}>2.</span> Difficulty
+                  <span style={{ color: (editCategory && editDifficulty) ? "#28a745" : "#007bff" }}>2.</span> {t('ui.difficulty-level')}
                 </h5>
                 <select
                   value={editDifficulty}
@@ -1315,12 +1352,9 @@ async function removeGoal(id: number) {
                     const difficultyEmojis: Record<string, string> = {
                       "very easy": "🟦", "easy": "🟢", "medium": "🟡", "hard": "🔴", "very hard": "⚫"
                     };
-                    const difficultyLabels: Record<string, string> = {
-                      "very easy": "Very Easy", "easy": "Easy", "medium": "Medium", "hard": "Hard", "very hard": "Very Hard"
-                    };
                     return availableDifficulties.map(diff => (
                       <option key={diff} value={diff}>
-                        {difficultyEmojis[diff]} {difficultyLabels[diff]}
+                        {difficultyEmojis[diff]} {t(`difficulty.${getDifficultyKey(diff)}`)}
                       </option>
                     ));
                   })()}
@@ -1332,7 +1366,7 @@ async function removeGoal(id: number) {
                     color: "#28a745",
                     fontWeight: "bold"
                   }}>
-                    ✓ Selected
+                    ✓ {t('ui.selected')}
                   </div>
                 )}
               </div>
@@ -1352,7 +1386,7 @@ async function removeGoal(id: number) {
                   fontSize: "0.8rem",
                   fontWeight: "bold"
                 }}>
-                  <span style={{ color: editTitle ? "#28a745" : "#007bff" }}>3.</span> Goal
+                  <span style={{ color: editTitle ? "#28a745" : "#007bff" }}>3.</span> {t('ui.goal')}
                 </h5>
                 <select
                   value={editTitle}
@@ -1368,12 +1402,12 @@ async function removeGoal(id: number) {
                     backgroundColor: editTitle ? "#f8fff8" : (editCategory && editDifficulty) ? "white" : "#f0f0f0"
                   }}
                 >
-                  <option value="">Select...</option>
+                  <option value="">{t('placeholders.select-goal')}</option>
                   {editCategory && editDifficulty && 
                     categorizedGoals[editCategory]
                       .filter(g => g.difficulty === editDifficulty)
                       .map((goalOption, i) => (
-                        <option key={i} value={goalOption.title}>{goalOption.title}</option>
+                        <option key={i} value={goalOption.title}>{t(`goal-titles.${getGoalTitleKey(goalOption.title)}`)}</option>
                       ))}
                 </select>
                 {editTitle && (
@@ -1383,7 +1417,7 @@ async function removeGoal(id: number) {
                     color: "#28a745",
                     fontWeight: "bold"
                   }}>
-                    ✓ Selected
+                    ✓ {t('ui.selected')}
                   </div>
                 )}
               </div>
@@ -1404,7 +1438,7 @@ async function removeGoal(id: number) {
                 fontWeight: "bold",
                 textAlign: "center"
               }}>
-                📊 Self-Efficacy Questions
+                📊 {t('pre-goal-assessment.title')}
               </h4>
 
               {/* Confidence */}
@@ -1416,7 +1450,7 @@ async function removeGoal(id: number) {
                   marginBottom: "0.3rem",
                   color: "#333"
                 }}>
-                  Confidence? 🌟
+                  {t('pre-goal-assessment.confidence-question')} 🌟
                 </label>
                 <input
                   type="range"
@@ -1456,7 +1490,7 @@ async function removeGoal(id: number) {
                   marginBottom: "0.3rem",
                   color: "#333"
                 }}>
-                  Expected Mistakes? 🎯
+                  {t('pre-goal-assessment.mistakes-question')} 🎯
                 </label>
                 <input
                   type="range"
@@ -1478,7 +1512,7 @@ async function removeGoal(id: number) {
                   color: editExpectedMistakes <= 2 ? "#27ae60" : 
                         editExpectedMistakes <= 5 ? "#f39c12" : "#e74c3c"
                 }}>
-                  {editExpectedMistakes} mistakes
+                  {editExpectedMistakes} {t('retrospective.mistakes')}
                 </div>
               </div>
 
@@ -1491,7 +1525,7 @@ async function removeGoal(id: number) {
                   marginBottom: "0.3rem",
                   color: "#333"
                 }}>
-                  How committed are you to achieving your goal? 🔥
+                  {t('pre-goal-assessment.motivation-question')} 🔥
                 </label>
                 <input
                   type="range"
@@ -1544,8 +1578,7 @@ async function removeGoal(id: number) {
                   cursor: editTitle ? "pointer" : "not-allowed",
                   boxShadow: editTitle ? "0 3px 6px rgba(40,167,69,0.5)" : "none",
                   transition: "all 0.3s ease",
-                  opacity: editTitle ? 1 : 0.6,
-                  fontFamily: "'Comic Sans MS', cursive, sans-serif"
+                  opacity: editTitle ? 1 : 0.6
                 }}
                 onMouseEnter={(e) => {
                   if (editTitle) e.currentTarget.style.backgroundColor = "#218838";
@@ -1554,7 +1587,7 @@ async function removeGoal(id: number) {
                   if (editTitle) e.currentTarget.style.backgroundColor = "#28a745";
                 }}
               >
-                💾 Save Changes
+                💾 {t('ui.confirm')}
               </button>
 
               <button
@@ -1569,13 +1602,12 @@ async function removeGoal(id: number) {
                   fontSize: "0.9rem",
                   cursor: "pointer",
                   boxShadow: "0 3px 6px rgba(220,53,69,0.5)",
-                  transition: "background-color 0.3s ease",
-                  fontFamily: "'Comic Sans MS', cursive, sans-serif"
+                  transition: "background-color 0.3s ease"
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#c82333")}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#dc3545")}
               >
-                ❌ Cancel
+                ❌ {t('ui.cancel')}
               </button>
             </div>
           </div>
@@ -1598,7 +1630,7 @@ async function removeGoal(id: number) {
                 const newGoals = goals.filter((g) => g.id !== reasonPrompt.goalId);
                 onGoalsChange(newGoals);
                 setAgentMessage({
-                  text: "🗑️ It's okay to remove goals if they feel too much, just remember to complete what you have!",
+                  text: t('agent-messages.goal-deleted'),
                   duration: 4000
                 });
                 setShowCheckIn(true);
@@ -1712,8 +1744,7 @@ async function removeGoal(id: number) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 1000,
-          fontFamily: "'Comic Sans MS', cursive, sans-serif"
+          zIndex: 1000
         }}
         onClick={() => setShowGuidanceModal(null)}
         >
@@ -1740,7 +1771,7 @@ async function removeGoal(id: number) {
                 fontSize: "1.2rem",
                 fontWeight: "bold"
               }}>
-                🎯 How to Complete This Goal
+                🎯 {t('goal-completion-guide.title')}
               </h3>
               <button
                 onClick={() => setShowGuidanceModal(null)}
@@ -1770,7 +1801,7 @@ async function removeGoal(id: number) {
                 fontSize: "1rem",
                 fontWeight: "bold"
               }}>
-                "{showGuidanceModal}"
+                "{t(`goal-titles.${getGoalTitleKey(showGuidanceModal)}`)}"
               </h4>
             </div>
 
@@ -1789,7 +1820,7 @@ async function removeGoal(id: number) {
                 fontWeight: "600",
                 whiteSpace: "pre-line"
               }}>
-                {goalCompletionGuide[showGuidanceModal] || "Completion guidance not available for this goal."}
+                {t(`goal-descriptions.${getGoalTitleKey(showGuidanceModal)}`)}
               </div>
             </div>
 
@@ -1797,7 +1828,21 @@ async function removeGoal(id: number) {
               marginTop: "1.5rem",
               textAlign: "center"
             }}>
-      
+              <button
+                onClick={() => setShowGuidanceModal(null)}
+                style={{
+                  backgroundColor: "#229EBC",
+                  color: "white",
+                  border: "none",
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  fontSize: "0.9rem"
+                }}
+              >
+                Got it! 👍
+              </button>
             </div>
           </div>
         </div>

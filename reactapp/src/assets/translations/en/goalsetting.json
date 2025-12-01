@@ -1,0 +1,495 @@
+{
+  "_comment": "Goal Setting System - English Translations",
+  
+  "categories": {
+    "basic-understanding": "Basic Understanding",
+    "method-mastery": "Method Mastery",
+    "problem-solving": "Problem Solving",
+    "learning-growth": "Learning & Growth"
+  },
+  
+  "difficulty": {
+    "very-easy": "Very Easy",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "very-hard": "Very Hard"
+  },
+  
+  "goal-titles": {
+    "learn-linear-equations": "Learn what linear equations are",
+    "understand-substitution": "Understand how substitution works",
+    "understand-elimination": "Understand how elimination works",
+    "understand-equalization": "Understand how equalization works",
+    "master-single-method": "Master substitution/equalization/elimination method",
+    "practice-different-methods": "Practice with different methods",
+    "switch-methods-strategically": "Switch methods strategically",
+    "choose-optimal-methods": "Choose optimal methods consistently",
+    "master-all-methods": "Master all three methods fluently",
+    "complete-without-hints": "Complete exercises without hints",
+    "solve-minimal-errors": "Solve problems with minimal errors",
+    "handle-complex-problems": "Handle complex problems confidently",
+    "exceptional-problem-solving": "Show exceptional problem-solving",
+    "maintain-accuracy": "Maintain accuracy under pressure",
+    "reflect-effectiveness": "Reflect on method effectiveness",
+    "build-confidence": "Build confidence through success",
+    "learn-from-mistakes": "Learn from mistakes effectively",
+    "develop-resilience": "Develop problem-solving resilience",
+    "explain-reasoning": "Explain reasoning clearly",
+    "show-improvement": "Show consistent improvement",
+    "work-independently": "Work independently",
+    "set-learning-challenges": "Set personal learning challenges"
+  },
+  
+  "goal-descriptions": {
+    "learn-linear-equations": "✅ What to do:\nComplete 1 exercise\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise in the Training Flexibility module",
+    "understand-substitution": "✅ What to do:\nComplete 1 exercise using Substitution method\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise that uses Substitution\n• Examples: Exercise #2, #3, #4, #5, #9, #14",
+    "understand-elimination": "✅ What to do:\nComplete 1 exercise using Elimination method\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise that uses Elimination\n• Examples: Exercise #6, #7, #8, #10, #12",
+    "understand-equalization": "✅ What to do:\nComplete 1 exercise using Equalization method\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise that uses Equalization\n• Examples: Exercise #1, #11, #13, #15",
+    "master-single-method": "✅ What to do:\nComplete 2 exercises using Substitution, Equalization, OR Elimination method\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise in the Training Flexibility module\n• Pick two exercises that use the same method twice",
+    "practice-different-methods": "✅ What to do:\nComplete 2 exercises using DIFFERENT methods\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• Use 2 different methods (e.g., Substitution + Elimination)",
+    "switch-methods-strategically": "✅ What to do:\nComplete 3 exercises using a DIFFERENT method each time\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• Use all 3 methods (Substitution, Elimination, Equalization) in any of the exercises",
+    "choose-optimal-methods": "✅ What to do:\nComplete 3 Efficiency Exercises\n\n📚 Exercises you can choose:\n• Any Efficiency Exercise",
+    "master-all-methods": "✅ What to do:\nComplete at least 2 exercises using EACH method\n\nMeans: 2 Substitution + 2 Elimination + 2 Equalization = 6 exercises total\n\n📚 Exercises you can choose:\n• Substitution: Exercise #2, #9\n• Elimination: Exercise #6, #7\n• Equalization: Exercise #1, #13",
+    "complete-without-hints": "✅ What to do:\nComplete 1 exercise without using any hints\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• Don't click the hint button",
+    "solve-minimal-errors": "✅ What to do:\nComplete exercises with 1 or fewer errors\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• System tracks automatically",
+    "handle-complex-problems": "✅ What to do:\nComplete 5 exercises in total\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• Any method",
+    "exceptional-problem-solving": "✅ What to do:\nComplete exercises with 0 hints AND 0 errors\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• Perfect execution required",
+    "maintain-accuracy": "✅ What to do:\nComplete 5 exercises with an average of 1 or fewer errors\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• System calculates your average automatically",
+    "reflect-effectiveness": "✅ What to do:\nComplete 1 exercise with self-explanation\n\n📚 Exercises you can choose:\n• Any Matching Exercise\n• Any Efficiency Exercise",
+    "build-confidence": "✅ What to do:\nComplete 1 exercise using 2 or fewer hints\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• Try to use minimal hints",
+    "learn-from-mistakes": "✅ What to do:\nThe system automatically tracks your improvement\nTry to reduce errors over time\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• System tracks improvement automatically",
+    "develop-resilience": "✅ What to do:\nComplete exercises even when you make mistakes\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• System tracks automatically",
+    "explain-reasoning": "✅ What to do:\nComplete 3 exercises with self-explanation\n\n📚 Exercises you can choose:\n• Any Matching Exercise\n• Any Efficiency Exercise",
+    "show-improvement": "✅ What to do:\nThe system automatically tracks your improvement\nTry to complete 4 exercises with fewer errors each time\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise\n• System tracks improvement automatically",
+    "work-independently": "✅ What to do:\nComplete 3 exercises without using hints\n\n📚 Exercises you can choose:\n• Any Flexibility Exercise",
+    "set-learning-challenges": "✅ What to do:\nComplete 10 exercises in total\n\n📚 Exercises you can choose:\n• Any Exercise\n• Any method"
+  },
+  
+  "ui": {
+    "set-goal": "Set Goal",
+    "view-goals": "View Goals",
+    "my-goals": "My Goals",
+    "active-goals": "Active Goals",
+    "your-active-goals": "Your Active Goals",
+    "completed-goals": "Completed Goals",
+    "all-goals": "All Goals",
+    "browse-goals": "Browse Goals",
+    "goal-completion": "Goal Completion",
+    "goal-progress": "Goal Progress",
+    "select-category": "Select a category",
+    "select-goal": "Select a goal",
+    "goal-details": "Goal Details",
+    "difficulty-level": "Difficulty",
+    "category": "Category",
+    "goal": "Goal",
+    "status": "Status",
+    "page-header": "🎯 Set Your Learning Goals",
+    "set-goals-tooltip": "🌟 Set your learning goals here! 🚀",
+    "set-goals-button-title": "Set your learning goals!",
+    "goal-completed-message": "🎉 Goal completed! Great work on \"{{title}}\".",
+    "all-goals-completed-message": "🎉 Awesome! You've completed all your goals!",
+    "active": "Active",
+    "completed": "Completed",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "in-progress": "In Progress",
+    "not-started": "Not Started",
+    "selected": "Selected",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "continue": "Continue",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "skip": "Skip",
+    "add-goal": "Add Goal",
+    "edit": "Edit",
+    "delete": "Delete",
+    "guide": "Guide",
+    "why": "Why?",
+    "no-active-goals": "No active goals. Create some goals to get started!",
+    "progressive-goal": "📈 Progressive Goal",
+    "progressive-goal-tooltip": "This is a progressive goal tracked across multiple exercises. Hover over your score below to see the breakdown.",
+    "score-breakdown": "Score Breakdown",
+    "average-score": "Average Score",
+    "contributing-exercises": "Contributing Exercises",
+    "exercise-count": "{{count}} exercises",
+    "no-goals": "No goals yet",
+    "create-first-goal": "Create your first goal to start tracking your progress!",
+    "goal-created": "Goal created successfully!",
+    "goal-completed": "Goal completed!",
+    "congratulations": "Congratulations!",
+    "keep-going": "Keep going!",
+    "almost-there": "Almost there!",
+    "great-job": "Great job!",
+    "excellent-work": "Excellent work!"
+  },
+  
+  "pre-goal-assessment": {
+    "title": "Before You Start",
+    "confidence-question": "How confident are you that you can achieve this goal?",
+    "confidence-scale": {
+      "1": "Not confident at all",
+      "2": "Slightly confident",
+      "3": "Moderately confident",
+      "4": "Very confident",
+      "5": "Extremely confident"
+    },
+    "mistakes-question": "How many mistakes do you expect to make?",
+    "mistakes-placeholder": "Enter a number (e.g., 0, 1, 2, 3...)",
+    "motivation-question": "How motivated are you to achieve this goal?",
+    "motivation-scale": {
+      "1": "Not motivated",
+      "2": "Slightly motivated",
+      "3": "Moderately motivated",
+      "4": "Very motivated",
+      "5": "Extremely motivated"
+    }
+  },
+  
+  "post-task-appraisal": {
+    "title": "🎯 Goal Reflection",
+    "satisfaction-question": "How satisfied are you with your performance?",
+    "satisfaction-scale": {
+      "1": "😔 Not satisfied",
+      "2": "🙁 Somewhat satisfied",
+      "3": "😊 Satisfied",
+      "4": "😃 Very satisfied",
+      "5": "🤩 Extremely satisfied"
+    },
+    "confidence-question": "How confident do you feel now about this topic?",
+    "confidence-scale": {
+      "1": "🌱 Beginning to learn",
+      "2": "🌿 Growing confidence",
+      "3": "🌳 Moderate confidence",
+      "4": "🚀 High confidence",
+      "5": "⭐ Master level"
+    },
+    "anxiety-question": "How anxious did you feel during the exercise?",
+    "anxiety-scale": {
+      "1": "🤩 Not anxious",
+      "2": "😃 Somewhat anxious",
+      "3": "🙁 Anxious",
+      "4": "😔 Very anxious",
+      "5": "😰 Extremely anxious"
+    },
+    "effort-question": "How much effort did you put into this exercise?",
+    "effort-scale": {
+      "1": "😴 Minimal effort",
+      "2": "😐 Some effort",
+      "3": "😌 Moderate effort",
+      "4": "💪 Strong effort",
+      "5": "🏆 Exceptional effort"
+    },
+    "enjoyment-question": "How much did you enjoy this exercise?",
+    "enjoyment-scale": {
+      "1": "😔 Not enjoyable",
+      "2": "🙁 Somewhat enjoyable",
+      "3": "😊 Enjoyable",
+      "4": "😃 Very enjoyable",
+      "5": "🤩 Extremely enjoyable"
+    },
+    "difficulty-question": "How difficult was this exercise for you?",
+    "difficulty-scale": {
+      "1": "Very easy",
+      "2": "Easy",
+      "3": "Moderate",
+      "4": "Difficult",
+      "5": "Very difficult"
+    }
+  },
+  
+  "retrospective": {
+    "title": "Let's Reflect",
+    "performance-question": "How many mistakes do you think you made?",
+    "performance-placeholder": "Enter a number",
+    "expected": "Expected",
+    "actual": "Actual",
+    "mistakes": "mistakes",
+    "actual-mistakes": "Actual mistakes: {{count}}",
+    "expected-mistakes": "You expected: {{count}}",
+    "better-than-expected": "You did better than expected!",
+    "as-expected": "You performed as expected!",
+    "room-for-improvement": "There's room for improvement!",
+    "contributing-exercises-info": "This goal tracked {{count}} exercises",
+    "great-job": "Great job! 👏",
+    "excellent": "Excellent! 🌟",
+    "outstanding": "Outstanding! 🎉",
+    "perfect-prediction": "Perfect prediction! 🎯",
+    "keep-trying": "Keep trying! 💪",
+    "dont-give-up": "Don't give up! 🚀",
+    "learning": "Learning! 📚",
+    "score-calculation": "Score Calculation",
+    "sum-of-exercises": "Sum of {{count}} exercises:",
+    "based-on-errors": "Based on your exercise errors (mistakes made)",
+    "complete-button": "Complete ✓"
+  },
+  
+  "adaptive-feedback": {
+    "goal-aware": {
+      "hints-free-goal": "🎯 Perfect! You achieved your goal of completing without hints! ",
+      "work-independently": "💪 Great independence! You're working without hints as your goal requires! ",
+      "exceptional-flawless": "✨ Flawless! You achieved exceptional problem-solving with 0 hints AND 0 errors! ",
+      "exceptional-halfway": "🏆 Excellent hint-free completion! You're halfway to exceptional problem-solving! ",
+      "minimal-errors": "⭐ Excellent accuracy! You kept errors minimal as your goal was targeted! ",
+      "keep-up": "Keep up the excellent work toward your learning objectives! 🌟"
+    },
+    "high-performance": {
+      "perfect": "🚀 Outstanding! Perfect execution with 0 hints and 0 errors! Your confidence is clearly high - you're ready for bigger challenges. I've updated your recommended goals to match your excellent progress!",
+      "excellent": "🌟 Excellent work! Only {{hints}} hints and {{errors}} errors shows real mastery. With your high confidence level, you're ready for more advanced goals. I've updated your recommended goals to push you further!"
+    },
+    "struggling": {
+      "with-anxiety": "💪 I see you're feeling anxious, but you pushed through {{errors}} errors and {{hints}} hints- that takes real courage! I've adjusted your goal recommendations to give you more support and build confidence step by step. You've got this!🤗",
+      "default": "🎯 Working through {{errors}} errors and using {{hints}} hints shows determination! Everyone learns at their own pace. I've updated your goals to better support your learning journey. You've got this!🤗"
+    },
+    "consistent-improvement": {
+      "message": "📈 Amazing progress! Your error rate improved by {{improvementPercent}}% from {{olderAvg}} to {{recentAvg}} - you're clearly learning and growing! I've updated your goals to celebrate and continue your improvement streak!"
+    },
+    "mixed-performance": {
+      "frustrated": "🎯 You're doing well ({{hints}} hints, {{errors}} errors), but I sense some frustration. That's completely normal! I've adjusted your goals to help you feel more successful. Remember, progress isn't always linear! 💙",
+      "default": "🌱 Good performance ({{hints}} hints, {{errors}} errors) but I want you to feel more confident too! I've updated your goals to support both achievement and confidence."
+    },
+    "building-confidence": {
+      "message": "🌟 Great work! {{hints}} hints and {{errors}} errors shows you're building solid skills. Your confidence is growing nicely - that's the foundation of all great learning! I've updated your goals to keep building on this positive momentum! Keep going!💙"
+    },
+    "perfectionist": {
+      "message": "🌟 Great job! You used no hints and made no errors! I notice you might still feel a bit stressed. Remember, learning doesn't have to be perfect every time. Let's set goals that celebrate your progress and keep things light. You're doing awesome!💙"
+    },
+    "overconfident": {
+      "message": "💪 I love your confidence! You used {{hints}} hints and made {{errors}} errors, which just means more chances to learn and grow. I've set goals that will challenge you while building on your positive mindset. Your enthusiasm is your superpower! 🚀"
+    },
+    "impostor-syndrome": {
+      "message": "🏆 Look at the data : only {{hints}} hints and {{errors}} errors - that's truly impressive! Your skills are real,even if you sometimes doubt them. It's normal to feel that way when you're growing. I've selected goals to help you recognize and trust your abilities and see your progress.You're more capable than you think!✨"
+    },
+    "burnout-fatigue": {
+      "message": "🌿 I can sense you're putting in serious effort but feeling drained. That takes courage to keep going! Learning fatigue is real, and it's okay to adjust your pace. I've suggested lighter goals that will help you rebuild your enthusiasm while still making progress. Your wellbeing matters as much as your achievement! 💚"
+    },
+    "flow-state": {
+      "message": "✨ You're in the learning zone! Great performance ({{hints}} hints, {{errors}} errors) plus you're clearly enjoying the process. This is what optimal learning looks like! I've chosen goals that will help you maintain this wonderful momentum and positive experience. This is the magic of engaged learning! 🌟"
+    },
+    "frustrated-learner": {
+      "message": "🤝 I see you're putting in real effort ({{hints}} hints, {{errors}} errors) but feeling frustrated with the results. That's completely normal. Your hard work isn't wasted- sometimes learning often happens beneath the surface. I've adjusted your goals to help you see your progress more clearly. Your persistence will pay off!🌱"
+    },
+    "anxious-high-achiever": {
+      "message": "🧘‍♀️ Strong performance ({{hints}} hints, {{errors}} errors) but I want you to feel as good as your results look! High achievement shouldn't come with high anxiety. You're clearly capable - now let's work on making it feel sustainable and enjoyable. I've selected goals that maintain your high standards while supporting your emotional wellbeing. Excellence and peace can coexist! 🌺"
+    },
+    "not-using-hints": {
+      "message": "💡 I notice you made more than {{errors}} errors without using any hints. That shows determination, but remember - hints are here to help you learn, not to make things easier! Using hints strategically can help you build understanding and confidence faster. I've updated your goals, and I encourage you to try using the hint system - it's a powerful learning tool! 🎓"
+    },
+    "hint-dependent": {
+      "message": "🎯 Great job getting a perfect score, but I noticed you used {{hints}} hints to get there. Hints are helpful for learning, but try challenging yourself to use fewer hints next time - it will help you build independent problem-solving skills and confidence! I've updated your goals to help you gradually reduce hint dependency while maintaining your success. You're capable of more than you think! 💪"
+    },
+    "generic": {
+      "message": "🎯 Nice work! You used {{hints}} hints and made {{errors}} errors - every attempt helps you learn! I've updated your recommended goals based on your progress."
+    }
+  },
+  
+  "recommendations": {
+    "title": "🎯 Your Adaptive Recommendations",
+    "personalized-message": "These goals are personalized based on your {{count}} completed goals.",
+    "why-instruction": "Click \"💡 Why recommended?\" to see detailed reasoning.",
+    "based-on-performance": "Based on your performance, we recommend:",
+    "category-label": "Category",
+    "difficulty-label": "Difficulty",
+    "goal-label": "Goal",
+    "why-button": "Why?",
+    "add-goal-button": "Add Goal",
+    "goal-added-button": "Added",
+    "condition-fulfilled": "Condition fullfilled",
+    "goal-exists-tooltip": "Goal already added to your list",
+    "add-goal-tooltip": "Add this goal to your list",
+    "why-recommended-tooltip": "Why is this goal recommended?",
+    "why-recommended": "Why this goal?",
+    "modal": {
+      "title": "🗺️ Your Learning Journey",
+      "subtitle": "See where you are and where you're headed!",
+      "pattern-matched": "PATTERN MATCHED",
+      "what-indicates": "WHAT THIS INDICATES",
+      "how-helps": "HOW THIS GOAL HELPS",
+      "loading": "Loading recommendation details...",
+      "close-button": "Got it! Let's do this! 🚀"
+    },
+    "reasons": {
+      "build-foundation": "Building a strong foundation will help with more complex goals.",
+      "natural-progression": "This is the natural next step in your learning journey.",
+      "address-struggles": "This goal targets areas where you can improve.",
+      "leverage-strengths": "This builds on your existing strengths.",
+      "variety": "Trying different approaches helps deepen understanding.",
+      "consolidate": "Consolidating your skills across methods is important.",
+      "challenge": "You're ready for a bigger challenge!",
+      "consistency": "Developing consistency will boost your confidence.",
+      "independence": "Working independently builds problem-solving skills.",
+      "reflection": "Reflection helps solidify your understanding."
+    },
+    "accept-recommendation": "Set This Goal",
+    "browse-other-goals": "Browse Other Goals",
+    "no-recommendation": "Great progress! Feel free to choose any goal that interests you."
+  },
+  
+  "claim-modal": {
+    "title": "Wozza! You Did It!",
+    "subtitle": "You've already satisfied the conditions for this goal!",
+    "what-accomplished": "✨ What You Accomplished:",
+    "explanation": "You've already fulfilled the conditions for this goal! If you'd like to track it, you can add it to your goal list and on your next excerise completion it will be marked as completed.",
+    "close-button": "Got It!"
+  },
+  
+  "goal-completion-guide": {
+    "title": "How to Complete This Goal",
+    "steps": "Steps",
+    "tips": "Tips",
+    "exercises-needed": "Exercises Needed: {{count}}",
+    "method-requirement": "Method: {{method}}",
+    "any-method": "Any method",
+    "specific-method": "{{method}} only",
+    "multiple-methods": "Use different methods",
+    "tip-take-time": "Take your time and focus on understanding, not just speed.",
+    "tip-use-hints": "Don't hesitate to use hints when you're stuck.",
+    "tip-review": "Review the concept before starting if you're unsure.",
+    "tip-practice": "Practice makes perfect - don't worry about mistakes!",
+    "tip-reflect": "Reflect on what you learned after each exercise.",
+    "tip-strategy": "Think about which method is most efficient for each problem.",
+    "tip-accuracy": "Focus on accuracy rather than rushing through.",
+    "tip-independence": "Challenge yourself to work without hints when possible."
+  },
+  
+  "errors-and-validation": {
+    "goal-title-required": "Please enter a goal title",
+    "goal-title-too-short": "Goal title must be at least 3 characters",
+    "goal-title-too-long": "Goal title must be less than 200 characters",
+    "category-required": "Please select a category",
+    "difficulty-required": "Please select a difficulty level",
+    "confidence-required": "Please rate your confidence",
+    "mistakes-required": "Please enter expected mistakes",
+    "mistakes-invalid": "Please enter a valid number",
+    "motivation-required": "Please rate your motivation",
+    "rating-required": "Please provide a rating",
+    "duplicate-goal": "You already have this goal active",
+    "max-active-goals": "You can only have {{max}} active goals at a time",
+    "goal-not-found": "Goal not found",
+    "error-creating-goal": "Error creating goal. Please try again.",
+    "error-completing-goal": "Error completing goal. Please try again.",
+    "error-loading-goals": "Error loading goals. Please try again."
+  },
+  
+  "placeholders": {
+    "search-goals": "Search goals...",
+    "goal-title": "Enter goal title...",
+    "notes": "Add notes (optional)...",
+    "reflection": "What did you learn?",
+    "select-category": "Select a category...",
+    "select-difficulty": "Select difficulty...",
+    "select-goal": "Select..."
+  },
+  
+  "pretest": {
+    "header-title": "📚 Quick Assessment",
+    "header-subtitle": "Help us suggest the best goals for your learning journey!",
+    "question-progress": "Question {{current}} of {{total}}",
+    "next-button": "Next Question",
+    "complete-button": "Complete Assessment",
+    "results-title": "🎯 Assessment Complete!",
+    "recommended-title": "🎯 Recommended Goals for You:",
+    "category-label": "Category",
+    "difficulty-label": "Difficulty",
+    "why-button": "Why Recommended?",
+    "why-button-tooltip": "Why is this goal recommended for you?",
+    "no-goals-message": "No specific goals suggested based on your answers.",
+    "no-goals-explore": "You can explore all available goals in the goal setting page!",
+    "continue-button": "Continue to Goal Setting",
+    "questions": {
+      "q1": "How confident are you with math problem-solving?",
+      "q2": "What type of goals do you prefer?"
+    },
+    "options": {
+      "not-confident": "Not confident at all",
+      "somewhat-confident": "Somewhat confident",
+      "very-confident": "Very confident",
+      "expert-level": "Expert level",
+      "quick-practice": "Quick practice sessions",
+      "deep-understanding": "Deep understanding focus",
+      "problem-variety": "Problem variety",
+      "skill-building": "Skill building"
+    },
+    "why-modal": {
+      "title": "💡 Why This Goal Was Recommended",
+      "subtitle": "Based on your pretest answers",
+      "close-button": "Got it! 👍",
+      "reasons": {
+        "not-confident": "You're not confident yet, so this goal provides a supportive starting point.",
+        "somewhat-confident": "You're somewhat confident, this goal strengthens your foundation.",
+        "very-confident": "With your high confidence, this goal offers the right level of challenge.",
+        "expert": "As an expert, this goal targets advanced skills.",
+        "quick-practice": "You prefer quick sessions. This goal fits short, focused exercises.",
+        "deep-understanding": "You value deep understanding. This goal encourages thorough comprehension.",
+        "problem-variety": "You enjoy variety. This goal exposes you to different approaches.",
+        "skill-building": "You focus on skill building. This goal develops specific competencies."
+      }
+    }
+  },
+  "agent-messages": {
+    "goal-updated": "👍 Great! Changing goals is okay — just remember why you made the switch!",
+    "goal-deleted": "🗑️ It's okay to remove goals if they feel too much, just remember to complete what you have!",
+    "goal-prefilled": "✨ Goal form pre-filled with: \"{{title}}\". Just set your self-efficacy questions and click create!"
+  },
+  "menu": {
+    "public-training-mode": "👤 Public Training Mode - All users share anonymous data",
+    "join-research-study": "🔬 Join Research Study"
+  },
+  "prefilled-form": {
+    "title": "📌 Pre-filled from recommendation:",
+    "instruction": "Just fill in your self-efficacy questions below and click create!"
+  },
+  "add-goal-help": {
+    "text": "💡 You can use the add goal button to prefill the goal form or add a goal of your choice from the goal form below."
+  },
+  "study-login": {
+    "title": "Research Study Login",
+    "subtitle": "Join our research study to contribute valuable data while training",
+    "participant-id-label": "Participant ID:",
+    "participant-id-placeholder": "Enter your participant ID (e.g., PART001)",
+    "participant-id-help": "3-20 characters: letters, numbers, underscore, hyphen only",
+    "start-button": "🚀 Start Study Session",
+    "cancel-button": "Cancel",
+    "what-happens-title": "📋 What happens when you join:",
+    "benefit-1": "Your goals and progress will be tracked individually",
+    "benefit-2": "All your data helps improve learning experiences",
+    "benefit-3": "You can end your session anytime"
+  },
+  "satisfaction-reasons": {
+    "completed-exercises": "You've completed {{count}} exercise!",
+    "completed-exercises_plural": "You've completed {{count}} exercises!",
+    "completed-substitution": "You've completed {{count}} substitution exercise!",
+    "completed-substitution_plural": "You've completed {{count}} substitution exercises!",
+    "completed-elimination": "You've completed {{count}} elimination exercise!",
+    "completed-elimination_plural": "You've completed {{count}} elimination exercises!",
+    "completed-equalization": "You've completed {{count}} equalization exercise!",
+    "completed-equalization_plural": "You've completed {{count}} equalization exercises!",
+    "mastered-substitution": "You've mastered substitution with {{count}} exercises!",
+    "mastered-elimination": "You've mastered elimination with {{count}} exercises!",
+    "mastered-equalization": "You've mastered equalization with {{count}} exercises!",
+    "used-methods": "You've used {{count}} different methods: {{methods}}!",
+    "completed-all-methods": "You've completed {{count}} exercises using all 3 methods!",
+    "completed-efficiency": "You've completed {{count}} efficiency exercises!",
+    "mastered-all-methods": "You've mastered all methods: {{substitution}} substitution, {{elimination}} elimination, {{equalization}} equalization!",
+    "completed-without-hints": "You've completed {{count}} exercise without hints!",
+    "completed-without-hints_plural": "You've completed {{count}} exercises without hints!",
+    "completed-low-errors": "You've completed {{count}} exercise with ≤1 error!",
+    "completed-low-errors_plural": "You've completed {{count}} exercises with ≤1 error!",
+    "completed-perfect": "You've completed {{count}} perfect exercise!",
+    "completed-perfect_plural": "You've completed {{count}} perfect exercises!",
+    "average-errors": "Your average errors over {{count}} exercises: {{average}}!",
+    "self-explanations": "You've provided {{count}} self-explanation!",
+    "self-explanations_plural": "You've provided {{count}} self-explanations!",
+    "completed-low-hints": "You've completed {{count}} exercise with ≤2 hints!",
+    "completed-low-hints_plural": "You've completed {{count}} exercises with ≤2 hints!",
+    "persevered-errors": "You've persevered through errors in {{count}} exercise!",
+    "persevered-errors_plural": "You've persevered through errors in {{count}} exercises!",
+    "errors-improved": "Your errors improved from {{older}} to {{recent}}!",
+    "errors-decreased": "Your errors decreased consistently: {{sequence}}!",
+    "conditions-satisfied": "Conditions satisfied!"
+  }
+}

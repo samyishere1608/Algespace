@@ -201,14 +201,12 @@ export function checkProgressiveGoals(
   session: ExerciseSession,
   completeGoalByTitle: (title: string) => void,
   exerciseId?: number
-): void {
+): string[] {
   
-  console.log(`� CHECKPOINT: checkProgressiveGoals called!`);
-  console.log(`�🚀 ===== PROGRESSIVE GOALS CHECK STARTED =====`);
+  console.log(`🚀 ===== PROGRESSIVE GOALS CHECK STARTED =====`);
   console.log(`🎯 User ID: ${userId}`);
   console.log(`🎯 Session data:`, session);
   console.log(`🎯 Exercise ID: ${exerciseId}`);
-  console.log(`🎯 Complete function provided:`, typeof completeGoalByTitle);
   
   // Save per-exercise session data if exerciseId is provided
   if (exerciseId) {
@@ -221,13 +219,16 @@ export function checkProgressiveGoals(
     console.log(`✅ completeGoalByTitle is a valid function`);
   } else {
     console.error(`❌ completeGoalByTitle is not a function:`, completeGoalByTitle);
-    return;
+    return [];
   }
   
   // Update progress with this session
   const progress = updateExerciseProgress(userId, session);
   
   console.log(`📊 Current progress after update:`, progress);
+  
+  // Collect all completed goals instead of triggering them immediately
+  const completedGoals: string[] = [];
   
   // 📚 Understanding Category Goals
   
@@ -237,14 +238,8 @@ export function checkProgressiveGoals(
   // Basic method understanding (first completion of each method)
   const methodStr = session.method.toLowerCase();
   if ((methodStr === 'substitution' || methodStr === '1') && progress.substitution >= 1) {
-    console.log(`🎯 ATTEMPTING: "Understand how substitution works" (substitution count: ${progress.substitution})`);
-    console.log(`🎯 About to call completeGoalByTitle with: "Understand how substitution works"`);
-    try {
-      completeGoalByTitle("Understand how substitution works");
-      console.log(`✅ Successfully called completeGoalByTitle for "Understand how substitution works"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Understand how substitution works" (substitution count: ${progress.substitution})`);
+    completedGoals.push("Understand how substitution works");
   } else {
     console.log(`❌ Not triggering "Understand how substitution works" - method: ${methodStr}, count: ${progress.substitution}`);
   }
@@ -253,22 +248,16 @@ export function checkProgressiveGoals(
   if (progress.substitution >= 2 || progress.elimination >= 2 || progress.equalization >= 2) {
     const masteredMethod = progress.substitution >= 2 ? 'substitution' : 
                           progress.elimination >= 2 ? 'elimination' : 'equalization';
-    console.log(`🎯 ATTEMPTING: "Master substitution/equalization/elimination method" (mastered ${masteredMethod} with 2+ completions)`);
-    console.log(`🎯 About to call completeGoalByTitle with: "Master substitution/equalization/elimination method"`);
-    try {
-      completeGoalByTitle("Master substitution/equalization/elimination method");
-      console.log(`✅ Successfully called completeGoalByTitle for "Master substitution/equalization/elimination method"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Master substitution/equalization/elimination method" (mastered ${masteredMethod} with 2+ completions)`);
+    completedGoals.push("Master substitution/equalization/elimination method");
   } else {
     console.log(`❌ Not triggering "Master substitution/equalization/elimination method" - substitution: ${progress.substitution}, elimination: ${progress.elimination}, equalization: ${progress.equalization} (need 2+ in any method)`);
   }
   
   // First-time elimination completion
   if ((methodStr === 'elimination' || methodStr === '2') && progress.elimination >= 1) {
-    console.log(`🎯 TRIGGERING GOAL: "Understand how elimination works" (first elimination completion)`);
-    completeGoalByTitle("Understand how elimination works");
+    console.log(`🎯 GOAL COMPLETED: "Understand how elimination works" (first elimination completion)`);
+    completedGoals.push("Understand how elimination works");
   }
   
   // First-time equalization completion  
@@ -276,31 +265,22 @@ export function checkProgressiveGoals(
   console.log(`🔍 Method checks for equalization: methodStr="${methodStr}", equalization=${methodStr === 'equalization'}, 0=${methodStr === '0'}, count=${progress.equalization}`);
   
   if ((methodStr === 'equalization' || methodStr === '0') && progress.equalization >= 1) {
-    console.log(`🎯 TRIGGERING GOAL: "Understand how equalization works" (first equalization completion)`);
-    completeGoalByTitle("Understand how equalization works");
+    console.log(`🎯 GOAL COMPLETED: "Understand how equalization works" (first equalization completion)`);
+    completedGoals.push("Understand how equalization works");
   } else {
     console.log(`❌ Not triggering "Understand how equalization works" - method: ${methodStr}, count: ${progress.equalization}`);
   }
   
-  // Understanding multiple methods - REMOVE THIS (not in new GoalForm)
-  // if (progress.elimination >= 1 && progress.equalization >= 1) {
-  //   completeGoalByTitle("Understand elimination and equalization");
-  // }
-  
   // First exercise completion (for "Learn what linear equations are")
   if (progress.total >= 1) {
-    console.log(`🎯 ATTEMPTING: "Learn what linear equations are" (first exercise completed)`);
-    try {
-      completeGoalByTitle("Learn what linear equations are");
-      console.log(`✅ Successfully called completeGoalByTitle for "Learn what linear equations are"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Learn what linear equations are" (first exercise completed)`);
+    completedGoals.push("Learn what linear equations are");
   }
   
   // Master all methods (2+ each)
   if (progress.substitution >= 2 && progress.elimination >= 2 && progress.equalization >= 2) {
-    completeGoalByTitle("Master all three methods fluently");
+    console.log(`🎯 GOAL COMPLETED: "Master all three methods fluently"`);
+    completedGoals.push("Master all three methods fluently");
   }
   
   // 🎯 Strategy Use Category Goals
@@ -309,89 +289,66 @@ export function checkProgressiveGoals(
   const methodsUsed = [progress.substitution, progress.elimination, progress.equalization].filter(count => count > 0).length;
   console.log(`🎯 Checking "Practice with different methods" - methods used: ${methodsUsed}/3`);
   if (methodsUsed >= 2) {
-    console.log(`🎯 ATTEMPTING: "Practice with different methods" (${methodsUsed} different methods)`);
-    try {
-      completeGoalByTitle("Practice with different methods");
-      console.log(`✅ Successfully called completeGoalByTitle for "Practice with different methods"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Practice with different methods" (${methodsUsed} different methods)`);
+    completedGoals.push("Practice with different methods");
   } else {
     console.log(`❌ Not triggering "Practice with different methods" - only ${methodsUsed} methods used`);
   }
   
   // Strategic switching (3 exercises with variety)
   if (progress.total >= 3 && methodsUsed >= 3) {
-    completeGoalByTitle("Switch methods strategically");
+    console.log(`🎯 GOAL COMPLETED: "Switch methods strategically"`);
+    completedGoals.push("Switch methods strategically");
   }
   
   // Optimal method choice (3 efficiency exercises)
   if (progress.efficiency >= 3) {
-    completeGoalByTitle("Choose optimal methods consistently");
+    console.log(`🎯 GOAL COMPLETED: "Choose optimal methods consistently"`);
+    completedGoals.push("Choose optimal methods consistently");
   }
   
   // 💭 Reflection Category Goals
   
   // Method effectiveness reflection (self-explanation)
   if (session.completedWithSelfExplanation) {
-    console.log(`🎯 ATTEMPTING: "Reflect on method effectiveness" (completed with explanation)`);
-    try {
-      completeGoalByTitle("Reflect on method effectiveness");
-      console.log(`✅ Successfully called completeGoalByTitle for "Reflect on method effectiveness"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Reflect on method effectiveness" (completed with explanation)`);
+    completedGoals.push("Reflect on method effectiveness");
   } else {
     console.log(`❌ Not triggering "Reflect on method effectiveness" - no self-explanation provided`);
   }
   
   // Clear reasoning (3 self-explanations)
   if (progress.selfExplanations >= 3) {
-    completeGoalByTitle("Explain reasoning clearly");
+    console.log(`🎯 GOAL COMPLETED: "Explain reasoning clearly"`);
+    completedGoals.push("Explain reasoning clearly");
   }
   
   // Consistent improvement (trend over 4+ exercises)
   if (checkConsistentImprovement(progress.errorHistory, 4)) {
-    completeGoalByTitle("Show consistent improvement");
+    console.log(`🎯 GOAL COMPLETED: "Show consistent improvement"`);
+    completedGoals.push("Show consistent improvement");
   }
   
   // 🎯 Learning & Growth Category Goals
   
   // Build confidence through success (2 or fewer hints)
   if (session.hints <= 2) {
-    console.log(`🎯 ATTEMPTING: "Build confidence through success" (${session.hints} hints used)`);
-    console.log(`🎯 About to call completeGoalByTitle with: "Build confidence through success"`);
-    try {
-      completeGoalByTitle("Build confidence through success");
-      console.log(`✅ Successfully called completeGoalByTitle for "Build confidence through success"`);
-    } catch (error) {
-      console.log(`❌ ERROR calling completeGoalByTitle for "Build confidence through success":`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Build confidence through success" (${session.hints} hints used)`);
+    completedGoals.push("Build confidence through success");
   }
   
   // Independence (0 hints) - UPDATED
   if (session.hints === 0) {
-    console.log(`🎯 ATTEMPTING: "Complete exercises without hints" (0 hints used)`);
-    console.log(`🎯 About to call completeGoalByTitle with: "Complete exercises without hints"`);
-    try {
-      completeGoalByTitle("Complete exercises without hints");
-      console.log(`✅ Successfully called completeGoalByTitle for "Complete exercises without hints"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Complete exercises without hints" (0 hints used)`);
+    completedGoals.push("Complete exercises without hints");
   } else {
     console.log(`❌ Not triggering "Complete exercises without hints" - hints used: ${session.hints}`);
   }
   
   // Build confidence (5 total exercises) - UPDATED
   if (progress.total >= 5) {
-    console.log(`🎯 ATTEMPTING: "Handle complex problems confidently" (5+ exercises)`);
-    try {
-      completeGoalByTitle("Handle complex problems confidently");
-      console.log(`✅ Successfully called completeGoalByTitle for "Handle complex problems confidently"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Handle complex problems confidently" (5+ exercises)`);
+    completedGoals.push("Handle complex problems confidently");
   } else {
     console.log(`❌ Not triggering "Handle complex problems confidently" (${progress.total}/5 exercises)`);
   }
@@ -404,13 +361,8 @@ export function checkProgressiveGoals(
     incrementHintFreeCount(userId);
     console.log(`🏆 Hint-free exercises count: ${recentHintFreeExercises + 1}/3`);
     if (recentHintFreeExercises + 1 >= 3) {
-      console.log(`🎯 ATTEMPTING: "Work independently" (3 hint-free exercises achieved)`);
-      try {
-        completeGoalByTitle("Work independently");
-        console.log(`✅ Successfully called completeGoalByTitle for "Work independently"`);
-      } catch (error) {
-        console.error(`❌ Error calling completeGoalByTitle:`, error);
-      }
+      console.log(`🎯 GOAL COMPLETED: "Work independently" (3 hint-free exercises achieved)`);
+      completedGoals.push("Work independently");
     } else {
       console.log(`❌ Not triggering "Work independently" (${recentHintFreeExercises + 1}/3 hint-free exercises)`);
     }
@@ -418,26 +370,16 @@ export function checkProgressiveGoals(
   
   // NEW: Minimal errors goal
   if (session.errors <= 1) {
-    console.log(`🎯 ATTEMPTING: "Solve problems with minimal errors" (${session.errors} errors ≤ 1)`);
-    try {
-      completeGoalByTitle("Solve problems with minimal errors");
-      console.log(`✅ Successfully called completeGoalByTitle for "Solve problems with minimal errors"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Solve problems with minimal errors" (${session.errors} errors ≤ 1)`);
+    completedGoals.push("Solve problems with minimal errors");
   } else {
     console.log(`❌ Not triggering "Solve problems with minimal errors" (${session.errors} errors > 1)`);
   }
   
   // NEW: Exceptional problem-solving (0 errors AND 0 hints)
   if (session.errors === 0 && session.hints === 0) {
-    console.log(`🎯 ATTEMPTING: "Show exceptional problem-solving" (perfect: 0 errors, 0 hints)`);
-    try {
-      completeGoalByTitle("Show exceptional problem-solving");
-      console.log(`✅ Successfully called completeGoalByTitle for "Show exceptional problem-solving"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Show exceptional problem-solving" (perfect: 0 errors, 0 hints)`);
+    completedGoals.push("Show exceptional problem-solving");
   } else {
     console.log(`❌ Not triggering "Show exceptional problem-solving" (errors: ${session.errors}, hints: ${session.hints})`);
   }
@@ -447,13 +389,8 @@ export function checkProgressiveGoals(
     const avgErrors = progress.errorHistory.reduce((sum, err) => sum + err, 0) / progress.errorHistory.length;
     console.log(`🎯 Checking accuracy under pressure: ${progress.total} exercises, avg errors = ${avgErrors.toFixed(2)}`);
     if (avgErrors <= 1) {
-      console.log(`🎯 ATTEMPTING: "Maintain accuracy under pressure" (avg ≤1 error over 5+ exercises)`);
-      try {
-        completeGoalByTitle("Maintain accuracy under pressure");
-        console.log(`✅ Successfully called completeGoalByTitle for "Maintain accuracy under pressure"`);
-      } catch (error) {
-        console.error(`❌ Error calling completeGoalByTitle:`, error);
-      }
+      console.log(`🎯 GOAL COMPLETED: "Maintain accuracy under pressure" (avg ≤1 error over 5+ exercises)`);
+      completedGoals.push("Maintain accuracy under pressure");
     } else {
       console.log(`❌ Not triggering "Maintain accuracy under pressure" (avg ${avgErrors.toFixed(2)} > 1.0)`);
     }
@@ -465,13 +402,8 @@ export function checkProgressiveGoals(
   
   // Develop problem-solving resilience (complete after making errors)
   if (session.errors > 0) {
-    console.log(`🎯 ATTEMPTING: "Develop problem-solving resilience" (persisted through ${session.errors} errors)`);
-    try {
-      completeGoalByTitle("Develop problem-solving resilience");
-      console.log(`✅ Successfully called completeGoalByTitle for "Develop problem-solving resilience"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Develop problem-solving resilience" (persisted through ${session.errors} errors)`);
+    completedGoals.push("Develop problem-solving resilience");
   }
   
   // Learn from mistakes effectively (improved error rate over time)
@@ -483,29 +415,22 @@ export function checkProgressiveGoals(
       const oldAvg = oldErrors.reduce((sum, err) => sum + err, 0) / oldErrors.length;
       console.log(`🎯 Checking mistake learning: recent avg = ${recentAvg.toFixed(2)}, old avg = ${oldAvg.toFixed(2)}`);
       if (recentAvg < oldAvg) {
-        console.log(`🎯 ATTEMPTING: "Learn from mistakes effectively" (improving error rate)`);
-        try {
-          completeGoalByTitle("Learn from mistakes effectively");
-          console.log(`✅ Successfully called completeGoalByTitle for "Learn from mistakes effectively"`);
-        } catch (error) {
-          console.error(`❌ Error calling completeGoalByTitle:`, error);
-        }
+        console.log(`🎯 GOAL COMPLETED: "Learn from mistakes effectively" (improving error rate)`);
+        completedGoals.push("Learn from mistakes effectively");
       }
     }
   }
   
   // Set personal learning challenges (complete 10+ exercises)
   if (progress.total >= 10) {
-    console.log(`🎯 ATTEMPTING: "Set personal learning challenges" (10+ exercises completed)`);
-    try {
-      completeGoalByTitle("Set personal learning challenges");
-      console.log(`✅ Successfully called completeGoalByTitle for "Set personal learning challenges"`);
-    } catch (error) {
-      console.error(`❌ Error calling completeGoalByTitle:`, error);
-    }
+    console.log(`🎯 GOAL COMPLETED: "Set personal learning challenges" (10+ exercises completed)`);
+    completedGoals.push("Set personal learning challenges");
   }
   
-  console.log(`✅ Progressive goal check complete for ${session.exerciseType} exercise with ${session.method} method`);
+  console.log(`✅ Progressive goal check complete - ${completedGoals.length} goals completed:`, completedGoals);
+  
+  // Return the list of completed goals - let the caller handle triggering them in sequence
+  return completedGoals;
 }
 
 // Helper function to track hint-free exercises (simplified implementation)

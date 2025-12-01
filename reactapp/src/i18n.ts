@@ -8,6 +8,7 @@ import equalization from "@translations/de/equalization.json";
 import error from "@translations/de/error.json";
 import flexibility from "@translations/de/flexibility.json";
 import general from "@translations/de/general.json";
+import goalsetting from "@translations/de/goalsetting.json";
 import study from "@translations/de/study.json";
 import substitution from "@translations/de/substitution.json";
 import variables from "@translations/de/variables.json";
@@ -17,6 +18,7 @@ import equalizationEN from "@translations/en/equalization.json";
 import errorEN from "@translations/en/error.json";
 import flexibilityEN from "@translations/en/flexibility.json";
 import generalEN from "@translations/en/general.json";
+import goalsettingEN from "@translations/en/goalsetting.json";
 import studyEN from "@translations/en/study.json";
 import substitutionEN from "@translations/en/substitution.json";
 import variablesEN from "@translations/en/variables.json";
@@ -38,6 +40,7 @@ export enum TranslationNamespaces {
     Error = "error",
     Equalization = "equalization",
     General = "general",
+    GoalSetting = "goalsetting",
     Substitution = "substitution",
     Variables = "variables",
     Study = "study",
@@ -55,7 +58,7 @@ i18n.use(Backend)
         },
         fallbackLng: Language.DE,
         defaultNS: TranslationNamespaces.General,
-        keySeparator: false,
+        keySeparator: '.',
         interpolation: {
             escapeValue: false,
             skipOnVariables: false
@@ -70,7 +73,8 @@ i18n.use(Backend)
                 variables: variablesEN,
                 study: studyEN,
                 about: aboutEN,
-                flexibility: flexibilityEN
+                flexibility: flexibilityEN,
+                goalsetting: goalsettingEN
             },
             de: {
                 general,
@@ -81,7 +85,8 @@ i18n.use(Backend)
                 variables,
                 study,
                 about,
-                flexibility
+                flexibility,
+                goalsetting
             }
         }
     });

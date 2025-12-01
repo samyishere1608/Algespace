@@ -2,6 +2,7 @@ import { TranslationNamespaces } from "@/i18n.ts";
 import React, { ReactElement, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { GeneralTranslations } from "@/types/shared/generalTranslations.ts";
+import { GoalSettingTranslations } from "@/types/shared/goalsettingTranslations.ts";
 import { Paths } from "@routes/paths.ts";
 import { getCompletedPKExercises, setCollapsibleState } from "@utils/storageUtils.ts";
 import ViewLayout from "@components/views/ViewLayout.tsx";
@@ -21,7 +22,7 @@ import { StudySession, getStudySession, createStudySession, clearStudySession, v
 import { displayProgressiveStats } from "@/utils/progressiveGoalTracking";
 
 export default function FlexibilityView(): ReactElement {
-    const { t } = useTranslation(TranslationNamespaces.General);
+    const { t } = useTranslation([TranslationNamespaces.General, TranslationNamespaces.GoalSetting]);
     const [showGoalOverlay, setShowGoalOverlay] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
     const [showStudyLogin, setShowStudyLogin] = useState(false);
@@ -131,7 +132,7 @@ export default function FlexibilityView(): ReactElement {
                 ) : (
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
                         <span style={{ color: "#6c757d", fontSize: "1rem" }}>
-                            👤 Public Training Mode - All users share anonymous data
+                            {t(`${TranslationNamespaces.GoalSetting}:menu.public-training-mode`)}
                         </span>
                         <button 
                             onClick={() => setShowStudyLogin(true)}
@@ -158,7 +159,7 @@ export default function FlexibilityView(): ReactElement {
                                 e.currentTarget.style.boxShadow = "0 3px 6px rgba(0,123,255,0.3)";
                             }}
                         >
-                            🔬 Join Research Study
+                            {t(`${TranslationNamespaces.GoalSetting}:menu.join-research-study`)}
                         </button>
                     </div>
                 )}
@@ -179,7 +180,6 @@ export default function FlexibilityView(): ReactElement {
                         padding: "0.75rem 1rem",
                         borderRadius: "15px",
                         fontSize: "0.9rem",
-                        fontFamily: "'Comic Sans MS', cursive, sans-serif",
                         fontWeight: "bold",
                         boxShadow: "0 8px 20px rgba(255, 107, 107, 0.4)",
                         whiteSpace: "nowrap",
@@ -187,7 +187,7 @@ export default function FlexibilityView(): ReactElement {
                         border: "2px solid rgba(255, 255, 255, 0.3)",
                         animation: "tooltipBounce 0.3s ease-out"
                     }}>
-                        🌟 Set your learning goals here! 🚀
+                        {t('ui.set-goals-tooltip', { ns: TranslationNamespaces.GoalSetting })}
                         {/* Arrow pointing down */}
                         <div style={{
                             position: "absolute",
@@ -231,10 +231,9 @@ export default function FlexibilityView(): ReactElement {
                         alignItems: "center",
                         justifyContent: "center",
                         transition: "all 0.3s ease",
-                        fontFamily: "'Comic Sans MS', cursive, sans-serif",
                         animation: "goalPulse 2s infinite"
                     }}
-                    title="Set your learning goals!"
+                    title={t('ui.set-goals-button-title', { ns: TranslationNamespaces.GoalSetting })}
                     aria-label="Open Goal Setting Modal"
                 >
                     🎯
@@ -300,10 +299,10 @@ export default function FlexibilityView(): ReactElement {
                         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
                             <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔬</div>
                             <h2 style={{ color: "#007bff", margin: 0, fontSize: "1.5rem" }}>
-                                Research Study Login
+                                {t(`${TranslationNamespaces.GoalSetting}:study-login.title`)}
                             </h2>
                             <p style={{ color: "#666", marginTop: "0.5rem", fontSize: "1rem" }}>
-                                Join our research study to contribute valuable data while training
+                                {t(`${TranslationNamespaces.GoalSetting}:study-login.subtitle`)}
                             </p>
                         </div>
                         
@@ -335,12 +334,12 @@ export default function FlexibilityView(): ReactElement {
                                     color: "#333",
                                     fontSize: "1rem"
                                 }}>
-                                    Participant ID:
+                                    {t(`${TranslationNamespaces.GoalSetting}:study-login.participant-id-label`)}
                                 </label>
                                 <input
                                     type="text"
                                     name="participantId"
-                                    placeholder="Enter your participant ID (e.g., PART001)"
+                                    placeholder={t(`${TranslationNamespaces.GoalSetting}:study-login.participant-id-placeholder`)}
                                     required
                                     style={{
                                         width: "100%",
@@ -360,7 +359,7 @@ export default function FlexibilityView(): ReactElement {
                                     }}
                                 />
                                 <small style={{ color: "#666", fontSize: "0.85rem" }}>
-                                    3-20 characters: letters, numbers, underscore, hyphen only
+                                    {t(`${TranslationNamespaces.GoalSetting}:study-login.participant-id-help`)}
                                 </small>
                             </div>
                             
@@ -385,7 +384,7 @@ export default function FlexibilityView(): ReactElement {
                                     e.currentTarget.style.backgroundColor = "#28a745";
                                     e.currentTarget.style.transform = "translateY(0)";
                                 }}>
-                                    🚀 Start Study Session
+                                    {t(`${TranslationNamespaces.GoalSetting}:study-login.start-button`)}
                                 </button>
                                 
                                 <button type="button" onClick={() => {
@@ -411,7 +410,7 @@ export default function FlexibilityView(): ReactElement {
                                     e.currentTarget.style.backgroundColor = "#6c757d";
                                     e.currentTarget.style.transform = "translateY(0)";
                                 }}>
-                                    Cancel
+                                    {t(`${TranslationNamespaces.GoalSetting}:study-login.cancel-button`)}
                                 </button>
                             </div>
                         </form>
@@ -424,11 +423,11 @@ export default function FlexibilityView(): ReactElement {
                             fontSize: "0.85rem",
                             color: "#0c5460"
                         }}>
-                            <strong>📋 What happens when you join:</strong>
+                            <strong>{t(`${TranslationNamespaces.GoalSetting}:study-login.what-happens-title`)}</strong>
                             <ul style={{ margin: "0.5rem 0 0 0", paddingLeft: "1.2rem" }}>
-                                <li>Your goals and progress will be tracked individually</li>
-                                <li>All your data helps improve learning experiences</li>
-                                <li>You can end your session anytime</li>
+                                <li>{t(`${TranslationNamespaces.GoalSetting}:study-login.benefit-1`)}</li>
+                                <li>{t(`${TranslationNamespaces.GoalSetting}:study-login.benefit-2`)}</li>
+                                <li>{t(`${TranslationNamespaces.GoalSetting}:study-login.benefit-3`)}</li>
                             </ul>
                         </div>
                     </div>
@@ -468,20 +467,27 @@ function ExerciseList({ completedExercises }: { completedExercises?: (number | s
     // }
 
     const getDifficultyLevel = (exerciseType: any) => {
+        let difficultyKey = "medium";
         switch (exerciseType) {
             case FlexibilityExerciseType.Suitability:     // 2
-                return "Easy";
+                difficultyKey = "easy";
+                break;
             case FlexibilityExerciseType.Efficiency:      // 1
-                return "Medium";
+                difficultyKey = "medium";
+                break;
             case FlexibilityExerciseType.Matching:        // 3
-                return "Hard";
+                difficultyKey = "hard";
+                break;
             case FlexibilityExerciseType.TipExercise:     // 4
-                return "Medium";
+                difficultyKey = "medium";
+                break;
             case FlexibilityExerciseType.PlainExercise:   // 5
-                return "Easy";
+                difficultyKey = "easy";
+                break;
             default:
-                return "Medium";
+                difficultyKey = "medium";
         }
+        return t(`${TranslationNamespaces.GoalSetting}:ui.${difficultyKey}`);
     };
 
     const getDifficultyStyle = (exerciseType: any) => {

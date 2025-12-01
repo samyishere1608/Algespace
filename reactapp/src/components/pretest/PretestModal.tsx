@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { TranslationNamespaces } from '@/i18n';
 import { submitPretestAnswers } from '@/utils/api';
 import { PretestModalProps, PretestAnswers } from '@/types/pretest';
+import { getGoalTitleKey, getCategoryKey, getDifficultyKey } from '@/utils/goalTranslations';
 import './PretestModal.css';
 
 // Goal completion guidance mapping
@@ -56,14 +59,27 @@ const goalCompletionGuide: Record<string, string> = {
 };
 
 export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onComplete, userId }) => {
+  const { t } = useTranslation(TranslationNamespaces.GoalSetting);
+  
+  // Define options with both display text and English keys for backend
   const questions = [
     {
-      question: "How confident are you with math problem-solving?",
-      options: ["Not confident at all", "Somewhat confident", "Very confident", "Expert level"]
+      question: t('pretest.questions.q1'),
+      options: [
+        { key: 'Not confident', display: t('pretest.options.not-confident') },
+        { key: 'Somewhat confident', display: t('pretest.options.somewhat-confident') },
+        { key: 'Very confident', display: t('pretest.options.very-confident') },
+        { key: 'Expert level', display: t('pretest.options.expert-level') }
+      ]
     },
     {
-      question: "What type of goals do you prefer?",
-      options: ["Quick practice sessions", "Deep understanding focus", "Problem variety", "Skill building"]
+      question: t('pretest.questions.q2'),
+      options: [
+        { key: 'Quick practice', display: t('pretest.options.quick-practice') },
+        { key: 'Deep understanding', display: t('pretest.options.deep-understanding') },
+        { key: 'Problem variety', display: t('pretest.options.problem-variety') },
+        { key: 'Skill building', display: t('pretest.options.skill-building') }
+      ]
     }
   ];
 
@@ -75,35 +91,35 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
   const [showGuidance, setShowGuidance] = useState<string | null>(null);
   const [showReasonModal, setShowReasonModal] = useState<string | null>(null);
 
-  // Generate recommendation reasoning based on pretest answers
+  // Generate recommendation reasoning based on pretest answers (using English keys)
   const getRecommendationReason = (goalTitle: string): string => {
     const confidence = answers['q1'] || '';
     const goalType = answers['q2'] || '';
 
     let reason = '';
 
-    // Line 1: Confidence match
-    if (confidence.includes('Not confident')) {
-      reason += `• You're not confident yet, so this goal provides a supportive starting point.`;
-    } else if (confidence.includes('Somewhat confident')) {
-      reason += `• You're somewhat confident, this goal strengthens your foundation.`;
-    } else if (confidence.includes('Very confident')) {
-      reason += `• With your high confidence, this goal offers the right level of challenge.`;
-    } else if (confidence.includes('Expert')) {
-      reason += `• As an expert, this goal targets advanced skills.`;
+    // Line 1: Confidence match - now using English keys
+    if (confidence === 'Not confident') {
+      reason += `• ${t('pretest.why-modal.reasons.not-confident')}`;
+    } else if (confidence === 'Somewhat confident') {
+      reason += `• ${t('pretest.why-modal.reasons.somewhat-confident')}`;
+    } else if (confidence === 'Very confident') {
+      reason += `• ${t('pretest.why-modal.reasons.very-confident')}`;
+    } else if (confidence === 'Expert level') {
+      reason += `• ${t('pretest.why-modal.reasons.expert')}`;
     }
 
     reason += '\n\n';
 
-    // Line 2: Goal preference match
-    if (goalType.includes('Quick practice')) {
-      reason += `• You prefer quick sessions. This goal fits short, focused exercises.`;
-    } else if (goalType.includes('Deep understanding')) {
-      reason += `• You value deep understanding. This goal encourages thorough comprehension.`;
-    } else if (goalType.includes('Problem variety')) {
-      reason += `• You enjoy variety. This goal exposes you to different approaches.`;
-    } else if (goalType.includes('Skill building')) {
-      reason += `• You focus on skill building. This goal develops specific competencies.`;
+    // Line 2: Goal preference match - now using English keys
+    if (goalType === 'Quick practice') {
+      reason += `• ${t('pretest.why-modal.reasons.quick-practice')}`;
+    } else if (goalType === 'Deep understanding') {
+      reason += `• ${t('pretest.why-modal.reasons.deep-understanding')}`;
+    } else if (goalType === 'Problem variety') {
+      reason += `• ${t('pretest.why-modal.reasons.problem-variety')}`;
+    } else if (goalType === 'Skill building') {
+      reason += `• ${t('pretest.why-modal.reasons.skill-building')}`;
     }
 
     return reason;
@@ -157,14 +173,14 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
         {!showResults && (
           <>
             <div className="pretest-header">
-              <h2>📚 Quick Assessment</h2>
-              <p>Help us suggest the best goals for your learning journey!</p>
+              <h2>{t('pretest.header-title')}</h2>
+              <p>{t('pretest.header-subtitle')}</p>
             </div>
 
             <div className="progress-bar">
               <div className="progress-fill" style={{ width: `${progress}%` }}></div>
               <div className="progress-text">
-                Question {currentQuestionIndex + 1} of {questions.length}
+                {t('pretest.question-progress', { current: currentQuestionIndex + 1, total: questions.length })}
               </div>
             </div>
 
@@ -172,16 +188,16 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
               <h3 className="question-text">{currentQuestion.question}</h3>
               
               <div className="options-container">
-                {currentQuestion.options.map((option: string, index: number) => (
+                {currentQuestion.options.map((option, index: number) => (
                   <label key={index} className="option-label">
                     <input
                       type="radio"
                       name="question-option"
-                      value={option}
-                      checked={selectedOption === option}
+                      value={option.key}
+                      checked={selectedOption === option.key}
                       onChange={(e) => setSelectedOption(e.target.value)}
                     />
-                    <span className="option-text">{option}</span>
+                    <span className="option-text">{option.display}</span>
                   </label>
                 ))}
               </div>
@@ -191,7 +207,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                 disabled={!selectedOption}
                 className="next-button"
               >
-                {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Complete Assessment'}
+                {currentQuestionIndex < questions.length - 1 ? t('pretest.next-button') : t('pretest.complete-button')}
               </button>
             </div>
           </>
@@ -199,11 +215,11 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
 
         {showResults && (
           <div className="results-container">
-            <h3>🎯 Assessment Complete!</h3>
+            <h3>{t('pretest.results-title')}</h3>
             
 
             <div className="suggested-goals">
-              <h4>🎯 Recommended Goals for You:</h4>
+              <h4>{t('pretest.recommended-title')}</h4>
               {suggestedGoals && suggestedGoals.length > 0 ? (
                 <div className="goals-list">
     
@@ -246,7 +262,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                               paddingBottom: '10px',
                               borderBottom: '1px solid #e3f2fd'
                             }}>
-                              {title}
+                              {t(`goal-titles.${getGoalTitleKey(title)}`)}
                             </div>
 
                             {/* Category and Difficulty Below Title */}
@@ -263,7 +279,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                                   color: '#64748b',
                                   textTransform: 'uppercase'
                                 }}>
-                                  Category:
+                                  {t('pretest.category-label')}:
                                 </span>
                                 <span style={{ 
                                   fontSize: '0.8rem',
@@ -273,7 +289,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                                   backgroundColor: '#e3f2fd',
                                   borderRadius: '4px'
                                 }}>
-                                  {category}
+                                  {t(`categories.${getCategoryKey(category)}`)}
                                 </span>
                               </div>
                               <div style={{ 
@@ -287,7 +303,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                                   color: '#64748b',
                                   textTransform: 'uppercase'
                                 }}>
-                                  Difficulty:
+                                  {t('pretest.difficulty-label')}:
                                 </span>
                                 <div style={{ 
                                   display: 'flex',
@@ -302,7 +318,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                                   border: `1.5px solid ${diffStyle.color}40`
                                 }}>
                                   <span style={{ fontSize: '0.8rem' }}>{diffStyle.emoji}</span>
-                                  <span>{diffStyle.label}</span>
+                                  <span>{t(`difficulty.${getDifficultyKey(difficulty)}`)}</span>
                                 </div>
                               </div>
                             </div>
@@ -340,10 +356,10 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                                   e.currentTarget.style.transform = "scale(1)";
                                   e.currentTarget.style.boxShadow = "0 2px 4px rgba(255, 152, 0, 0.25)";
                                 }}
-                                title="Why is this goal recommended for you?"
+                                title={t('pretest.why-button-tooltip')}
                               >
                                 <span style={{ fontSize: '0.9rem' }}>💡</span>
-                                <span>Why Recommended?</span>
+                                <span>{t('pretest.why-button')}</span>
                               </button>
                             </div>
                           </div>
@@ -377,10 +393,10 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                   textAlign: 'center' 
                 }}>
                   <p style={{ color: '#666', marginBottom: '8px' }}>
-                    No specific goals suggested based on your answers.
+                    {t('pretest.no-goals-message')}
                   </p>
                   <p style={{ color: '#666', fontSize: '0.9rem' }}>
-                    You can explore all available goals in the goal setting page!
+                    {t('pretest.no-goals-explore')}
                   </p>
                 </div>
               )}
@@ -388,7 +404,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
 
             <div className="results-actions">
               <button onClick={handleComplete} className="complete-button">
-                Continue to Goal Setting
+                {t('pretest.continue-button')}
               </button>
             </div>
           </div>
@@ -439,14 +455,14 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                 justifyContent: "center",
                 gap: "0.5rem"
               }}>
-                💡 Why This Goal Was Recommended
+                {t('pretest.why-modal.title')}
               </h2>
               <p style={{
                 margin: "0.5rem 0 0 0",
                 fontSize: "0.9rem",
                 opacity: 0.95
               }}>
-                Based on your pretest answers
+                {t('pretest.why-modal.subtitle')}
               </p>
             </div>
             
@@ -502,7 +518,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                   e.currentTarget.style.boxShadow = "0 2px 8px rgba(255, 152, 0, 0.3)";
                 }}
               >
-                Got it! 👍
+                {t('pretest.why-modal.close-button')}
               </button>
             </div>
           </div>

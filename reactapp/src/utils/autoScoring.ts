@@ -292,9 +292,32 @@ export function getContributingExercises(
       
     case "Choose optimal methods consistently":
       // First 3 efficiency exercises
-      return sortedExercises.filter(ex => 
-        ex.exerciseType.toLowerCase() === 'efficiency'
-      ).slice(0, 3);
+      console.warn(`🔍 [AUTOSCORING] "Choose optimal methods consistently" - filtering efficiency exercises`);
+      console.warn(`🔍 [AUTOSCORING] Total exercises to filter:`, sortedExercises.length);
+      console.warn(`🔍 [AUTOSCORING] All exercises:`, sortedExercises.map(ex => ({
+        exerciseId: ex.exerciseId,
+        exerciseType: ex.exerciseType,
+        exerciseTypeLowercase: ex.exerciseType.toLowerCase(),
+        method: ex.method,
+        hints: ex.hints,
+        errors: ex.errors,
+        timestamp: ex.timestamp
+      })));
+      
+      const efficiencyExercises = sortedExercises.filter(ex => {
+        const isEfficiency = ex.exerciseType.toLowerCase() === 'efficiency';
+        console.warn(`🔍 [AUTOSCORING] Exercise ${ex.exerciseId}: type="${ex.exerciseType}", lowercase="${ex.exerciseType.toLowerCase()}", isEfficiency=${isEfficiency}`);
+        return isEfficiency;
+      });
+      
+      console.warn(`🔍 [AUTOSCORING] Found ${efficiencyExercises.length} efficiency exercises`);
+      console.warn(`🔍 [AUTOSCORING] Taking first 3:`, efficiencyExercises.slice(0, 3).map(ex => ({
+        exerciseId: ex.exerciseId,
+        hints: ex.hints,
+        errors: ex.errors
+      })));
+      
+      return efficiencyExercises.slice(0, 3);
       
     case "Handle complex problems confidently":
       // First 5 exercises total

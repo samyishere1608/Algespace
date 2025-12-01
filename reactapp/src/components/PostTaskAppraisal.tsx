@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { TranslationNamespaces } from "@/i18n";
+import { GoalSettingTranslations } from "@/types/shared/goalsettingTranslations.ts";
+
 
 interface Props {
   isOpen: boolean;
@@ -15,6 +19,7 @@ interface Props {
 // ✅ REMOVED old emotional feedback system - now using adaptive feedback
 
 export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName }: Props) {
+  const { t } = useTranslation(TranslationNamespaces.GoalSetting);
   const [postSatisfaction, setPostSatisfaction] = useState(3);
   const [postConfidence, setPostConfidence] = useState(3);
   const [postEffort, setPostEffort] = useState(3);
@@ -44,11 +49,11 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
 
   const getSatisfactionLabel = (value: number) => {
     const labels = {
-      1: "😔 Not satisfied",
-      2: "🙁 Somewhat satisfied",
-      3: "😊 Satisfied",
-      4: "😃 Very satisfied",
-      5: "🤩 Extremely satisfied"
+      1: t(GoalSettingTranslations.SATISFACTION_NOT_SATISFIED),
+      2: t(GoalSettingTranslations.SATISFACTION_SOMEWHAT),
+      3: t(GoalSettingTranslations.SATISFACTION_SATISFIED),
+      4: t(GoalSettingTranslations.SATISFACTION_VERY_SATISFIED),
+      5: t(GoalSettingTranslations.SATISFACTION_EXTREMELY_SATISFIED)
     };
     return labels[value as keyof typeof labels];
   };
@@ -57,33 +62,33 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
 
   const getConfidenceLabel = (value: number) => {
     const labels = {
-      1: "🌱 Beginning to learn",
-      2: "🌿 Growing confidence",
-      3: "🌳 Moderate confidence",
-      4: "🚀 High confidence",
-      5: "⭐ Master level"
+      1: t(GoalSettingTranslations.CONFIDENCE_BEGINNING),
+      2: t(GoalSettingTranslations.CONFIDENCE_GROWING),
+      3: t(GoalSettingTranslations.CONFIDENCE_MODERATE),
+      4: t(GoalSettingTranslations.CONFIDENCE_HIGH),
+      5: t(GoalSettingTranslations.CONFIDENCE_MASTER)
     };
     return labels[value as keyof typeof labels];
   };
 
   const getEffortLabel = (value: number) => {
     const labels = {
-      1: "😴 Minimal effort",
-      2: "😐 Some effort",
-      3: "😌 Moderate effort",
-      4: "💪 Strong effort",
-      5: "🏆 Exceptional effort"
+      1: t(GoalSettingTranslations.EFFORT_MINIMAL),
+      2: t(GoalSettingTranslations.EFFORT_SOME),
+      3: t(GoalSettingTranslations.EFFORT_MODERATE),
+      4: t(GoalSettingTranslations.EFFORT_STRONG),
+      5: t(GoalSettingTranslations.EFFORT_EXCEPTIONAL)
     };
     return labels[value as keyof typeof labels];
   };
 
   const getEnjoymentLabel = (value: number) => {
     const labels = {
-      1: "😔 Not enjoyable",
-      2: "🙁 Somewhat enjoyable",
-      3: "😊 Enjoyable",
-      4: "😃 Very enjoyable",
-      5: "🤩 Extremely enjoyable"
+      1: t(GoalSettingTranslations.ENJOYMENT_NOT_ENJOYABLE),
+      2: t(GoalSettingTranslations.ENJOYMENT_SOMEWHAT),
+      3: t(GoalSettingTranslations.ENJOYMENT_ENJOYABLE),
+      4: t(GoalSettingTranslations.ENJOYMENT_VERY_ENJOYABLE),
+      5: t(GoalSettingTranslations.ENJOYMENT_EXTREMELY_ENJOYABLE)
     };
     return labels[value as keyof typeof labels];
   };
@@ -92,11 +97,11 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
 
   const getAnxietyLabel = (value: number) => {
     const labels = {
-      1: "🤩 Not anxious",
-      2: "😃 Somewhat anxious",
-      3: "🙁 Anxious",
-      4: "😔 Very anxious",
-      5: "😰 Extremely anxious"
+      1: t(GoalSettingTranslations.ANXIETY_NOT_ANXIOUS),
+      2: t(GoalSettingTranslations.ANXIETY_SOMEWHAT),
+      3: t(GoalSettingTranslations.ANXIETY_ANXIOUS),
+      4: t(GoalSettingTranslations.ANXIETY_VERY_ANXIOUS),
+      5: t(GoalSettingTranslations.ANXIETY_EXTREMELY_ANXIOUS)
     };
     return labels[value as keyof typeof labels];
   };
@@ -139,7 +144,7 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
       }}
       onClick={(e) => e.stopPropagation()}
       >
-        <h3 style={{ textAlign: "center", marginBottom: "0.5rem" }}>🎯 Goal Reflection</h3>
+        <h3 style={{ textAlign: "center", marginBottom: "0.5rem" }}>{t(GoalSettingTranslations.POSTTASK_TITLE)}</h3>
         
         {/* Display goal name if provided */}
         {goalName && (
@@ -151,13 +156,13 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
             borderRadius: "8px",
             border: "2px solid #229EBC"
           }}>
-            <strong style={{ color: "#229EBC" }}>Goal:</strong>{" "}
+            <strong style={{ color: "#229EBC" }}>{t("ui.goal")}:</strong>{" "}
             <span style={{ color: "#333" }}>{goalName}</span>
           </div>
         )}
         
         <div style={{ marginBottom: "1.5rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem" }}>How satisfied are you?</label>
+          <label style={{ display: "block", marginBottom: "0.5rem" }}>{t("post-task-appraisal.satisfaction-question")}</label>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem",color:"black" }}>
             <input 
               type="range" 
@@ -172,7 +177,7 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
         </div>
 
         <div style={{ marginBottom: "2rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem" }}>Your confidence level now?</label>
+          <label style={{ display: "block", marginBottom: "0.5rem" }}>{t("post-task-appraisal.confidence-question")}</label>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <input 
               type="range" 
@@ -186,7 +191,7 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
           </div>
         </div>
         <div style={{ marginBottom: "1.5rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem" }}>How much effort did you put in?</label>
+          <label style={{ display: "block", marginBottom: "0.5rem" }}>{t("post-task-appraisal.effort-question")}</label>
           <input 
             type="range" 
             min="1" 
@@ -198,7 +203,7 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
           <span style={{ minWidth: "150px" }}>{getEffortLabel(postEffort)}</span>
         </div>
         <div style={{ marginBottom: "1.5rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem" }}>How much enjoyment did you get from this?</label>
+          <label style={{ display: "block", marginBottom: "0.5rem" }}>{t("post-task-appraisal.enjoyment-question")}</label>
           <input 
             type="range" 
             min="1" 
@@ -211,7 +216,7 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
         </div>
 
         <div style={{ marginBottom: "1.5rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem" }}>How much anxiety did you feel?</label>
+          <label style={{ display: "block", marginBottom: "0.5rem" }}>{t("post-task-appraisal.anxiety-question")}</label>
           <input 
             type="range" 
             min="1" 
@@ -233,7 +238,7 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
               background: "#fff",color:"black"
             }}
           >
-            Cancel
+            {t("ui.cancel")}
           </button>
       <button 
       onClick={handleSubmit}
@@ -246,7 +251,7 @@ export default function PostTaskAppraisal({ isOpen, onClose, onSubmit, goalName 
         cursor: "pointer"
       }}
     >
-      Submit
+      {t("ui.submit")}
     </button>
         </div>
       </div>

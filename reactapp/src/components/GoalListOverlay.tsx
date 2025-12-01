@@ -5,6 +5,14 @@ import { updateGoal, deleteGoal, logReason } from "@/utils/api";
 import ReasonPrompt from "./ReasonPrompt";
 import AgentPopup from "./PedologicalAgent";
 import FemaleAfricanSmiling from "@images/flexibility/Agent 3.png";
+import { useTranslation } from "react-i18next";
+import { TranslationNamespaces } from "@/i18n";
+import { GoalSettingTranslations } from "@/types/shared/goalsettingTranslations.ts";
+import { 
+  getGoalTitleKey,
+  getCategoryKey,
+  getDifficultyKey 
+} from "@/utils/goalTranslations";
 
 interface GoalListOverlayProps {
   goals: Goal[];
@@ -109,6 +117,8 @@ const goalCompletionGuide: { [key: string]: string } = {
 };
 
 export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange }: GoalListOverlayProps) {
+  const { t } = useTranslation(TranslationNamespaces.GoalSetting);
+  
   // State for edit functionality (matching GoalList.tsx)
   const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -243,7 +253,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
         borderRadius: "10px",
         border: "3px solid #229EBC",
         overflow: "hidden",
-        fontFamily: "'Comic Sans MS', cursive, sans-serif"
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
       }}>
         {/* Header Section */}
         <div style={{
@@ -259,7 +269,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
             fontSize: "1rem",
             fontWeight: "bold"
           }}>
-            🎯 Your Active Goals
+            🎯 {t(GoalSettingTranslations.LABEL_YOUR_ACTIVE_GOALS)}
           </h3>
           <button
             onClick={onClose}
@@ -306,7 +316,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
               fontWeight: "600",
               textAlign: "center"
             }}>
-              🎯 Your Active Goals ({goals.filter(g => !g.completed).length})
+              🎯 {t(GoalSettingTranslations.LABEL_YOUR_ACTIVE_GOALS)} ({goals.filter(g => !g.completed).length})
             </h4>
             
             {goals.filter(g => !g.completed).length === 0 ? (
@@ -317,7 +327,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                 padding: "1.5rem",
                 fontSize: "0.8rem"
               }}>
-                No active goals. Create some goals to get started!
+                {t(GoalSettingTranslations.MESSAGE_NO_ACTIVE_GOALS)}
               </div>
             ) : (
               <div style={{
@@ -353,7 +363,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                       fontSize: "0.8rem",
                       lineHeight: "1.3"
                     }}>
-                      {goal.title}
+                      {t(`goal-titles.${getGoalTitleKey(goal.title)}`)}
                     </div>
                     
                     {goal.category && (
@@ -365,7 +375,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                         marginBottom: "0.4rem",
                         fontWeight: "500"
                       }}>
-                        {goal.category}
+                        {t(`categories.${getCategoryKey(goal.category)}`)}
                       </div>
                     )}
                     
@@ -376,7 +386,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                         fontWeight: "500",
                         marginBottom: "0.5rem"
                       }}>
-                        📊 {goal.difficulty.charAt(0).toUpperCase() + goal.difficulty.slice(1)}
+                        📊 {t(`difficulty.${getDifficultyKey(goal.difficulty)}`)}
                       </div>
                     )}
 
@@ -404,7 +414,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                         onMouseLeave={(e) => (e.currentTarget.style.background = "#ffc107")}
                         title={`Edit goal: ${goal.title}`}
                       >
-                        ✏️ Edit
+                        ✏️ {t(GoalSettingTranslations.BUTTON_EDIT)}
                       </button>
 
                       <button
@@ -424,7 +434,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                         onMouseLeave={(e) => (e.currentTarget.style.background = "#dc3545")}
                         title={`Delete goal: ${goal.title}`}
                       >
-                        🗑️ Delete
+                        🗑️ {t(GoalSettingTranslations.BUTTON_DELETE)}
                       </button>
 
                       <button
@@ -444,7 +454,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                         onMouseLeave={(e) => (e.currentTarget.style.background = "#17a2b8")}
                         title={`View completion guide for: ${goal.title}`}
                       >
-                        💡 Guide
+                        💡 {t(GoalSettingTranslations.BUTTON_GUIDE)}
                       </button>
                     </div>
                   </div>
@@ -480,8 +490,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 2000,
-          fontFamily: "'Comic Sans MS', cursive, sans-serif"
+          zIndex: 2000
         }}
         onClick={cancelEditing}
         >
@@ -511,7 +520,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                 fontSize: "1.2rem",
                 fontWeight: "bold"
               }}>
-                ✏️ Edit Your Goal
+                ✏️ {t("ui.edit")} {t("ui.your-active-goals").split(" ")[1]} {t("ui.goal")}
               </h3>
               <button
                 onClick={cancelEditing}
@@ -550,7 +559,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                   fontSize: "0.8rem",
                   fontWeight: "bold"
                 }}>
-                  <span style={{ color: editCategory ? "#28a745" : "#007bff" }}>1.</span> Category
+                  <span style={{ color: editCategory ? "#28a745" : "#007bff" }}>1.</span> {t("ui.category")}
                 </h5>
                 <select
                   value={editCategory}
@@ -575,9 +584,9 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                     backgroundColor: editCategory ? "#f8fff8" : "white"
                   }}
                 >
-                  <option value="">Select...</option>
+                  <option value="">{t("placeholders.select-category")}</option>
                   {Object.keys(categorizedGoals).map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat} value={cat}>{t(`categories.${getCategoryKey(cat)}`)}</option>
                   ))}
                 </select>
                 {editCategory && (
@@ -587,7 +596,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                     color: "#28a745",
                     fontWeight: "bold"
                   }}>
-                    ✓ Selected
+                    ✓ {t("ui.selected")}
                   </div>
                 )}
               </div>
@@ -607,7 +616,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                   fontSize: "0.8rem",
                   fontWeight: "bold"
                 }}>
-                  <span style={{ color: (editCategory && editDifficulty) ? "#28a745" : "#007bff" }}>2.</span> Difficulty
+                  <span style={{ color: (editCategory && editDifficulty) ? "#28a745" : "#007bff" }}>2.</span> {t("ui.difficulty-level")}
                 </h5>
                 <select
                   value={editDifficulty}
@@ -634,12 +643,9 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                     const difficultyEmojis: Record<string, string> = {
                       "very easy": "🟦", "easy": "🟢", "medium": "🟡", "hard": "🔴", "very hard": "⚫"
                     };
-                    const difficultyLabels: Record<string, string> = {
-                      "very easy": "Very Easy", "easy": "Easy", "medium": "Medium", "hard": "Hard", "very hard": "Very Hard"
-                    };
                     return availableDifficulties.map(diff => (
                       <option key={diff} value={diff}>
-                        {difficultyEmojis[diff]} {difficultyLabels[diff]}
+                        {difficultyEmojis[diff]} {t(`difficulty.${getDifficultyKey(diff)}`)}
                       </option>
                     ));
                   })()}
@@ -651,7 +657,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                     color: "#28a745",
                     fontWeight: "bold"
                   }}>
-                    ✓ Selected
+                    ✓ {t("ui.selected")}
                   </div>
                 )}
               </div>
@@ -671,7 +677,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                   fontSize: "0.8rem",
                   fontWeight: "bold"
                 }}>
-                  <span style={{ color: editTitle ? "#28a745" : "#007bff" }}>3.</span> Goal
+                  <span style={{ color: editTitle ? "#28a745" : "#007bff" }}>3.</span> {t("ui.goal")}
                 </h5>
                 <select
                   value={editTitle}
@@ -687,12 +693,12 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                     backgroundColor: editTitle ? "#f8fff8" : (editCategory && editDifficulty) ? "white" : "#f0f0f0"
                   }}
                 >
-                  <option value="">Select...</option>
+                  <option value="">{t("placeholders.select-goal")}</option>
                   {editCategory && editDifficulty && 
                     categorizedGoals[editCategory]
                       .filter(g => g.difficulty === editDifficulty)
                       .map((goalOption, i) => (
-                        <option key={i} value={goalOption.title}>{goalOption.title}</option>
+                        <option key={i} value={goalOption.title}>{t(`goal-titles.${getGoalTitleKey(goalOption.title)}`)}</option>
                       ))}
                 </select>
                 {editTitle && (
@@ -702,7 +708,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                     color: "#28a745",
                     fontWeight: "bold"
                   }}>
-                    ✓ Selected
+                    ✓ {t("ui.selected")}
                   </div>
                 )}
               </div>
@@ -723,7 +729,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                 fontWeight: "bold",
                 textAlign: "center"
               }}>
-                📊 Self-Efficacy Questions
+                📊 {t("pre-goal-assessment.title")}
               </h4>
 
               {/* Confidence */}
@@ -735,7 +741,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                   marginBottom: "0.3rem",
                   color: "#333"
                 }}>
-                  Confidence? 🌟
+                  {t("pre-goal-assessment.confidence-question")} 🌟
                 </label>
                 <input
                   type="range"
@@ -775,7 +781,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                   marginBottom: "0.3rem",
                   color: "#333"
                 }}>
-                  Expected Mistakes? 🎯
+                  {t("pre-goal-assessment.mistakes-question")} 🎯
                 </label>
                 <input
                   type="range"
@@ -815,7 +821,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                   marginBottom: "0.3rem",
                   color: "#333"
                 }}>
-                  Motivation? 🔥
+                  {t("pre-goal-assessment.motivation-question")} 🔥
                 </label>
                 <input
                   type="range"
@@ -865,11 +871,10 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                   borderRadius: "6px",
                   cursor: "pointer",
                   fontSize: "0.9rem",
-                  fontWeight: "bold",
-                  fontFamily: "'Comic Sans MS', cursive, sans-serif"
+                  fontWeight: "bold"
                 }}
               >
-                ❌ Cancel
+                ❌ {t("ui.cancel")}
               </button>
               
               <button
@@ -883,11 +888,10 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                   borderRadius: "6px",
                   cursor: (editTitle && editCategory && editDifficulty) ? "pointer" : "not-allowed",
                   fontSize: "0.9rem",
-                  fontWeight: "bold",
-                  fontFamily: "'Comic Sans MS', cursive, sans-serif"
+                  fontWeight: "bold"
                 }}
               >
-                ✅ Save Goal
+                ✅ {t("ui.submit")}
               </button>
             </div>
           </div>
@@ -924,7 +928,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
               marginBottom: "1rem"
             }}>
               <h3 style={{ margin: 0, color: "#333" }}>
-                How to Complete: "{showGuidanceModal}"
+                {t("goal-completion-guide.title")}: "{t(`goal-titles.${getGoalTitleKey(showGuidanceModal)}`)}"
               </h3>
               <button
                 onClick={() => setShowGuidanceModal(null)}
@@ -945,7 +949,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
               lineHeight: "1.6",
               whiteSpace: "pre-line"
             }}>
-              {goalCompletionGuide[showGuidanceModal] || "Completion guidance not available for this goal."}
+              {t(`goal-descriptions.${getGoalTitleKey(showGuidanceModal)}`)}
             </div>
             
             <div style={{ textAlign: "right", marginTop: "1.5rem" }}>
@@ -960,7 +964,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
                   cursor: "pointer"
                 }}
               >
-                Got it!
+                {t("ui.close")}
               </button>
             </div>
           </div>
