@@ -755,7 +755,8 @@ async function handleAppraisalSubmit(
         } else {
           // ✅ FIX: Generate adaptive feedback even without exercise session data
           // This handles auto-completed goals from study sessions that don't have exercise session data
-          console.log('🎯 No exercise session found, generating adaptive feedback from reflection data only');
+          // 🎯 Also handles queued goals where session data was cleared by a previous goal
+          console.log('🎯 No exercise session found, generating adaptive feedback from contributing exercises data');
           
           const emotionalData = {
             postSatisfaction,
@@ -765,10 +766,11 @@ async function handleAppraisalSubmit(
             postAnxiety
           };
           
-          // Use default values for technical performance (no exercise data available)
+          // ✅ FIX: Use totalHints/totalErrors from contributing exercises (already calculated above)
+          // This fixes the bug where queued goals would show 0/0 after session data was cleared
           const feedbackData = {
-            hints: 0,  // Default: assume no hints needed if no session data
-            errors: 0,  // Default: assume no errors if no session data
+            hints: totalHints ?? 0,  // Use calculated totalHints, fallback to 0
+            errors: totalErrors ?? 0,  // Use calculated totalErrors, fallback to 0
             method: 'substitution',
             exerciseType: 'efficiency',
             completedWithSelfExplanation: false,
@@ -776,7 +778,11 @@ async function handleAppraisalSubmit(
             ...emotionalData
           };
           
-          console.log('🎯 Generating adaptive feedback from reflection data:', emotionalData);
+          console.log('🎯 Generating adaptive feedback with contributing exercises data:', {
+            hints: feedbackData.hints,
+            errors: feedbackData.errors,
+            emotionalData
+          });
           const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
           messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
         }

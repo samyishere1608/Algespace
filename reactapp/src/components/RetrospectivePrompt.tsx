@@ -220,7 +220,7 @@ const RetrospectiveModal: React.FC<RetrospectiveModalProps> = ({ isOpen, onClose
                 >
                   {autoCalculatedScore || 0}
                 </div>
-                <div style={{ fontSize: "0.8rem", color: "#28a745" }}>mistakes</div>
+                <div style={{ fontSize: "0.8rem", color: "#28a745" }}>{t("retrospective.mistakes")}</div>
                 
                 {/* Tooltip for multi-exercise goals */}
                 {showTooltip && contributingExercises && contributingExercises.length > 1 && (

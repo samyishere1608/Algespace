@@ -18,6 +18,16 @@ function t(key: string, options?: Record<string, unknown>): string {
   return i18n.t(`satisfaction-reasons.${key}`, { ns: 'goalsetting', ...options });
 }
 
+// Helper function to translate method names
+function translateMethodName(method: string): string {
+  const methodTranslations: Record<string, string> = {
+    'substitution': i18n.t('categories.method-mastery', { ns: 'goalsetting' }).includes('Lösungsverfahren') ? 'Einsetzungsverfahren' : 'Substitution',
+    'elimination': i18n.t('categories.method-mastery', { ns: 'goalsetting' }).includes('Lösungsverfahren') ? 'Additionsverfahren' : 'Elimination',
+    'equalization': i18n.t('categories.method-mastery', { ns: 'goalsetting' }).includes('Lösungsverfahren') ? 'Gleichsetzungsverfahren' : 'Equalization'
+  };
+  return methodTranslations[method] || method;
+}
+
 /**
  * Check if a specific goal's conditions are already satisfied
  * @param userId - The user ID
@@ -186,9 +196,9 @@ export function getGoalSatisfactionReason(userId: number, goalTitle: string): st
       
     case "Practice with different methods": {
       const methods = [];
-      if (progress.substitution > 0) methods.push('substitution');
-      if (progress.elimination > 0) methods.push('elimination');
-      if (progress.equalization > 0) methods.push('equalization');
+      if (progress.substitution > 0) methods.push(translateMethodName('substitution'));
+      if (progress.elimination > 0) methods.push(translateMethodName('elimination'));
+      if (progress.equalization > 0) methods.push(translateMethodName('equalization'));
       return t('used-methods', { count: methods.length, methods: methods.join(', ') });
     }
       

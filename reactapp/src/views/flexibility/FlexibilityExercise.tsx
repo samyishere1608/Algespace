@@ -519,16 +519,20 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
                     messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
 
-                    // Clear the used session data after using it for adaptive feedback
-                    if (mostRecentKey) {
+                    // Only clear session data if there are no more pending goals in queue
+                    // This ensures subsequent goals can still use the same session data
+                    if (mostRecentKey && pendingGoalQueue.length === 0) {
                         sessionStorage.removeItem(mostRecentKey);
-                        console.log('🧹 Cleared used session data after adaptive feedback:', mostRecentKey);
+                        console.log('🧹 Cleared used session data after adaptive feedback (no more goals in queue):', mostRecentKey);
+                    } else if (mostRecentKey) {
+                        console.log('🎯 Keeping session data - still have', pendingGoalQueue.length, 'goals in queue');
                     }
                 } else {
                     throw new Error('Invalid session data');
                 }
             } else {
-                console.log('🎯 No exercise session found, generating adaptive feedback from reflection data only');
+                // No exercise session found - use contributing exercises data if available
+                console.log('🎯 No exercise session found, using contributing exercises data');
 
                 const emotionalData = {
                     postSatisfaction,
@@ -538,9 +542,15 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     postAnxiety
                 };
 
+                // Use totalHints/totalErrors from contributing exercises, or default to 0
+                const finalHints = totalHints !== undefined ? totalHints : 0;
+                const finalErrors = totalErrors !== undefined ? totalErrors : 0;
+                
+                console.log('🎯 Using contributing exercises data for feedback:', { finalHints, finalErrors });
+
                 const feedbackData = {
-                    hints: 0,
-                    errors: 0,
+                    hints: finalHints,
+                    errors: finalErrors,
                     method: 'substitution',
                     exerciseType: 'efficiency',
                     completedWithSelfExplanation: false,

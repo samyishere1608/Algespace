@@ -227,7 +227,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
         
         // Show agent message for delete (from GoalList.tsx)
         setAgentMessage({
-          text: "🗑️ It's okay to remove goals if they feel too much, just remember to complete what you have!",
+          text: t('agent-messages.goal-deleted'),
           duration: 4000
         });
         setShowCheckIn(true);
