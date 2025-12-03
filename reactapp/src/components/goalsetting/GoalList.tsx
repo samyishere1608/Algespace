@@ -1744,7 +1744,7 @@ async function removeGoal(id: number) {
     isOpen={true}
     onClose={() => setShowAppraisalModal(null)}
     onSubmit={handleAppraisalSubmit}
-    goalName={goals.find(g => g.id === showAppraisalModal.goalId)?.title}
+    goalName={getTranslatedTitle(goals.find(g => g.id === showAppraisalModal.goalId)?.title || '')}
   />
 )}
 

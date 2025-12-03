@@ -128,18 +128,40 @@ namespace webapi.Controllers
                 // Limit to 2-3 goals max and remove duplicates
                 goals = goals.Distinct().Take(3).ToList();
 
+                // 🎯 SAFETY CHECK: Remove Basic Understanding goals for Very confident/Expert users
+                var userConfidence = request.Answers.ContainsKey("q1") ? request.Answers["q1"] : "";
+                bool isExpertLevel = userConfidence.Contains("Very confident") || 
+                    userConfidence.Contains("Expert") ||
+                    (!userConfidence.Contains("Not confident") && !userConfidence.Contains("Somewhat confident") && !string.IsNullOrEmpty(userConfidence));
+                
+                if (isExpertLevel)
+                {
+                    var beforeCount = goals.Count;
+                    goals = goals.Where(g => !g.StartsWith("Basic Understanding|")).ToList();
+                    if (beforeCount != goals.Count)
+                    {
+                        _logger.LogInformation("🎯 Filtered out Basic Understanding goals for expert user {UserId}", request.UserId);
+                    }
+                }
+
                 // Ensure we always have at least 2 goals suggested
                 if (goals.Count == 0)
                 {
                     _logger.LogWarning("No goals were generated, adding default suggestions");
-                    goals.Add("Basic Understanding|Learn what linear equations are|very easy");
+                    if (!isExpertLevel)
+                    {
+                        goals.Add("Basic Understanding|Learn what linear equations are|very easy");
+                    }
+                    else
+                    {
+                        goals.Add("Method Mastery|Practice with different methods|easy");
+                    }
                     goals.Add("Learning & Growth|Build confidence through success|easy");
                 }
                 else if (goals.Count == 1)
                 {
                     // Add a complementary goal if we only have one
-                    var confidence = request.Answers.ContainsKey("q1") ? request.Answers["q1"] : "";
-                    if (confidence.Contains("Not confident"))
+                    if (!isExpertLevel && userConfidence.Contains("Not confident"))
                         goals.Add("Learning & Growth|Reflect on method effectiveness|very easy");
                     else
                         goals.Add("Learning & Growth|Explain reasoning clearly|medium");

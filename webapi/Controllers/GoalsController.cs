@@ -394,6 +394,19 @@ private List<string> GenerateProgressBasedSuggestions(int userId, List<Goal> com
         suggestions = GetDefaultSuggestions(performanceStats, isExpertLevel);
     }
     
+    // 🎯 FINAL SAFETY CHECK: Remove ALL Basic Understanding goals for expert users
+    // This ensures no Basic Understanding goals slip through regardless of performance-based logic
+    if (isExpertLevel)
+    {
+        var beforeCount = suggestions.Count;
+        suggestions = suggestions.Where(s => !s.StartsWith("Basic Understanding|")).ToList();
+        var afterCount = suggestions.Count;
+        if (beforeCount != afterCount)
+        {
+            Console.WriteLine($"[RECOMMENDATIONS] 🎯 Filtered out {beforeCount - afterCount} Basic Understanding goals for expert user {userId}");
+        }
+    }
+    
     // Limit to 3-4 suggestions to avoid overwhelming
     return suggestions.Take(4).ToList();
 }
@@ -404,17 +417,26 @@ private bool IsUserExpertLevel(int userId)
     {
         var pretestAnswers = _pretestService.GetUserPretestAnswers(userId);
         
+        Console.WriteLine($"[DEBUG] IsUserExpertLevel for userId {userId}: pretestAnswers = {System.Text.Json.JsonSerializer.Serialize(pretestAnswers)}");
+        
         // Check q1 (confidence level)
         if (pretestAnswers.ContainsKey("q1"))
         {
             var confidence = pretestAnswers["q1"];
+            Console.WriteLine($"[DEBUG] User {userId} confidence level from pretest: '{confidence}'");
+            
             // Exclude Basic Understanding for "Very confident" and "Expert level" users
             // Only "Not confident" and "Somewhat confident" users get Basic Understanding goals
-            if (confidence.Contains("Very confident") || 
-                (!confidence.Contains("Not confident") && !confidence.Contains("Somewhat confident")))
-            {
-                return true; // Very confident or Expert level
-            }
+            bool isExpert = confidence.Contains("Very confident") || 
+                confidence.Contains("Expert level") ||
+                (!confidence.Contains("Not confident") && !confidence.Contains("Somewhat confident"));
+            
+            Console.WriteLine($"[DEBUG] User {userId} isExpert calculation: {isExpert}");
+            return isExpert;
+        }
+        else
+        {
+            Console.WriteLine($"[DEBUG] User {userId} has no q1 answer in pretest");
         }
         
         return false;

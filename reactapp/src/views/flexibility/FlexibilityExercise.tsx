@@ -28,7 +28,7 @@ import { GoalCompletionProvider } from "@/contexts/GoalCompletionContext.tsx";
 import RetrospectiveModal from "@/components/RetrospectivePrompt.tsx";
 import PostTaskAppraisal from "@/components/PostTaskAppraisal.tsx";
 import { generateAdaptiveFeedback } from "@/utils/adaptiveFeedback";
-import { getGoalTitleKey } from "@/utils/goalTranslations";
+import { getGoalTitleKey, hasGoalTranslation } from "@/utils/goalTranslations";
 import AgentPopup from "@/components/PedologicalAgent";
 import FemaleAfricanSmiling from "@images/flexibility/Agent 3.png";
 import confetti from "canvas-confetti";
@@ -48,6 +48,16 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
     const [exitOverlay, setExitOverlay] = useState<[boolean, boolean]>([false, false]);
     const location = useLocation();
     const { exerciseId } = useParams();
+
+    // Helper to get translated goal title (handles old goals without translation keys)
+    const getTranslatedTitle = (title: string): string => {
+        if (hasGoalTranslation(title)) {
+            const key = getGoalTitleKey(title);
+            return t(`goal-titles.${key}`);
+        }
+        // For old goals without translation keys, return the original title
+        return title;
+    };
 
     const [showOverlay, setShowOverlay] = useState(false);
     const [goals, setGoals] = useState<Goal[]>([]);
@@ -860,7 +870,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     setCompletingGoalId(null);
                 }}
                 onSubmit={handleAppraisalSubmit}
-                goalName={completingGoalId ? goals.find(g => g.id === completingGoalId)?.title : undefined}
+                goalName={completingGoalId ? getTranslatedTitle(goals.find(g => g.id === completingGoalId)?.title || '') : undefined}
             />
 
             {/* Agent popup for adaptive feedback */}
