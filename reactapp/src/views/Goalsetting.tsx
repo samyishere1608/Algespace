@@ -8,7 +8,7 @@ import GoalList from "@/components/goalsetting/GoalList";
 import AgentPopup from "@/components/PedologicalAgent";
 import { PretestModal } from "@/components/pretest/PretestModal";
 import { getStudySession } from "@/utils/studySession";
-import { checkGoalConditionsSatisfied, getGoalSatisfactionReason } from "@/utils/implicitGoalChecker";
+import { checkGoalConditionsSatisfied, getGoalSatisfactionReason, getGoalGuidance } from "@/utils/implicitGoalChecker";
 import { getGoalTitleKey, getCategoryKey, getDifficultyKey } from "@/utils/goalTranslations";
 
 import FemaleAfricanSmiling from "@images/flexibility/AfroAmerican_F_Smiling.png";
@@ -464,6 +464,11 @@ useEffect(() => {
               // Check if goal conditions are already satisfied
               const isAlreadySatisfied = !goalExists && checkGoalConditionsSatisfied(userId, title);
               const satisfactionReason = isAlreadySatisfied ? getGoalSatisfactionReason(userId, title) : "";
+              const goalGuidance = isAlreadySatisfied ? getGoalGuidance(title) : "";
+              // Combine reason and guidance for full tooltip
+              const fullTooltip = isAlreadySatisfied 
+                ? `${satisfactionReason}\n\n${goalGuidance}`
+                : "";
               
               // Get difficulty color and emoji - matching GoalForm style
               const getDifficultyStyle = (diff: string) => {
@@ -657,7 +662,7 @@ useEffect(() => {
                             boxShadow: "0 2px 6px rgba(33, 150, 243, 0.3)",
                             transition: "all 0.2s"
                           }}
-                          title={satisfactionReason}
+                          title={fullTooltip}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.transform = "scale(1.03)";
                             e.currentTarget.style.boxShadow = "0 3px 8px rgba(33, 150, 243, 0.4)";
@@ -1451,7 +1456,7 @@ useEffect(() => {
                 </p>
               </div>
 
-              {/* Explanation */}
+              {/* Goal-specific guidance */}
               <div style={{
                 backgroundColor: "#f5f5f5",
                 padding: "1.2rem",
@@ -1465,7 +1470,17 @@ useEffect(() => {
                   lineHeight: "1.7",
                   textAlign: "center"
                 }}>
-                  {t('claim-modal.explanation')}
+                  {t('claim-modal.subtitle')}
+                </p>
+                <p style={{ 
+                  margin: "0.8rem 0 0 0",
+                  color: "#1565c0",
+                  fontSize: "0.95rem",
+                  lineHeight: "1.7",
+                  textAlign: "center",
+                  fontWeight: "500"
+                }}>
+                  {getGoalGuidance(claimingGoal.title)}
                 </p>
               </div>
 

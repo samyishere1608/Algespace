@@ -280,3 +280,89 @@ export function getGoalSatisfactionReason(userId: number, goalTitle: string): st
       return t('conditions-satisfied');
   }
 }
+
+/**
+ * Get guidance message for what the user needs to do to track a goal they've already satisfied
+ * This explains that they need to do one more exercise to officially track the goal
+ */
+export function getGoalGuidance(goalTitle: string): string {
+  // Helper function for guidance translations
+  const tg = (key: string): string => {
+    return i18n.t(`goal-guidance.${key}`, { ns: 'goalsetting' });
+  };
+  
+  switch (goalTitle) {
+    // Basic Understanding - simple completion goals
+    case "Learn what linear equations are":
+      return tg('complete-any-exercise');
+      
+    case "Understand how substitution works":
+      return tg('complete-substitution');
+      
+    case "Understand how elimination works":
+      return tg('complete-elimination');
+      
+    case "Understand how equalization works":
+      return tg('complete-equalization');
+      
+    // Method Mastery - progressive and method-specific
+    case "Master substitution/equalization/elimination method":
+      return tg('complete-same-method');
+      
+    case "Practice with different methods":
+      return tg('complete-different-method');
+      
+    case "Switch methods strategically":
+      return tg('complete-any-method');
+      
+    case "Choose optimal methods consistently":
+      return tg('complete-efficiency');
+      
+    case "Master all three methods fluently":
+      return tg('complete-any-method');
+      
+    // Problem Solving - performance-based
+    case "Complete exercises without hints":
+      return tg('complete-without-hints');
+      
+    case "Solve problems with minimal errors":
+      return tg('complete-low-errors');
+      
+    case "Handle complex problems confidently":
+      return tg('complete-any-exercise');
+      
+    case "Show exceptional problem-solving":
+      return tg('complete-perfect');
+      
+    case "Maintain accuracy under pressure":
+      return tg('complete-maintain-accuracy');
+      
+    // Learning & Growth
+    case "Reflect on method effectiveness":
+      return tg('provide-explanation');
+      
+    case "Build confidence through success":
+      return tg('complete-low-hints');
+      
+    case "Develop problem-solving resilience":
+      return tg('complete-any-exercise');
+      
+    case "Learn from mistakes effectively":
+      return tg('continue-improving');
+      
+    case "Explain reasoning clearly":
+      return tg('provide-explanation');
+      
+    case "Show consistent improvement":
+      return tg('continue-improving');
+      
+    case "Set personal learning challenges":
+      return tg('complete-any-exercise');
+      
+    case "Work independently":
+      return tg('complete-without-hints');
+      
+    default:
+      return tg('complete-any-exercise');
+  }
+}

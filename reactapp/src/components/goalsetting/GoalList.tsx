@@ -23,8 +23,9 @@ import {
   logReason,
   completeGoalWithScore,
   updateGoalSuggestions,
+  logAction,
 } from "@/utils/api";
-import { generateAdaptiveFeedback } from "../../utils/adaptiveFeedback";
+import { generateAdaptiveFeedback, detectPerformancePattern } from "../../utils/adaptiveFeedback";
 
 import AgentPopup from "../PedologicalAgent";
 import FemaleAfricanSmiling from "@images/flexibility/AfroAmerican_F_Smiling.png";
@@ -735,7 +736,22 @@ async function handleAppraisalSubmit(
           
           const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
           
+          // Log the detected pattern to backend for analytics
+          const detectedPattern = detectPerformancePattern(feedbackData);
           console.log('🎯 Generated adaptive feedback for goal completion');
+          console.log(`📊 Pattern logged: ${detectedPattern.pattern} (confidence: ${detectedPattern.confidence})`);
+          
+          // Log adaptive feedback pattern to backend
+          try {
+            await logAction(
+              userId, 
+              'ADAPTIVE_FEEDBACK_GENERATED', 
+              `Pattern: ${detectedPattern.pattern}, Confidence: ${detectedPattern.confidence}, Hints: ${feedbackData.hints}, Errors: ${feedbackData.errors}, Goal: ${currentGoal?.title || 'N/A'}`
+            );
+          } catch (logError) {
+            console.warn('Failed to log adaptive feedback pattern:', logError);
+          }
+          
           messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
           
           // ✅ FIXED: Don't clear session data immediately - multiple goals might need it
@@ -784,11 +800,26 @@ async function handleAppraisalSubmit(
             emotionalData
           });
           const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
+          
+          // Log the detected pattern to backend for analytics
+          const detectedPattern = detectPerformancePattern(feedbackData);
+          console.log(`📊 Pattern logged: ${detectedPattern.pattern} (confidence: ${detectedPattern.confidence})`);
+          
+          try {
+            await logAction(
+              userId, 
+              'ADAPTIVE_FEEDBACK_GENERATED', 
+              `Pattern: ${detectedPattern.pattern}, Confidence: ${detectedPattern.confidence}, Hints: ${feedbackData.hints}, Errors: ${feedbackData.errors}, Goal: ${currentGoal?.title || 'N/A'}`
+            );
+          } catch (logError) {
+            console.warn('Failed to log adaptive feedback pattern:', logError);
+          }
+          
           messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
         }
       } catch (error) {
         console.error('🎯 Error generating adaptive feedback:', error);
-        messages.push({ text: "📈 Your goal recommendations have been updated based on your progress!", duration: 4000 });
+        messages.push({ text: t('ui.recommendations-updated'), duration: 4000 });
       } finally {
         // ✅ Clean up any remaining session data for this user (in case of errors)
         const allSessionKeys = Object.keys(sessionStorage).filter(key => 
@@ -861,7 +892,7 @@ async function handleAppraisalSubmit(
 
   } catch (error) {
     console.error("Failed to submit appraisal", error);
-    setAgentMessage({ text: "❌ Something went wrong with the submission.", duration: 4000 });
+    setAgentMessage({ text: t('ui.submission-error'), duration: 4000 });
     setShowCheckIn(true);
   }
 }

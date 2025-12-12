@@ -27,7 +27,8 @@ import GoalList from "@/components/goalsetting/GoalList.tsx";
 import { GoalCompletionProvider } from "@/contexts/GoalCompletionContext.tsx";
 import RetrospectiveModal from "@/components/RetrospectivePrompt.tsx";
 import PostTaskAppraisal from "@/components/PostTaskAppraisal.tsx";
-import { generateAdaptiveFeedback } from "@/utils/adaptiveFeedback";
+import { generateAdaptiveFeedback, detectPerformancePattern } from "@/utils/adaptiveFeedback";
+import { logAction } from "@/utils/api";
 import { getGoalTitleKey, hasGoalTranslation } from "@/utils/goalTranslations";
 import AgentPopup from "@/components/PedologicalAgent";
 import FemaleAfricanSmiling from "@images/flexibility/Agent 3.png";
@@ -527,6 +528,21 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     };
 
                     const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
+                    
+                    // Log the detected pattern to backend for analytics
+                    const detectedPattern = detectPerformancePattern(feedbackData);
+                    console.log(`📊 Pattern logged: ${detectedPattern.pattern} (confidence: ${detectedPattern.confidence})`);
+                    
+                    try {
+                        await logAction(
+                            userId, 
+                            'ADAPTIVE_FEEDBACK_GENERATED', 
+                            `Pattern: ${detectedPattern.pattern}, Confidence: ${detectedPattern.confidence}, Hints: ${feedbackData.hints}, Errors: ${feedbackData.errors}, Goal: ${currentGoal?.title || 'N/A'}`
+                        );
+                    } catch (logError) {
+                        console.warn('Failed to log adaptive feedback pattern:', logError);
+                    }
+                    
                     messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
 
                     // Only clear session data if there are no more pending goals in queue
@@ -570,11 +586,26 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                 };
 
                 const adaptiveFeedbackMessage = generateAdaptiveFeedback(feedbackData);
+                
+                // Log the detected pattern to backend for analytics
+                const detectedPattern = detectPerformancePattern(feedbackData);
+                console.log(`📊 Pattern logged: ${detectedPattern.pattern} (confidence: ${detectedPattern.confidence})`);
+                
+                try {
+                    await logAction(
+                        userId, 
+                        'ADAPTIVE_FEEDBACK_GENERATED', 
+                        `Pattern: ${detectedPattern.pattern}, Confidence: ${detectedPattern.confidence}, Hints: ${feedbackData.hints}, Errors: ${feedbackData.errors}, Goal: ${currentGoal?.title || 'N/A'}`
+                    );
+                } catch (logError) {
+                    console.warn('Failed to log adaptive feedback pattern:', logError);
+                }
+                
                 messages.push({ text: adaptiveFeedbackMessage, duration: 15000 });
             }
         } catch (error) {
             console.error('🎯 Error generating adaptive feedback:', error);
-            messages.push({ text: "📈 Your goal recommendations have been updated based on your progress!", duration: 4000 });
+            messages.push({ text: t('ui.recommendations-updated'), duration: 4000 });
         }
 
         // 🎉 Confetti for every goal completion!

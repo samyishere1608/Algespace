@@ -46,26 +46,6 @@ export default function AgentPopup({ message, image, onClose, duration = 4000 }:
         zIndex: 999,
         maxWidth: "300px" // Matches system agent maxWidth
       }}>
-        {/* Close button - matches system styling */}
-        <button 
-          onClick={onClose}
-          style={{
-            position: "absolute",
-            top: "0",
-            right: "0",
-            background: "var(--primary-blue, #219ebc)",
-            color: "white",
-            border: "none",
-            borderRadius: "0.25rem",
-            padding: "0.25rem 0.5rem",
-            fontSize: "0.875rem",
-            cursor: "pointer",
-            zIndex: 1000
-          }}
-        >
-          ✕
-        </button>
-        
         {/* Speech bubble container - matches system styling */}
         <div style={{
           display: "flex",
