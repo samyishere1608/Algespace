@@ -643,13 +643,14 @@ export function SuitabilityExercise({ flexibilityExerciseId, exercise, condition
 
     return (
         <>
-            <DebugOverlay 
+            {/* DebugOverlay hidden for experiment */}
+            {/* <DebugOverlay 
                 hints={totalHints} 
                 errors={totalErrors} 
                 exerciseType="suitability"
                 method={selectedMethod ? Method[selectedMethod] : 'none'}
                 userId={getCurrentUserId()}
-            />
+            /> */}
             
             {/* Auto-close enabled - no manual close button needed */}
             {content}

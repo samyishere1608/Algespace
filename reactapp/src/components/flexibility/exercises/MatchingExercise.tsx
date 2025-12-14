@@ -435,13 +435,14 @@ export function MatchingExercise({ flexibilityExerciseId, exercise, condition, h
 
     return (
         <>
-            <DebugOverlay 
+            {/* DebugOverlay hidden for experiment */}
+            {/* <DebugOverlay 
                 hints={totalHints} 
                 errors={totalErrors} 
                 exerciseType="matching"
                 method="matching"
                 userId={getCurrentUserId()}
-            />
+            /> */}
             
             {/* Auto-close enabled - no manual close button needed */}
             {content}
