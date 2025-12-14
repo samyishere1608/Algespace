@@ -5,6 +5,7 @@ import { flushSync } from "react-dom";
 import { Goal, GoalInput } from "@/types/goal";
 import { useTranslation } from "react-i18next";
 import { TranslationNamespaces } from "@/i18n";
+import { getStudySession } from "@/utils/studySession";
 import { 
   goalTitleToKey, 
   categoryToKey, 
@@ -139,6 +140,14 @@ const categorizedGoals: Record<string, { title: string; difficulty: string }[]> 
 
 export default function GoalList({ goals, onGoalsChange, userId, showOnlyActive, showOnlyCompleted, compact = false, onModalTrigger }: Props) {
   const { t } = useTranslation(TranslationNamespaces.GoalSetting);
+  
+  // Check if user is in CONTROL condition (no adaptive feedback)
+  const isControlCondition = (): boolean => {
+    const studySession = getStudySession();
+    if (!studySession) return false;
+    return studySession.participantId.toUpperCase().startsWith('C');
+  };
+  
   const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDifficulty, setEditDifficulty] = useState("");
@@ -752,7 +761,12 @@ async function handleAppraisalSubmit(
             console.warn('Failed to log adaptive feedback pattern:', logError);
           }
           
-          messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+          // Only show adaptive feedback for ADAPT condition (not CONTROL)
+          if (!isControlCondition()) {
+            messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+          } else {
+            console.log('🔬 CONTROL condition - adaptive feedback suppressed');
+          }
           
           // ✅ FIXED: Don't clear session data immediately - multiple goals might need it
           // Instead, mark it as used and clean it up after a delay to allow queued goals to use it
@@ -815,7 +829,12 @@ async function handleAppraisalSubmit(
             console.warn('Failed to log adaptive feedback pattern:', logError);
           }
           
-          messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+          // Only show adaptive feedback for ADAPT condition (not CONTROL)
+          if (!isControlCondition()) {
+            messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+          } else {
+            console.log('🔬 CONTROL condition - adaptive feedback suppressed');
+          }
         }
       } catch (error) {
         console.error('🎯 Error generating adaptive feedback:', error);

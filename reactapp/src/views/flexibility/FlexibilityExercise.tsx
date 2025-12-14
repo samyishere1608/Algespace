@@ -30,6 +30,7 @@ import PostTaskAppraisal from "@/components/PostTaskAppraisal.tsx";
 import { generateAdaptiveFeedback, detectPerformancePattern } from "@/utils/adaptiveFeedback";
 import { logAction } from "@/utils/api";
 import { getGoalTitleKey, hasGoalTranslation } from "@/utils/goalTranslations";
+import { getStudySession } from "@/utils/studySession";
 import AgentPopup from "@/components/PedologicalAgent";
 import FemaleAfricanSmiling from "@images/flexibility/Agent 3.png";
 import confetti from "canvas-confetti";
@@ -42,7 +43,6 @@ import { WorkedExamples } from "@components/flexibility/exercises/WorkedExamples
 import { TipExercise } from "@components/flexibility/exercises/TipExercise.tsx";
 import { PlainExercise as PlainExerciseProps } from "@/types/flexibility/plainExercise.ts";
 import { PlainExercise } from "@components/flexibility/exercises/PlainExercise.tsx";
-import { getStudySession } from "@/utils/studySession";
 
 export default function FlexibilityExercise({ isStudyExample }: { isStudyExample: boolean }): ReactElement {
     const { t } = useTranslation(TranslationNamespaces.GoalSetting);
@@ -58,6 +58,13 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
         }
         // For old goals without translation keys, return the original title
         return title;
+    };
+
+    // Helper to check if participant is in control condition (C-prefix = control, no adaptive feedback)
+    const isControlCondition = (): boolean => {
+        const studySession = getStudySession();
+        if (!studySession) return false;
+        return studySession.participantId.toUpperCase().startsWith('C');
     };
 
     const [showOverlay, setShowOverlay] = useState(false);
@@ -543,7 +550,12 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                         console.warn('Failed to log adaptive feedback pattern:', logError);
                     }
                     
-                    messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+                    // Only show adaptive feedback for ADAPT condition (not control)
+                    if (!isControlCondition()) {
+                        messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+                    } else {
+                        console.log('🔬 CONTROL condition - adaptive feedback suppressed (still logged)');
+                    }
 
                     // Only clear session data if there are no more pending goals in queue
                     // This ensures subsequent goals can still use the same session data
@@ -601,7 +613,12 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     console.warn('Failed to log adaptive feedback pattern:', logError);
                 }
                 
-                messages.push({ text: adaptiveFeedbackMessage, duration: 15000 });
+                // Only show adaptive feedback for ADAPT condition (not control)
+                if (!isControlCondition()) {
+                    messages.push({ text: adaptiveFeedbackMessage, duration: 15000 });
+                } else {
+                    console.log('🔬 CONTROL condition - adaptive feedback suppressed (still logged)');
+                }
             }
         } catch (error) {
             console.error('🎯 Error generating adaptive feedback:', error);

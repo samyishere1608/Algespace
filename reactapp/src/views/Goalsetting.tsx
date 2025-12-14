@@ -85,6 +85,16 @@ export default function GoalSettingView({ userId: propUserId }: { userId?: numbe
   const [suggestedCategory, setSuggestedCategory] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
+  // Check if user is in CONTROL condition (participant ID starts with 'C')
+  // ADAPT condition participants have IDs starting with 'A' and see recommendations
+  const isControlCondition = (): boolean => {
+    const studySession = getStudySession();
+    if (!studySession) return false; // Not in study mode, show recommendations
+    const participantId = studySession.participantId.toUpperCase();
+    const isControl = participantId.startsWith('C'); // Control condition = starts with C
+    console.log(`🔬 Experiment Condition Check: Participant ${participantId} → ${isControl ? 'CONTROL (no recommendations)' : 'ADAPT (with recommendations)'}`);
+    return isControl;
+  };
 
 //  future authentication working
  // const { user } = useAuth();
@@ -406,8 +416,8 @@ useEffect(() => {
 
     {/* Learning Profile panel removed - focus is on "Why recommended?" explanations in goal cards */}
 
-    {/* Show suggested goals if pretest was completed */}
-    {pretestCompleted && suggestedGoals.length > 0 && (
+    {/* Show suggested goals if pretest was completed - HIDDEN for control condition */}
+    {pretestCompleted && suggestedGoals.length > 0 && !isControlCondition() && (
       <div style={{ 
         backgroundColor: 'rgba(227, 242, 253, 0.95)', 
         padding: '1rem', 
