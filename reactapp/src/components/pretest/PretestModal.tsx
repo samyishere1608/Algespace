@@ -634,7 +634,7 @@ export const PretestModal: React.FC<PretestModalProps> = ({ isOpen, onClose, onC
                   fontSize: "0.9rem"
                 }}
               >
-                Got it! 👍
+                {t("recommendations.why-modal.close-button")}
               </button>
             </div>
           </div>

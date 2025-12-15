@@ -126,7 +126,7 @@ export default function FlexibilityView(): ReactElement {
                                 e.currentTarget.style.transform = "translateY(0)";
                             }}
                         >
-                            End Study Session
+                            {t(`${TranslationNamespaces.GoalSetting}:menu.end-study-session`)}
                         </button>
                     </div>
                 ) : (

@@ -358,7 +358,8 @@
     "tip-reflect": "Reflect on what you learned after each exercise.",
     "tip-strategy": "Think about which method is most efficient for each problem.",
     "tip-accuracy": "Focus on accuracy rather than rushing through.",
-    "tip-independence": "Challenge yourself to work without hints when possible."
+    "tip-independence": "Challenge yourself to work without hints when possible.",
+    "close-button": "Got it! 👍"
   },
   
   "errors-and-validation": {
@@ -442,7 +443,8 @@
   },
   "menu": {
     "public-training-mode": "👤 Public Training Mode - All users share anonymous data",
-    "join-research-study": "🔬 Join Research Study"
+    "join-research-study": "🔬 Join Research Study",
+    "end-study-session": "End Study Session"
   },
   "prefilled-form": {
     "title": "📌 Pre-filled from recommendation:",

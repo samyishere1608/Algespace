@@ -358,7 +358,8 @@
     "tip-reflect": "Reflektiere nach jeder Aufgabe, was du gelernt hast.",
     "tip-strategy": "Denk darüber nach, welches Lösungsverfahren am effizientesten ist.",
     "tip-accuracy": "Konzentriere dich auf Genauigkeit, anstatt dich zu beeilen.",
-    "tip-independence": "Fordere dich heraus, wenn möglich ohne Hinweise zu arbeiten."
+    "tip-independence": "Fordere dich heraus, wenn möglich ohne Hinweise zu arbeiten.",
+    "close-button": "Verstanden! 👍"
   },
 
   "errors-and-validation": {
@@ -442,7 +443,8 @@
   },
   "menu": {
     "public-training-mode": "👤 Dies ist die öffentliche Version der Plattform - Anonymisierte Daten aller Teilnehmenden werden gespeichert ",
-    "join-research-study": "🔬 An Studie teilnehmen"
+    "join-research-study": "🔬 An Studie teilnehmen",
+    "end-study-session": "Studie beenden"
   },
   "prefilled-form": {
     "title": "📌 Ausgefüllt basierend auf einer Empfehlung:",

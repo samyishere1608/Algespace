@@ -1907,7 +1907,7 @@ async function removeGoal(id: number) {
                   fontSize: "0.9rem"
                 }}
               >
-                Got it! 👍
+                {t("goal-completion-guide.close-button")}
               </button>
             </div>
           </div>
