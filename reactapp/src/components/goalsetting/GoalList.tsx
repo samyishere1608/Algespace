@@ -351,7 +351,7 @@ const [showFeedbackModal, setShowFeedbackModal] = useState(false);
       setReasonPrompt({ goalId: editingGoalId, action: "Update" });
       setAgentMessage({
         text: t('agent-messages.goal-updated'),
-        duration: 4000
+        duration: 2500
       });
       setShowCheckIn(true);
     } catch (error) {
@@ -524,7 +524,7 @@ async function handleAppraisalSubmit(
     
     // Add basic goal completion feedback with translated title
     const translatedTitle = getTranslatedTitle(currentGoal.title);
-    messages.push({ text: t('ui.goal-completed-message', { title: translatedTitle }), duration: 4000 });
+    messages.push({ text: t('ui.goal-completed-message', { title: translatedTitle }), duration: 2500 });
 
     // Add progression feedback if suggestions were updated
     if (updatedSuggestions && updatedSuggestions.length > 0) {
@@ -763,7 +763,7 @@ async function handleAppraisalSubmit(
           
           // Only show adaptive feedback for ADAPT condition (not CONTROL)
           if (!isControlCondition()) {
-            messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+            messages.push({ text: adaptiveFeedbackMessage, duration: 8000 }); // 8 seconds for adaptive feedback
           } else {
             console.log('🔬 CONTROL condition - adaptive feedback suppressed');
           }
@@ -831,14 +831,14 @@ async function handleAppraisalSubmit(
           
           // Only show adaptive feedback for ADAPT condition (not CONTROL)
           if (!isControlCondition()) {
-            messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+            messages.push({ text: adaptiveFeedbackMessage, duration: 8000 }); // 8 seconds for adaptive feedback
           } else {
             console.log('🔬 CONTROL condition - adaptive feedback suppressed');
           }
         }
       } catch (error) {
         console.error('🎯 Error generating adaptive feedback:', error);
-        messages.push({ text: t('ui.recommendations-updated'), duration: 4000 });
+        messages.push({ text: t('ui.recommendations-updated'), duration: 2500 });
       } finally {
         // ✅ Clean up any remaining session data for this user (in case of errors)
         const allSessionKeys = Object.keys(sessionStorage).filter(key => 
@@ -878,7 +878,7 @@ async function handleAppraisalSubmit(
     const updatedCompletedGoals = newGoals.filter(g => g.completed).length;
     const isAllCompleted = updatedCompletedGoals === totalGoals;
     if (isAllCompleted) {
-      messages.push({ text: t('ui.all-goals-completed-message'), duration: 4000 });
+      messages.push({ text: t('ui.all-goals-completed-message'), duration: 2500 });
       setTimeout(() => {
         confetti({
           particleCount: 200,
@@ -911,7 +911,7 @@ async function handleAppraisalSubmit(
 
   } catch (error) {
     console.error("Failed to submit appraisal", error);
-    setAgentMessage({ text: t('ui.submission-error'), duration: 4000 });
+    setAgentMessage({ text: t('ui.submission-error'), duration: 2500 });
     setShowCheckIn(true);
   }
 }
@@ -1697,7 +1697,7 @@ async function removeGoal(id: number) {
                 onGoalsChange(newGoals);
                 setAgentMessage({
                   text: t('agent-messages.goal-deleted'),
-                  duration: 4000
+                  duration: 2500
                 });
                 setShowCheckIn(true);
               }

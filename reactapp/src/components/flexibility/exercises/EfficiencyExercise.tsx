@@ -155,17 +155,17 @@ export function EfficiencyExercise({ flexibilityExerciseId, exercise, condition,
     // Auto-close when exercise completed AND retrospective completed AND all goal feedback shown
     useEffect(() => {
         if (isExerciseCompleted && retrospectiveCompleted && allFeedbackComplete) {
-            console.log('🎯 EfficiencyExercise: Retrospective and all goal feedback completed, auto-closing in 2 seconds...');
+            console.log('🎯 EfficiencyExercise: Retrospective and all goal feedback completed, auto-closing...');
             const timer = setTimeout(() => {
                 console.log('🎯 EfficiencyExercise: Auto-closing now!');
                 handleEnd();
-            }, 2000); // Brief delay after all feedback completion
+            }, 500); // Quick close after all feedback
             
             return () => clearTimeout(timer);
         }
     }, [isExerciseCompleted, retrospectiveCompleted, allFeedbackComplete, handleEnd]);
 
-    // Fallback: Auto-close if no goals are triggered within 8 seconds 
+    // Fallback: Auto-close if no goals are triggered within 3 seconds 
     useEffect(() => {
         if (isExerciseCompleted) {
             console.log('🎯 EfficiencyExercise: Starting fallback timer for exercises with no goals');
@@ -176,7 +176,7 @@ export function EfficiencyExercise({ flexibilityExerciseId, exercise, condition,
                 } else {
                     console.log('🎯 EfficiencyExercise: Goal completion started, canceling fallback timer');
                 }
-            }, 8000); // 8 seconds fallback to give enough time for any goal completion flow
+            }, 500); // Immediate fallback (brief delay for stability)
             
             return () => clearTimeout(fallbackTimer);
         }

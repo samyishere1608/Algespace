@@ -391,7 +391,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
 
             // Add completion celebration message first - use translated title
             const translatedTitle = t(`goal-titles.${getGoalTitleKey(currentGoal.title)}`);
-            messages.push({ text: t('ui.goal-completed-message', { title: translatedTitle }), duration: 4000 });
+            messages.push({ text: t('ui.goal-completed-message', { title: translatedTitle }), duration: 2500 });
 
             // Update dynamic goal suggestions based on new progress
             let updatedSuggestions: string[] = [];
@@ -552,7 +552,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
                     
                     // Only show adaptive feedback for ADAPT condition (not control)
                     if (!isControlCondition()) {
-                        messages.push({ text: adaptiveFeedbackMessage, duration: 15000 }); // 15 seconds for adaptive feedback
+                        messages.push({ text: adaptiveFeedbackMessage, duration: 8000 }); // 8 seconds for adaptive feedback
                     } else {
                         console.log('🔬 CONTROL condition - adaptive feedback suppressed (still logged)');
                     }
@@ -622,7 +622,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
             }
         } catch (error) {
             console.error('🎯 Error generating adaptive feedback:', error);
-            messages.push({ text: t('ui.recommendations-updated'), duration: 4000 });
+            messages.push({ text: t('ui.recommendations-updated'), duration: 2500 });
         }
 
         // 🎉 Confetti for every goal completion!
@@ -641,7 +641,7 @@ export default function FlexibilityExercise({ isStudyExample }: { isStudyExample
         
         if (isAllCompleted) {
             console.log('🎉 All goals completed! Adding celebration message');
-            messages.push({ text: t('ui.all-goals-completed-message'), duration: 4000 });
+            messages.push({ text: t('ui.all-goals-completed-message'), duration: 2500 });
             
             // Extra confetti burst for all goals done
             setTimeout(() => {

@@ -169,11 +169,11 @@ export function SuitabilityExercise({ flexibilityExerciseId, exercise, condition
     // Auto-close when exercise completed AND retrospective completed AND all goal feedback shown
     useEffect(() => {
         if (isExerciseCompleted && retrospectiveCompleted && allFeedbackComplete) {
-            console.log('🎯 SuitabilityExercise: Retrospective and all goal feedback completed, auto-closing in 2 seconds...');
+            console.log('🎯 SuitabilityExercise: Retrospective and all goal feedback completed, auto-closing...');
             const timer = setTimeout(() => {
                 console.log('🎯 SuitabilityExercise: Auto-closing now!');
                 handleEnd();
-            }, 2000); // Brief delay after all feedback completion
+            }, 500); // Quick close after all feedback
             
             return () => clearTimeout(timer);
         }
@@ -190,7 +190,7 @@ export function SuitabilityExercise({ flexibilityExerciseId, exercise, condition
                 } else {
                     console.log('🎯 SuitabilityExercise: Goal completion started, canceling fallback timer');
                 }
-            }, 8000); // 8 seconds fallback to give enough time for any goal completion flow
+            }, 500); // Immediate fallback (brief delay for stability)
             
             return () => clearTimeout(fallbackTimer);
         }

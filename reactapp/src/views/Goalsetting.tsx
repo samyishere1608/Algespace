@@ -141,6 +141,14 @@ export default function GoalSettingView({ userId: propUserId }: { userId?: numbe
   useEffect(() => {
     // Check if user has completed pretest from database
     const checkPretestStatus = async () => {
+      // 🔬 CONTROL condition: Skip pretest entirely
+      if (isControlCondition()) {
+        console.log('🔬 CONTROL condition - skipping pretest entirely');
+        setPretestCompleted(true); // Mark as "completed" so UI works normally
+        setSuggestedGoals([]); // No recommendations for control
+        return;
+      }
+      
       try {
         console.log('Checking pretest status for user:', userId);
         const status = await checkPretestStatusAPI(userId);

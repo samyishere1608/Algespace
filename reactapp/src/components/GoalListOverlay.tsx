@@ -193,7 +193,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
       // Show agent message for edit (from GoalList.tsx)
       setAgentMessage({
         text: "👍 Great! Changing goals is okay — just remember why you made the switch!",
-        duration: 4000
+        duration: 2500
       });
       setShowCheckIn(true);
       
@@ -228,7 +228,7 @@ export default function GoalListOverlay({ goals, onClose, userId, onGoalsChange 
         // Show agent message for delete (from GoalList.tsx)
         setAgentMessage({
           text: t('agent-messages.goal-deleted'),
-          duration: 4000
+          duration: 2500
         });
         setShowCheckIn(true);
       }
