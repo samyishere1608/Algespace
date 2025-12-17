@@ -176,7 +176,7 @@ export function EfficiencyExercise({ flexibilityExerciseId, exercise, condition,
                 } else {
                     console.log('🎯 EfficiencyExercise: Goal completion started, canceling fallback timer');
                 }
-            }, 500); // Immediate fallback (brief delay for stability)
+            }, 2000); // 2 second fallback to allow goal detection
             
             return () => clearTimeout(fallbackTimer);
         }

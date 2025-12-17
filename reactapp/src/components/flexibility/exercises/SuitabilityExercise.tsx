@@ -190,7 +190,7 @@ export function SuitabilityExercise({ flexibilityExerciseId, exercise, condition
                 } else {
                     console.log('🎯 SuitabilityExercise: Goal completion started, canceling fallback timer');
                 }
-            }, 500); // Immediate fallback (brief delay for stability)
+            }, 2000); // 2 second fallback to allow goal detection
             
             return () => clearTimeout(fallbackTimer);
         }
