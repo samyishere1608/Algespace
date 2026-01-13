@@ -66,11 +66,16 @@ export default function FlexibilityView(): ReactElement {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (studySession) {
-            // Log the session end
-            logAction(studySession.userId, 'study_session_ended', 
-                `Participant ${studySession.participantId} ended study session ${studySession.sessionId} after ${Math.round((new Date().getTime() - new Date(studySession.loginTime).getTime()) / 1000 / 60)} minutes`);
+            try {
+                // Log the session end (non-blocking, failures won't prevent logout)
+                await logAction(studySession.userId, 'study_session_ended', 
+                    `Participant ${studySession.participantId} ended study session ${studySession.sessionId} after ${Math.round((new Date().getTime() - new Date(studySession.loginTime).getTime()) / 1000 / 60)} minutes`);
+            } catch (error) {
+                console.error('Failed to log session end (non-critical):', error);
+                // Continue with logout even if logging fails
+            }
             
             clearStudySession();
             setStudySession(null);

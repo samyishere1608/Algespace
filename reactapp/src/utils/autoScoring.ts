@@ -96,8 +96,7 @@ export const GOAL_SCORING_STRATEGIES = {
       "Complete exercises without hints", // Single hint-free exercise
       "Build confidence through success", // Single low-hint exercise
       "Solve problems with minimal errors", // Single low-error exercise
-      "Reflect on method effectiveness", // Single exercise with self-explanation
-      "Learn from mistakes effectively" // Single exercise showing improvement
+      "Reflect on method effectiveness" // Single exercise with self-explanation
     ],
     scoringMethod: 'single' as const
   },  // Goals that need multiple exercises - use average
@@ -110,7 +109,8 @@ export const GOAL_SCORING_STRATEGIES = {
       "Master all three methods fluently", // 2+ in each method
       "Explain reasoning clearly", // 3 exercises with self-explanation
       "Show consistent improvement", // improvement trend over 4+ exercises
-      "Maintain accuracy under pressure" // avg ≤1 error over 5+ exercises
+      "Maintain accuracy under pressure", // avg ≤1 error over 5+ exercises
+      "Learn from mistakes effectively" // improvement across 4+ exercises
     ],
     scoringMethod: 'average' as const
   },
@@ -359,19 +359,15 @@ export function getContributingExercises(
       return selfExplanationExercises.length > 0 ? [selfExplanationExercises[selfExplanationExercises.length - 1]] : [];
       
     case "Learn from mistakes effectively":
-      // MOST RECENT exercise showing improvement (use latest improvement, not first)
-      if (sortedExercises.length < 2) {
-        // If only 1 exercise, use it
-        return sortedExercises.length > 0 ? [sortedExercises[sortedExercises.length - 1]] : [];
+      // Return ALL exercises that contributed to improvement detection (minimum 4)
+      // This matches the progressive goal tracking logic: checks errorHistory.length >= 4
+      // Need all exercises to show the improvement trend properly
+      if (sortedExercises.length < 4) {
+        // Return all available exercises if less than 4
+        return sortedExercises;
       }
-      // Check from most recent backwards for improvement
-      for (let i = sortedExercises.length - 1; i > 0; i--) {
-        if (sortedExercises[i].errors < sortedExercises[i-1].errors) {
-          return [sortedExercises[i]]; // Return most recent improvement
-        }
-      }
-      // If no improvement found, return most recent exercise
-      return sortedExercises.length > 0 ? [sortedExercises[sortedExercises.length - 1]] : [];
+      // Return the most recent 4+ exercises that show the improvement trend
+      return sortedExercises.slice(-4);
       
     case "Practice with different methods":
       // First exercises using 2+ different methods
@@ -390,12 +386,18 @@ export function getContributingExercises(
       return sortedExercises;
       
     case "Show consistent improvement":
-      // First 4+ exercises showing improvement trend
-      return sortedExercises.slice(0, Math.max(4, sortedExercises.length));
+      // Last 5-6 exercises showing recent improvement trend
+      if (sortedExercises.length < 4) {
+        return sortedExercises;
+      }
+      return sortedExercises.slice(-Math.min(6, sortedExercises.length));
       
     case "Maintain accuracy under pressure":
-      // First 5+ exercises for accuracy averaging
-      return sortedExercises.slice(0, Math.max(5, sortedExercises.length));
+      // Last 5 exercises for recent accuracy check
+      if (sortedExercises.length < 5) {
+        return sortedExercises;
+      }
+      return sortedExercises.slice(-5);
       
     case "Show exceptional problem-solving":
       // MOST RECENT exercise with 0 errors and 0 hints (use latest perfect performance)

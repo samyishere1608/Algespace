@@ -130,10 +130,14 @@ export function checkErrorImprovement(errorHistory: number[], minExercises: numb
 export function checkConsistentImprovement(errorHistory: number[], minExercises: number = 4): boolean {
   if (errorHistory.length < minExercises) return false;
   
-  // Check if recent exercises have lower error rates
-  const recentCount = Math.min(3, Math.floor(errorHistory.length / 2));
-  const recent = errorHistory.slice(-recentCount);
-  const earlier = errorHistory.slice(0, errorHistory.length - recentCount);
+  // Check improvement within recent 5-6 exercises only
+  const recentWindow = errorHistory.slice(-Math.min(6, errorHistory.length));
+  if (recentWindow.length < 4) return false;
+  
+  // Split recent window: compare first half vs second half
+  const midPoint = Math.floor(recentWindow.length / 2);
+  const earlier = recentWindow.slice(0, midPoint);
+  const recent = recentWindow.slice(midPoint);
   
   const recentAvg = recent.reduce((sum, errors) => sum + errors, 0) / recent.length;
   const earlierAvg = earlier.reduce((sum, errors) => sum + errors, 0) / earlier.length;
@@ -384,18 +388,19 @@ export function checkProgressiveGoals(
     console.log(`❌ Not triggering "Show exceptional problem-solving" (errors: ${session.errors}, hints: ${session.hints})`);
   }
   
-  // NEW: Maintain accuracy under pressure (≤1 error average across 5+ exercises)
-  if (progress.total >= 5) {
-    const avgErrors = progress.errorHistory.reduce((sum, err) => sum + err, 0) / progress.errorHistory.length;
-    console.log(`🎯 Checking accuracy under pressure: ${progress.total} exercises, avg errors = ${avgErrors.toFixed(2)}`);
+  // NEW: Maintain accuracy under pressure (≤1 error average across recent 5 exercises)
+  if (progress.total >= 5 && progress.errorHistory.length >= 5) {
+    const recentFive = progress.errorHistory.slice(-5); // Last 5 exercises only
+    const avgErrors = recentFive.reduce((sum, err) => sum + err, 0) / recentFive.length;
+    console.log(`🎯 Checking accuracy under pressure: ${progress.total} exercises, recent 5 avg errors = ${avgErrors.toFixed(2)}`);
     if (avgErrors <= 1) {
-      console.log(`🎯 GOAL COMPLETED: "Maintain accuracy under pressure" (avg ≤1 error over 5+ exercises)`);
+      console.log(`🎯 GOAL COMPLETED: "Maintain accuracy under pressure" (avg ≤1 error over recent 5 exercises)`);
       completedGoals.push("Maintain accuracy under pressure");
     } else {
-      console.log(`❌ Not triggering "Maintain accuracy under pressure" (avg ${avgErrors.toFixed(2)} > 1.0)`);
+      console.log(`❌ Not triggering "Maintain accuracy under pressure" (recent 5 avg ${avgErrors.toFixed(2)} > 1.0)`);
     }
   } else {
-    console.log(`❌ Not enough exercises for "Maintain accuracy under pressure" (${progress.total}/5)`);
+    console.log(`❌ Not enough exercises for "Maintain accuracy under pressure" (${progress.total}/5, errorHistory: ${progress.errorHistory.length})`);
   }
   
   // 📚 Additional Learning & Growth Goals
@@ -407,10 +412,10 @@ export function checkProgressiveGoals(
   }
   
   // Learn from mistakes effectively (improved error rate over time)
-  if (progress.total >= 3) {
+  if (progress.total >= 3 && progress.errorHistory.length >= 4) {
     const recentErrors = progress.errorHistory.slice(-3); // Last 3 exercises
     const oldErrors = progress.errorHistory.slice(0, -3); // Earlier exercises
-    if (oldErrors.length > 0) {
+    if (oldErrors.length > 0 && recentErrors.length > 0) {
       const recentAvg = recentErrors.reduce((sum, err) => sum + err, 0) / recentErrors.length;
       const oldAvg = oldErrors.reduce((sum, err) => sum + err, 0) / oldErrors.length;
       console.log(`🎯 Checking mistake learning: recent avg = ${recentAvg.toFixed(2)}, old avg = ${oldAvg.toFixed(2)}`);
